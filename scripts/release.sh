@@ -25,8 +25,10 @@ git checkout $masterBranch
 git merge --no-ff $releaseBranch
 
 git tag $versionLabel
+git push origin --tags
 
 git checkout $devBranch
 git merge --no-ff $releaseBranch
 
 git branch -d $releaseBranch
+

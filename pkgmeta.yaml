@@ -1,0 +1,5 @@
+package-as: XpFlag
+ignore:
+    - scripts
+    - media/flag1.psd
+manual-changelog: CHANGELOG.md
