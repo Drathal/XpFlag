@@ -1,4 +1,7 @@
 * chore
-* init scripts
-* init
-* init
+* feat: added changelog
+* feat: added changelog
+* feat: added changelog
+* feat: added changelog
+* feat: automatic release script
+* chore
