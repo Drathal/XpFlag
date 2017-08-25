@@ -1,24 +1,14 @@
 * feat: added changelog (HEAD -> feature/release-script)
->Fri, 25 Aug 2017 12:58:41 +0200
 
+* feat: added changelog
 
 * feat: automatic release script
->Fri, 25 Aug 2017 12:52:47 +0200
-
 
 * chore (origin/feature/release-script, origin/develop, develop)
->Fri, 25 Aug 2017 12:33:51 +0200
-
 
 * init scripts (origin/master, master)
->Fri, 25 Aug 2017 12:31:56 +0200
-
 
 * init
->Fri, 25 Aug 2017 12:25:01 +0200
-
 
 * init
->Fri, 25 Aug 2017 12:20:55 +0200
-
 
