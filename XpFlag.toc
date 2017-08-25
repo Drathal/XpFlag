@@ -1,0 +1,9 @@
+## Interface: 70200
+## Title: XpFlag
+## Author: Drathal
+## Version: 0.11.0
+## DefaultState: Enabled
+## LoadOnDemand: 0
+## SavedVariables: XpFlagDB
+
+XpFlag.xml
