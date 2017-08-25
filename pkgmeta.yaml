@@ -2,6 +2,8 @@ package-as: XpFlag
 ignore:
     - scripts
     - media/flag1.psd
+    - media/logo.psd
+    - media/logo.png
 manual-changelog: CHANGELOG.md
 
 externals:
