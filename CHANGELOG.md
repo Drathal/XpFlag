@@ -1,6 +1,6 @@
 # CHANGELOG
 
-##[0.11.1]
+##[0.11.1a]
 
   * hosting addon source at github now
   * added script to make releasing new versions more easy
