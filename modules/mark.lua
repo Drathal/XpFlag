@@ -89,8 +89,8 @@ function module:UpdateMark(name, value, maxvalue, level, class)
     D:SendMessage("UpdatePlayerMark", name, m)
 end
 
-function module:OnUpdateMark(event, friend, msg )
-    self:UpdateMark(friend, msg.xp, msg.maxxp, msg.level, msg.class)
+function module:OnUpdateMark(event, friend, data )
+    self:UpdateMark(friend, data.xp, data.max, data.level, data.class)
 end
 
 function module:OnDeleteMark(event, friend )
@@ -104,57 +104,19 @@ function module:UnregisterOnMaxLevel()
     end
 end
 
-function module:RegisterEvents()
-    if D.IsMaxLevel() or not C.db.profile.mark.showPlayer then return end
-    self:RegisterEvent("PLAYER_ENTERING_WORLD")
-    self:RegisterEvent("PLAYER_UPDATE_RESTING")
-    self:RegisterEvent("PLAYER_XP_UPDATE")
-    self:RegisterEvent("PLAYER_LEVEL_UP")
-end
-
-function module:UnregisterEvents()
-    self:UnregisterEvent("PLAYER_UPDATE_RESTING")
-    self:UnregisterEvent("PLAYER_XP_UPDATE")
-    self:UnregisterEvent("PLAYER_LEVEL_UP")
-end
-
 function module:OnEnable()
-    self:RegisterEvents()
-
     self:RegisterMessage("ReceiveData", self.OnUpdateMark)
     self:RegisterMessage("ReceiveRequest", self.OnUpdateMark)
     self:RegisterMessage("ReceiveDelete", self.OnDeleteMark)
-
+    self:RegisterMessage("DataXpUpdate", "OnUpdateMark")
     self:UnregisterOnMaxLevel()
 end
 
 function module:OnDisable()
-    self:UnregisterEvents()
-
     self:UnregisterMessage("ReceiveData")
     self:UnregisterMessage("ReceiveRequest")
     self:UnregisterMessage("ReceiveDelete")
-end
-
-function module:PLAYER_ENTERING_WORLD(event)
-    self:UnregisterEvent("PLAYER_ENTERING_WORLD")
-    self:UpdateMark()
-end
-
-function module:PLAYER_UPDATE_RESTING(event)
-    if self:UnregisterOnMaxLevel() then return end
-    self:UpdateMark()
-end
-
-function module:PLAYER_XP_UPDATE(event, unit)
-    if unit ~= "player" then return end
-    if self:UnregisterOnMaxLevel() then return end
-    self:UpdateMark()
-end
-
-function module:PLAYER_LEVEL_UP(event, level)
-    if self:UnregisterOnMaxLevel() then return end
-    self:UpdateMark()
+    self:UnregisterMessage("DataXpUpdate")
 end
 
 function module:DeleteMark(friend)
@@ -168,9 +130,7 @@ end
 function module:Update()
     if not C.db.profile.mark.showPlayer then
         self:DeleteMark(D.nameRealm)
-        self:UnregisterEvents()
-    elseif C.db.profile.mark.showPlayer then
-        self:RegisterEvents()
+    else        
         self:UpdateMark(D.nameRealm)
     end
 
@@ -178,7 +138,6 @@ function module:Update()
         if not mark then return end
         self:UpdateMark(mark.name, mark.value, mark.maxvalue, mark.level, mark.class)
     end
-
 end
 
 local function GetMark(friend)

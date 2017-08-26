@@ -26,12 +26,12 @@ local function CreateMessage(type, xp, max, level, class)
 end
 
 local function DecodeMessage(msg)
-    local type, xp, maxxp, level, class = msg:match("^(.-):(.-):(.-):(.-):(.-)$");
+    local type, xp, max, level, class = msg:match("^(.-):(.-):(.-):(.-):(.-)$");
 
     return {
         type = type,
         xp = xp,
-        maxxp = maxxp,
+        max = max,
         level = level,
         class = class
     }
@@ -80,28 +80,28 @@ function module:CHAT_MSG_ADDON(event, pre, rawmsg, chan, sender)
         sender = sender.."-"..D.realm
     end
 
-    local msg = DecodeMessage(rawmsg)
+    local data = DecodeMessage(rawmsg)
 
-    if msg.type == MSG_TYPE_DATA then
-        D:SendMessage("ReceiveData", sender, msg)
+    if data.type == MSG_TYPE_DATA then
+        D:SendMessage("ReceiveData", sender, data)
     end
 
-    if msg.type == MSG_TYPE_PING then
+    if data.type == MSG_TYPE_PING then
         SendPong(sender)
-        D:SendMessage("ReceivePing", sender, msg)
+        D:SendMessage("ReceivePing", sender, data)
     end
 
-    if msg.type == MSG_TYPE_PONG then
-        D:SendMessage("ReceivePong", sender, msg)
+    if data.type == MSG_TYPE_PONG then
+        D:SendMessage("ReceivePong", sender, data)
     end
 
-    if msg.type == MSG_TYPE_REQUEST then
+    if data.type == MSG_TYPE_REQUEST then
         SendUpdate(sender)
-        D:SendMessage("ReceiveRequest", sender, msg)
+        D:SendMessage("ReceiveRequest", sender, data)
     end
 
-    if msg.type == MSG_TYPE_DELETE then
-        D:SendMessage("ReceiveDelete", sender, msg)
+    if data.type == MSG_TYPE_DELETE then
+        D:SendMessage("ReceiveDelete", sender, data)
     end
 end
 

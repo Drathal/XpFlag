@@ -15,6 +15,7 @@
     <Script file="XpFlag.lua" />
     <Include file="locales\locales.xml" />
     <Script file="config.lua" />	
+    <Script file="modules\dataXp.lua" />    
 	<Script file="modules\utils.lua" />
     <Script file="modules\friends.lua" />
 	<Script file="modules\communication.lua" />
