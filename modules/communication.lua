@@ -15,14 +15,14 @@ local MSG_TYPE_PONG = "PONG"
 
 local module = D:NewModule("Communication", "AceEvent-3.0")
 
-function module:OnEnable()
-    module:RegisterEvent("CHAT_MSG_ADDON")
-    module:RegisterEvent("PLAYER_XP_UPDATE")
-    RegisterAddonMessagePrefix(MessagePrefix)
-end
-
 local function CreateMessage(type, xp, max, level, class)
-    return (type or MSG_TYPE_DATA)..":"..(xp or UnitXP("PLAYER"))..":"..(max or UnitXPMax("PLAYER"))..":"..(level or UnitLevel("player"))..":"..(class or D.class)
+    local data = D.DataXpGet({
+        xp = xp,
+        max = max,
+        level = level,
+        class = class
+    })
+    return (type or MSG_TYPE_DATA)..":"..data.xp..":"..data.max..":"..data.level..":"..data.class
 end
 
 local function DecodeMessage(msg)
@@ -71,8 +71,21 @@ local function SendUpdates()
     end
 end
 
+function module:OnEnable()
+    RegisterAddonMessagePrefix(MessagePrefix)
+    self:RegisterEvent("CHAT_MSG_ADDON")    
+    self:RegisterMessage("DataXpUpdate", SendUpdates)
+end
+
+function module:OnDisable()
+    self:UnregisterEvent("CHAT_MSG_ADDON")    
+    self:UnregisterMessage("DataXpUpdate")
+end
+
 function module:CHAT_MSG_ADDON(event, pre, rawmsg, chan, sender)
-    if pre ~= MessagePrefix then return end
+    print(event, rawmsg, sender
+          )
+    if pre ~= MessagePrefix or pre ~= "XpFlag" then return end
     if sender == D.nameRealm then return end
     if not rawmsg or rawmsg == "" then return end
 
@@ -82,7 +95,7 @@ function module:CHAT_MSG_ADDON(event, pre, rawmsg, chan, sender)
 
     local data = DecodeMessage(rawmsg)
 
-    if data.type == MSG_TYPE_DATA then
+    if data.type == MSG_TYPE_DATA or data.type == "XpFlag" then
         D:SendMessage("ReceiveData", sender, data)
     end
 
@@ -103,15 +116,6 @@ function module:CHAT_MSG_ADDON(event, pre, rawmsg, chan, sender)
     if data.type == MSG_TYPE_DELETE then
         D:SendMessage("ReceiveDelete", sender, data)
     end
-end
-
-function module:PLAYER_XP_UPDATE(event, unit)
-    if unit ~= "player" then return end
-    if D.IsMaxLevel() then
-        module:UnregisterEvent("PLAYER_XP_UPDATE")
-        return
-    end
-    SendUpdates()
 end
 
 -- API

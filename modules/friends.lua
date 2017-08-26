@@ -58,8 +58,8 @@ local function SetButtonTexture(button, state)
     button:SetHighlightTexture(buttonOff)
 end
 
-local function CreateMiniButton(parent)
-    local b = CreateFrame("Button", nil, parent)
+local function CreateMiniButton(parent, friend)
+    local b = CreateFrame("Button", "Minibutton-"..friend, parent)
     b:SetFrameLevel(8)
     b:SetFrameStrata("DIALOG")
     b:SetSize(16, 16)
@@ -67,6 +67,7 @@ local function CreateMiniButton(parent)
     b:SetNormalTexture(buttonOff)
     b:SetPushedTexture(buttonOff)
     b:SetHighlightTexture(buttonOff)
+    b:SetParent(parent)
     b:Show()
     return b
 end
@@ -96,23 +97,28 @@ local function OnStateButtonClick(button, friend)
 end
 
 local function OnFriendsFrameUpdate()
+    print("---------------")
     local buttons = FriendsFrameFriendsScrollFrame.buttons
     wipe(online)
 
     for i = 1, #buttons do
+        buttons[i].statusbutton = nil
         local friend = GetFriendNameByButton(buttons[i])
         if friend then
+            print("got data:", friend, i)
             online[friend] = buttons[i]
         end
     end
-
+    print("- - - - - - - - - - - - - - -")
     for friend, button in pairs(online) do
+        print("loop online:", friend)
         RemoveOffineFriends()
         Ping(friend)
 
         if hasAddon[friend] and button:IsShown() then
             if not button.statusbutton then
-                button.statusbutton = CreateMiniButton(button)
+                print("CreateMiniButton", friend, button)
+                button.statusbutton = CreateMiniButton(button, friend)
                 button.statusbutton:SetScript("OnClick", function(self) OnStateButtonClick(self, friend) end)
             end
 

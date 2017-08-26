@@ -90,6 +90,7 @@ function module:UpdateMark(name, value, maxvalue, level, class)
 end
 
 function module:OnUpdateMark(event, friend, data )
+    print("OnUpdateMark", event, friend, data)
     self:UpdateMark(friend, data.xp, data.max, data.level, data.class)
 end
 
@@ -105,10 +106,10 @@ function module:UnregisterOnMaxLevel()
 end
 
 function module:OnEnable()
-    self:RegisterMessage("ReceiveData", self.OnUpdateMark)
-    self:RegisterMessage("ReceiveRequest", self.OnUpdateMark)
-    self:RegisterMessage("ReceiveDelete", self.OnDeleteMark)
-    self:RegisterMessage("DataXpUpdate", "OnUpdateMark")
+    self:RegisterMessage("ReceiveData", "OnUpdateMark")
+    self:RegisterMessage("ReceiveRequest", "OnUpdateMark")
+    self:RegisterMessage("ReceiveDelete", "OnDeleteMark")
+    self:RegisterMessage(C.db.profile.mark.dataSource, "OnUpdateMark")
     self:UnregisterOnMaxLevel()
 end
 
@@ -116,7 +117,7 @@ function module:OnDisable()
     self:UnregisterMessage("ReceiveData")
     self:UnregisterMessage("ReceiveRequest")
     self:UnregisterMessage("ReceiveDelete")
-    self:UnregisterMessage("DataXpUpdate")
+    self:UnregisterMessage(C.db.profile.mark.dataSource)
 end
 
 function module:DeleteMark(friend)

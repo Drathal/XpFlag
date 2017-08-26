@@ -14,19 +14,20 @@ end
 
 function module:OnEnable()
     if not C.db.profile.bar.show then return end
-    self:RegisterMessage("DataXpUpdate", "UpdatePlayerBar")
+    if not C.db.profile.bar.dataSource then return end
+    self:RegisterMessage(C.db.profile.bar.dataSource, "UpdatePlayerBar")
 end
 
 function module:OnDisable()
     self.DeleteBar(D.nameRealm)
-    self:UnregisterMessage("DataXpUpdate")
+    self:UnregisterMessage(C.db.profile.bar.dataSource)
 end
 
 function module:CreateBar(friend)
     local bar = CreateFrame("Frame", D.addonName..'-'..friend..'-XpBar', parent)
     bar.name = friend
     bar:SetHeight(C.db.profile.bar.height)
-    bar:SetWidth(20)
+    bar:SetWidth(0)
     bar:SetPoint(unpack(C.bar.position))
     bar:SetFrameLevel(1)
     bar:SetFrameStrata("DIALOG");

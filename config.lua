@@ -98,6 +98,11 @@ function D:OnInitialize()
     LibStub("AceConfigDialog-3.0"):AddToBlizOptions(self.addonName)
 end
 
+C["positions"] = {
+    ["SCREENTOP"] = { "TOPLEFT", _G['UIParent'], "TOPLEFT", 0, 0 },
+    ["SCREENBOTTOM"] = { "BOTTOMLEFT", _G['UIParent'], "BOTTOMLEFT", 0, 0 },
+}
+
 C["player"] = {
     ["show"] = true,
     ["color"] = { 0.25, 0.5, 1, 1 },
@@ -125,6 +130,7 @@ C["sparkModel"] = {
 
 C["bar"] = {
     ["position"] = { "TOPLEFT", _G['UIParent'], "TOPLEFT", 0, 0 },
+    ["dataSource"] = "DataXpUpdate",
     ["show"] = true,
     ["texture"] = "Interface\\AddOns\\"..D.addonName.."\\media\\bar.blp",
     ["backdrop"] = [[Interface\BUTTONS\WHITE8X8]],
@@ -134,7 +140,9 @@ C["bar"] = {
 }
 
 C["mark"] = {
+    ["position"] = { "TOPLEFT", _G['UIParent'], "TOPLEFT", 0, 0 },
 	["size"] = 15,
+    ["dataSource"] = "DataXpUpdate",
 	["flip"] = true,
     ["showPlayer"] = true,
 	["animationSpeed"] = 6,
