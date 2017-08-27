@@ -138,8 +138,7 @@ C["sparkXP"] = {
     ["fontColor"] = { 1, .82, 0, 1 },
     ["xSpread"] = { - 15, 15 },
     ["ySpread"] = { - 120, - 80 },
-    ["durationSpread"] = { 1, 2 },
-    ["y"] = -20
+    ["durationSpread"] = { 1, 2 }
 }
 
 C["sparkModel"] = {

@@ -26,6 +26,12 @@ function module:CreateMark(name, class)
     m:SetAlpha(1)
     m:Show()
 
+    if string.match(C.db.profile.mark.position, "TOP") then
+        C.db.profile.mark.flip = true
+    else
+        C.db.profile.mark.flip = nil
+    end
+
     marks[name] = m
 
     m.texture = m:CreateTexture(nil, "OVERLAY")
