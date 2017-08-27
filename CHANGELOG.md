@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 0.12.3
+
+  * feature: flip marker now also flips xp animation
+  * chore: set changelog to markdown
+
 ## 0.12.2
 
   * fix: disable marks on max level did not work
