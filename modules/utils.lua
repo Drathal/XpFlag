@@ -39,7 +39,7 @@ local function CreateUpdateAnimation(f, cb)
 
     anim.UpdateAnimation = function(self, elapsed)
         if Throttle(self, elapsed) then return end
-        if not f.to or f.to == 0 then
+        if not f.to then
             self:Stop()
             return
         end
@@ -47,7 +47,7 @@ local function CreateUpdateAnimation(f, cb)
     end
 
     anim.Start = function()
-        if not f.to or f.to == 0 then return end
+        if not f.to then return end
         anim:SetScript("OnUpdate", anim.UpdateAnimation)
     end
 
@@ -84,7 +84,7 @@ local function AnimateWidth(f)
         f.to = nil
     end
 
-    f:SetWidth(new)
+    f:SetWidth(new + 0.001)
 
     return f.to
 end

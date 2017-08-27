@@ -1,6 +1,7 @@
 local D, C, L = unpack(select(2, ...))
 
 local _G = _G
+local GetTime = _G.GetTime
 local buttonOff = "Interface\\COMMON\\Indicator-Gray"
 local buttonOn = "Interface\\COMMON\\Indicator-Green"
 local pinged = {}
@@ -15,32 +16,40 @@ local function GetBNFriendName(id)
     if not bnetIDGameAccount then return end
     if not CanCooperateWithGameAccount(bnetIDGameAccount) then return end
     local _, characterName, client, realmName, realmID, faction, race, class, _, zoneName, _, _, _, _, _, _ = BNGetGameAccountInfo(bnetIDGameAccount)
-
     if not isOnline or not characterName or client ~= 'WoW' then return nil end
-
     return characterName..'-'..realmName
 end
 
 local function GetFriendName(id)
     local name, level, class, area, connected, status, note, raf, id = GetFriendInfo(id)
-
     if not name or not connected then return nil end
-
     if not string.match(name, "-") then
         name = name.."-"..D.realm
     end
-
     return name
 end
 
 local function GetFriendNameByButton(button)
+    if button and not button.id then return end
+    local data = nil
     if button.buttonType == FRIENDS_BUTTON_TYPE_BNET then
-        return GetBNFriendName(button.id)
+        data = GetBNFriendName(button.id)
     elseif button.buttonType == FRIENDS_BUTTON_TYPE_WOW then
-        return GetFriendName(button.id)
+        data = GetFriendName(button.id)
     end
 
-    return nil
+    return data
+end
+
+local function OnStateButtonClick(self)
+    local friend = self:GetParent().friend
+    if not friend then return end
+    if D.GetMark(friend) then
+        D:DeleteMark(friend)
+        D.SendDelete(friend)
+    else
+        D.SendRequest(friend)
+    end
 end
 
 local function SetButtonTexture(button, state)
@@ -59,7 +68,7 @@ local function SetButtonTexture(button, state)
 end
 
 local function CreateMiniButton(parent)
-    local b = CreateFrame("Button", nil, parent)
+    local b = CreateFrame("Button", parent:GetName().."FriendButton", parent)
     b:SetFrameLevel(8)
     b:SetFrameStrata("DIALOG")
     b:SetSize(16, 16)
@@ -67,14 +76,15 @@ local function CreateMiniButton(parent)
     b:SetNormalTexture(buttonOff)
     b:SetPushedTexture(buttonOff)
     b:SetHighlightTexture(buttonOff)
-    b:Show()
+    b:SetScript("OnClick", OnStateButtonClick)
+    b:Hide()
     return b
 end
 
 local function RemoveOffineFriends()
     for friend, _ in pairs(D.GetMarks()) do
         if friend and friend ~= D.nameRealm and not online[friend] then
-            D.DeleteMark(friend)
+            D:DeleteMark(friend)
         end
     end
 end
@@ -86,52 +96,50 @@ local function Ping(friend)
     pinged[friend] = GetTime()
 end
 
-local function OnStateButtonClick(button, friend)
-    if D.GetMark(friend) then
-        D.DeleteMark(friend)
-        D.SendDelete(friend)
-    else
-        D.SendRequest(friend)
-    end
-end
-
 local function OnFriendsFrameUpdate()
-    local buttons = FriendsFrameFriendsScrollFrame.buttons
+    if not FriendsFrame:IsShown() then return end
+
     wipe(online)
+    local buttons = FriendsFrameFriendsScrollFrame.buttons
 
     for i = 1, #buttons do
         local friend = GetFriendNameByButton(buttons[i])
+        buttons[i].friend = friend
+        if buttons[i].statusButton then
+            buttons[i].statusButton:Hide()
+        end
         if friend then
-            online[friend] = buttons[i]
-        end
-    end
-
-    for friend, button in pairs(online) do
-        RemoveOffineFriends()
-        Ping(friend)
-
-        if hasAddon[friend] and button:IsShown() then
-            if not button.statusbutton then
-                button.statusbutton = CreateMiniButton(button)
-                button.statusbutton:SetScript("OnClick", function(self) OnStateButtonClick(self, friend) end)
+            online[friend] = true
+            Ping(friend)
+            if buttons[i]:IsShown() then
+                if not buttons[i].statusButton then
+                    buttons[i].statusButton = CreateMiniButton(buttons[i])
+                end
+                SetButtonTexture(buttons[i].statusButton, D.GetMark(friend))
+                if hasAddon[friend] then
+                    buttons[i].statusButton:Show()
+                end
             end
-
-            SetButtonTexture(button.statusbutton, D.GetMark(friend))
         end
-
     end
+
+    RemoveOffineFriends()
+
 end
 
 local function OnPong(event, friend)
+    -- print("FRIEND: OnPong", friend)
     hasAddon[friend] = true
     OnFriendsFrameUpdate()
 end
 
 local function OnNewMark(event, friend)
+    -- print("FRIEND: OnNewMark", friend)
     OnFriendsFrameUpdate()
 end
 
 local function OnDeleteMark(event, friend)
+    -- print("FRIEND: OnDeleteMark", friend)
     OnFriendsFrameUpdate()
 end
 

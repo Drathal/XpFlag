@@ -1,14 +1,9 @@
 local D, C, L = unpack(select(2, ...))
 
 local _G = _G
-local GetXPExhaustion = _G.GetXPExhaustion
 local CreateFrame = _G.CreateFrame
-local UnitLevel = _G.UnitLevel
-local UnitXP = _G.UnitXP
-local UnitXPMax = _G.UnitXPMax
 
 local bars = {}
-local parent = select(2, unpack(C.bar.position))
 
 local module = D:NewModule("bar", "AceEvent-3.0")
 
@@ -16,18 +11,30 @@ function module:OnAnimation(bar, elapsed)
     D.AnimateWidth(bar)
 end
 
-function module:CreateBar()
-    local bar = CreateFrame("Frame", D.addonName..'-XpBar', parent)
+function module:OnEnable()
+    if not C.db.profile.bar.show then return end
+    if not C.db.profile.bar.dataSource then return end
+    self:RegisterMessage(C.db.profile.bar.dataSource, "UpdatePlayerBar")
+end
+
+function module:OnDisable()
+    self.DeleteBar(D.nameRealm)
+    self:UnregisterMessage(C.db.profile.bar.dataSource)
+end
+
+function module:CreateBar(friend)
+    local parent = select(2, unpack(C.positions[C.db.profile.bar.position]))
+    local bar = CreateFrame("Frame", nil, parent)
+    bar.name = friend
     bar:SetHeight(C.db.profile.bar.height)
     bar:SetWidth(0)
-    bar:SetPoint(unpack(C.bar.position))
+    bar:SetPoint(unpack(C.positions[C.db.profile.bar.position]))
     bar:SetFrameLevel(1)
     bar:SetFrameStrata("DIALOG");
 
     bar.texture = bar:CreateTexture(nil, "OVERLAY")
     bar.texture:SetTexture(C.bar.texture)
     bar.texture:SetAllPoints(bar)
-    bar.texture:SetVertexColor(unpack(D.GetXpColor()));
 
     bar:SetBackdrop({
         bgFile = C.bar.backdrop,
@@ -41,72 +48,76 @@ function module:CreateBar()
     bar:SetBackdropBorderColor(0, 0, 0, 0.5)
     bar:Show()
 
+    if friend == D.nameRealm then
+        bar.isPlayer = true
+    end
+
     bar.anim = D.CreateUpdateAnimation(bar, self.OnAnimation)
+
+    bars[friend] = bar
 
     return bar
 end
 
-function module:OnEnable()
-    if not C.db.profile.bar.show then return end
-
-    self:RegisterEvent("PLAYER_ENTERING_WORLD")
-    self:RegisterEvent("PLAYER_UPDATE_RESTING")
-    self:RegisterEvent("PLAYER_XP_UPDATE")
+function module:DeleteBar(friend)
+    if not friend then return end
+    if not bars[friend] then return end
+    bars[friend]:Hide()
+    bars[friend] = nil
+    D:SendMessage("DeleteBar", friend)
 end
 
-function module:OnDisable()
-    if bars.player then
-        bars.player:Hide()
-    end
-    self:UnregisterEvent("PLAYER_UPDATE_RESTING")
-    self:UnregisterEvent("PLAYER_XP_UPDATE")
-end
+function module:UpdateBar(friend, data)
+    if not data then return end
+    local bar = bars[friend] or self:CreateBar(friend)
 
-function module:CreatePlayerBar()
-    bars.player = self:CreateBar()
-    return bars.player
-end
+    bar.data = data
 
-function module:UpdatePlayerBar()
-    local bar = bars.player or self:CreatePlayerBar()
-
-    if D.IsMaxLevel() then
-        module:Disable()
+    if data.isMaxLevel then
+        self.DeleteBar(friend)
         return
     end
 
-    bar.to = parent:GetWidth() * UnitXP("PLAYER") / UnitXPMax("PLAYER")
-    bar.texture:SetVertexColor(unpack(D.GetXpColor()))
     bar:Show()
 
+    bar.to = bar:GetParent():GetWidth() * data.p or 0
     bar.anim.Start()
 
+    if not bar.isPlayer then return end
+    bar.texture:SetVertexColor(unpack(D.GetXpColor()))
 end
 
-function module:PLAYER_ENTERING_WORLD()
-    self:UpdatePlayerBar()
-    self:UnregisterEvent("PLAYER_ENTERING_WORLD");
-end
-
-function module:PLAYER_UPDATE_RESTING()
-    self:UpdatePlayerBar()
-end
-
-function module:PLAYER_XP_UPDATE(event, unit)
-    if unit ~= "player" then return end
-    self:UpdatePlayerBar()
+function module:UpdatePlayerBar(msg, friend, data)
+    self:UpdateBar(friend, data)
 end
 
 function module:Update()
     if not C.db.profile.bar.show then
-        self:Disable()
-        return
-    elseif not module:IsEnabled() then
-        self:Enable()
-    end
-    if bars.player then
-        bars.player:SetHeight(C.db.profile.bar.height)
+        self:DeleteBar(D.nameRealm)
+    else
+        self:UpdateBar(D.nameRealm, D.DataXpGet())
     end
 
-    self:UpdatePlayerBar()
+    if bars[D.nameRealm] then
+        bars[D.nameRealm]:SetHeight(C.db.profile.bar.height)
+        bars[D.nameRealm]:ClearAllPoints()
+        bars[D.nameRealm]:SetPoint(unpack(C.positions[C.db.profile.bar.position]))
+    end
+
+    if bars[D.nameRealm] and bars[D.nameRealm].data then
+        self.UpdateBar(D.nameRealm, bars[D.nameRealm].data)
+    end
 end
+
+local function GetBar(friend)
+    return bars[friend]
+end
+
+local function GetBarks()
+    return bars
+end
+
+-- API
+D.DeleteBar = module.DeleteBar
+D.GetBar = GetBar
+D.GetBars = GeBars

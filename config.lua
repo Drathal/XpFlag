@@ -46,9 +46,20 @@ D.options = {
                     name = L["SHOW_PLAYER_XP_BAR_LABEL"],
                     desc = L["SHOW_PLAYER_XP_BAR_DESC"]
                 },
+                position = {
+                    type = 'select',
+                    order = 2,
+                    width = 'full',
+                    values = {
+                        ["SCREENTOP"] = L["POS_SCREENTOP"],
+                        ["SCREENBOTTOM"] = L["POS_SCREENBOTTOM"],
+                    },
+                    name = L["PLAYER_XP_BAR_POS_LABEL"],
+                    desc = L["PLAYER_XP_BAR_POS_DESC"]
+                },
                 height = {
                     type = 'range',
-                    order = 2,
+                    order = 3,
                     width = 'full',
                     min = 1,
                     max = 15,
@@ -72,9 +83,20 @@ D.options = {
                     name = L["SHOW_PLAYER_MARK_LABEL"],
                     desc = L["SHOW_PLAYER_MARK_DESC"]
                 },
+                position = {
+                    type = 'select',
+                    order = 2,
+                    width = 'full',
+                    values = {
+                        ["SCREENTOP"] = L["POS_SCREENTOP"],
+                        ["SCREENBOTTOM"] = L["POS_SCREENBOTTOM"],
+                    },
+                    name = L["MARK_POS_LABEL"],
+                    desc = L["Mark_POS_DESC"]
+                },
                 size = {
                     type = 'range',
-                    order = 2,
+                    order = 3,
                     width = 'full',
                     min = 6,
                     max = 30,
@@ -97,6 +119,11 @@ function D:OnInitialize()
     LibStub("AceConfigRegistry-3.0"):RegisterOptionsTable(self.addonName, self.options)
     LibStub("AceConfigDialog-3.0"):AddToBlizOptions(self.addonName)
 end
+
+C["positions"] = {
+    ["SCREENTOP"] = { "TOPLEFT", _G['UIParent'], "TOPLEFT", 0, 0 },
+    ["SCREENBOTTOM"] = { "BOTTOMLEFT", _G['UIParent'], "BOTTOMLEFT", 0, 0 },
+}
 
 C["player"] = {
     ["show"] = true,
@@ -124,7 +151,8 @@ C["sparkModel"] = {
 }
 
 C["bar"] = {
-    ["position"] = { "TOPLEFT", _G['UIParent'], "TOPLEFT", 0, 0 },
+    ["position"] = "SCREENTOP",
+    ["dataSource"] = "DataXpUpdate",
     ["show"] = true,
     ["texture"] = "Interface\\AddOns\\"..D.addonName.."\\media\\bar.blp",
     ["backdrop"] = [[Interface\BUTTONS\WHITE8X8]],
@@ -134,7 +162,9 @@ C["bar"] = {
 }
 
 C["mark"] = {
+    ["position"] = "SCREENTOP",
 	["size"] = 15,
+    ["dataSource"] = "DataXpUpdate",
 	["flip"] = true,
     ["showPlayer"] = true,
 	["animationSpeed"] = 6,
