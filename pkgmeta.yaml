@@ -1,10 +1,14 @@
 package-as: XpFlag
+
 ignore:
     - scripts
     - media/flag1.psd
     - media/logo.psd
     - media/logo.png
-manual-changelog: CHANGELOG.md
+
+manual-changelog:
+    filename: CHANGELOG.md
+    markup-type: markdown
 
 externals:
     libs/AceAddon-3.0: https://repos.wowace.com/wow/ace3/trunk/AceAddon-3.0

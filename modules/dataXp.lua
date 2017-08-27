@@ -31,7 +31,7 @@ function module:PLAYER_UPDATE_RESTING()
     self:Update()   
 end
 
-function module:PLAYER_LEVEL_UP()
+function module:PLAYER_LEVEL_UP()    
     self:Update()   
 end
 
@@ -54,7 +54,7 @@ end
 
 function module:Update() 
     local data = self:GetData()
-
+    
     D:SendMessage("DataXpUpdate", D.nameRealm, data)
 
     if data.isMaxLevel then
