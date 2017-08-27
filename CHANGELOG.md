@@ -2,6 +2,7 @@
 
 ## v0.12
 
+  * *with this release its no longer possible to communicate with friends that use an older version*
   * feature: add option to change bar position
   * feature: add option to change marker position
   * fix: communication button on firendlist
