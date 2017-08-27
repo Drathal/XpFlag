@@ -84,7 +84,7 @@ end
 local function RemoveOffineFriends()
     for friend, _ in pairs(D.GetMarks()) do
         if friend and friend ~= D.nameRealm and not online[friend] then
-            D.DeleteMark(friend)
+            D:DeleteMark(friend)
         end
     end
 end
