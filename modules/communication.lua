@@ -83,7 +83,7 @@ function module:OnDisable()
 end
 
 function module:CHAT_MSG_ADDON(event, pre, rawmsg, chan, sender)
-    if pre ~= MessagePrefix and pre ~= "XpFlag" then return end
+    if pre ~= MessagePrefix then return end
     if sender == D.nameRealm then return end
     if not rawmsg or rawmsg == "" then return end
 
@@ -93,7 +93,7 @@ function module:CHAT_MSG_ADDON(event, pre, rawmsg, chan, sender)
 
     local data = DecodeMessage(rawmsg)
 
-    if data.type == MSG_TYPE_DATA or data.type == "XpFlag" then
+    if data.type == MSG_TYPE_DATA then
         D:SendMessage("ReceiveData", sender, data)
     end
 
