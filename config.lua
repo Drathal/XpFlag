@@ -29,7 +29,7 @@ local function Set(moduleName)
 end
 
 D.options = {
-    name = D.addonName,
+    name = D.addonName.." "..D.version,
     type = 'group',
     args = {
         bar = {

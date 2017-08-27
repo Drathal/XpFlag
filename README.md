@@ -2,7 +2,7 @@
 Its shows Player Experience at the top of the Screen. It can also Sync your Battle.net Friends Experience. 
 
 ## How i can share my Char Experience with XpFlag?
-  * Your friend needs also XpFlag
+  * Your friend needs also XpFlag (best is same version)
   * Your friend should play on the same realmpool
   * Open the Friends Pane
   * If there is a little new (dark round) button unter the online Status then your Friend also have XpFlag installed.
@@ -18,5 +18,5 @@ At the moment XpFlag has not a lot of features. When everything works well, i wi
   * other Data sources than XP
   * ...
 
-## This Addon is in beta development Stage.
+## This Addon is in early development Stage.
 So maybe some bugs will bite you.
