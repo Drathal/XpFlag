@@ -97,19 +97,11 @@ function module:OnDeleteMark(event, friend )
     self:DeleteMark(friend)
 end
 
-function module:UnregisterOnMaxLevel()
-    if D.IsMaxLevel() or not C.db.profile.mark.showPlayer then
-        self:UnregisterEvents()
-        return true
-    end
-end
-
 function module:OnEnable()
     self:RegisterMessage("ReceiveData", "OnUpdateMark")
     self:RegisterMessage("ReceiveRequest", "OnUpdateMark")
     self:RegisterMessage("ReceiveDelete", "OnDeleteMark")
     self:RegisterMessage(C.db.profile.mark.dataSource, "OnUpdateMark")
-    self:UnregisterOnMaxLevel()
 end
 
 function module:OnDisable()

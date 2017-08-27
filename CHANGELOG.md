@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.12.2
+
+  * fix: disable marks on max level did not work
+  
 ## 0.12.1
 
   * feature: show version number in the options page
