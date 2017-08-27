@@ -6,7 +6,7 @@ local UnitXPMax = _G.UnitXPMax
 local UnitLevel = _G.UnitLevel
 local SendAddonMessage = _G.SendAddonMessage
 
-local MessagePrefix = D.addonName
+local MessagePrefix = "XPF1b"
 local MSG_TYPE_DATA = "DATA"
 local MSG_TYPE_REQUEST = "RESQUEST"
 local MSG_TYPE_DELETE = "DELETE"
@@ -37,30 +37,30 @@ local function DecodeMessage(msg)
     }
 end
 
-local function SendRequest(target)
+local function Send(type, target)
+    -- print("COM: Send", type, target, CreateMessage(type))
     if not string.match(target, "%-") then return end
-    SendAddonMessage(MessagePrefix, CreateMessage(MSG_TYPE_REQUEST), "WHISPER", target)
+    SendAddonMessage(MessagePrefix, CreateMessage(type), "WHISPER", target)
+end
+
+local function SendRequest(target)
+    Send(MSG_TYPE_REQUEST, target)
 end
 
 local function SendDelete(target)
-    if not string.match(target, "%-") then return end
-    SendAddonMessage(MessagePrefix, CreateMessage(MSG_TYPE_DELETE), "WHISPER", target)
+    Send(MSG_TYPE_DELETE, target)
 end
 
 local function SendPing(target)
-    if not string.match(target, "%-") then return end
-    SendAddonMessage(MessagePrefix, CreateMessage(MSG_TYPE_PING), "WHISPER", target)
+    Send(MSG_TYPE_PING, target)
 end
 
 local function SendPong(target)
-    if not string.match(target, "%-") then return end
-    SendAddonMessage(MessagePrefix, CreateMessage(MSG_TYPE_PONG), "WHISPER", target)
+    Send(MSG_TYPE_PONG, target)
 end
 
 local function SendUpdate(target)
-    if not string.match(target, "%-") then return end
-    SendAddonMessage(MessagePrefix, CreateMessage(MSG_TYPE_DATA), "WHISPER", target)
-    D:SendMessage("SendData", sender)
+    Send(MSG_TYPE_DATA, target)
 end
 
 local function SendUpdates()
@@ -73,19 +73,17 @@ end
 
 function module:OnEnable()
     RegisterAddonMessagePrefix(MessagePrefix)
-    self:RegisterEvent("CHAT_MSG_ADDON")    
+    self:RegisterEvent("CHAT_MSG_ADDON")
     self:RegisterMessage("DataXpUpdate", SendUpdates)
 end
 
 function module:OnDisable()
-    self:UnregisterEvent("CHAT_MSG_ADDON")    
+    self:UnregisterEvent("CHAT_MSG_ADDON")
     self:UnregisterMessage("DataXpUpdate")
 end
 
 function module:CHAT_MSG_ADDON(event, pre, rawmsg, chan, sender)
-    print(event, rawmsg, sender
-          )
-    if pre ~= MessagePrefix or pre ~= "XpFlag" then return end
+    if pre ~= MessagePrefix and pre ~= "XpFlag" then return end
     if sender == D.nameRealm then return end
     if not rawmsg or rawmsg == "" then return end
 

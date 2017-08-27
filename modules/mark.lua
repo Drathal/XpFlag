@@ -90,11 +90,12 @@ function module:UpdateMark(name, value, maxvalue, level, class)
 end
 
 function module:OnUpdateMark(event, friend, data )
-    print("OnUpdateMark", event, friend, data)
+    -- print("MARK: OnUpdateMark", event, friend, data)
     self:UpdateMark(friend, data.xp, data.max, data.level, data.class)
 end
 
 function module:OnDeleteMark(event, friend )
+    -- print("MARK: OnDeleteMark", event, friend, data)
     self:DeleteMark(friend)
 end
 
@@ -131,7 +132,7 @@ end
 function module:Update()
     if not C.db.profile.mark.showPlayer then
         self:DeleteMark(D.nameRealm)
-    else        
+    else
         self:UpdateMark(D.nameRealm)
     end
 
