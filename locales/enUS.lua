@@ -5,11 +5,18 @@ L["DESCRIPTION"] = "Its shows player experience at the top of the Screen. It can
 L["SECTION_BAR"] = "Bar"
 L["SHOW_PLAYER_XP_BAR_LABEL"] = "Show"
 L["SHOW_PLAYER_XP_BAR_DESC"] = "Show / Hide bar"
+L["PLAYER_XP_BAR_POS_LABEL"] = "Position"
+L["PLAYER_XP_BAR_POS_DESC"] = "Position of bar"
 L["PLAYER_XP_BAR_HEIGHT_LABEL"] = "Height"
 L["PLAYER_XP_BAR_HEIGHT_DESC"] = "Height of bar"
 
 L["SECTION_MARK"] = "Marker"
 L["SHOW_PLAYER_MARK_LABEL"] = "Show Player marker"
 L["SHOW_PLAYER_MARK_DESC"] = "Show own XP Marker"
+L["MARK_POS_LABEL"] = "Position"
+L["Mark_POS_DESC"] = "Position of bar"
 L["MARK_SIZE_LABEL"] = "Size"
 L["MARK_SIZE_DESC"] = "Size of all Markers"
+
+L["POS_SCREENTOP"] = "Top"
+L["POS_SCREENBOTTOM"] = "Bottom"

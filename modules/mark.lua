@@ -13,10 +13,11 @@ end
 
 function module:CreateMark(name, class)
     local rcolor = RAID_CLASS_COLORS[class]
-    local m = CreateFrame("Frame", nil, _G['UIParent'])
+    local parent = select(2, unpack(C.positions[C.db.profile.mark.position]))
+    local m = CreateFrame("Frame", nil, parent)
     m:SetHeight(C.db.profile.mark.size)
     m:SetWidth(C.db.profile.mark.size)
-    m:SetPoint("TOPLEFT", _G['UIParent'], "TOPLEFT", 0, 0)
+    m:SetPoint(unpack(C.positions[C.db.profile.mark.position]))
     m:EnableMouse()
     m:SetScript("OnEnter", D.OnMarkTooltipEnter)
     m:SetScript("OnLeave", D.OnMarkTooltipLeave)
@@ -30,7 +31,7 @@ function module:CreateMark(name, class)
     m.texture = m:CreateTexture(nil, "OVERLAY")
     m.texture:SetAllPoints(m)
     m.texture:SetTexture(C.mark.texture.default)
-    m.texture:SetTexCoord(unpack(C.mark.flip and {0, 1, 1, 0} or {0, 1, 0, 1}))
+    m.texture:SetTexCoord(unpack(C.db.profile.mark.flip and {0, 1, 1, 0} or {0, 1, 0, 1}))
     m.texture:SetVertexColor(rcolor.r, rcolor.g, rcolor.b, 1)
 
     m.name = name
@@ -72,11 +73,8 @@ function module:UpdateMark(name, value, maxvalue, level, class)
     m.level = level
     m.gain = tonumber(value) - tonumber(m.prev) or 0
     m.to = D.screenWidth * value / maxvalue
-
     m.texture:SetTexture(D.GetMarkTexture(level, UnitLevel("player")))
     m.texture:SetVertexColor(RAID_CLASS_COLORS[class].r, RAID_CLASS_COLORS[class].g, RAID_CLASS_COLORS[class].b)
-    m:SetHeight(C.db.profile.mark.size)
-    m:SetWidth(C.db.profile.mark.size)
     m:Show()
 
     m.anim.Start()
@@ -136,8 +134,21 @@ function module:Update()
         self:UpdateMark(D.nameRealm)
     end
 
+    if string.match(C.db.profile.mark.position, "TOP") then
+        C.db.profile.mark.flip = true
+    else
+        C.db.profile.mark.flip = nil
+    end
+
     for name, mark in pairs(marks) do
         if not mark then return end
+
+        mark:ClearAllPoints()
+        mark:SetPoint(unpack(C.positions[C.db.profile.mark.position]))
+        mark:SetHeight(C.db.profile.mark.size)
+        mark:SetWidth(C.db.profile.mark.size)
+        mark.texture:SetTexCoord(unpack(C.db.profile.mark.flip and {0, 1, 1, 0} or {0, 1, 0, 1}))
+
         self:UpdateMark(mark.name, mark.value, mark.maxvalue, mark.level, mark.class)
     end
 end

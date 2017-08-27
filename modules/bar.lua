@@ -4,7 +4,6 @@ local _G = _G
 local CreateFrame = _G.CreateFrame
 
 local bars = {}
-local parent = select(2, unpack(C.bar.position))
 
 local module = D:NewModule("bar", "AceEvent-3.0")
 
@@ -24,11 +23,12 @@ function module:OnDisable()
 end
 
 function module:CreateBar(friend)
-    local bar = CreateFrame("Frame", D.addonName..'-'..friend..'-XpBar', parent)
+    local parent = select(2, unpack(C.positions[C.db.profile.bar.position]))
+    local bar = CreateFrame("Frame", nil, parent)
     bar.name = friend
     bar:SetHeight(C.db.profile.bar.height)
     bar:SetWidth(0)
-    bar:SetPoint(unpack(C.bar.position))
+    bar:SetPoint(unpack(C.positions[C.db.profile.bar.position]))
     bar:SetFrameLevel(1)
     bar:SetFrameStrata("DIALOG");
 
@@ -54,12 +54,12 @@ function module:CreateBar(friend)
 
     bar.anim = D.CreateUpdateAnimation(bar, self.OnAnimation)
 
-    bars[friend] = bar 
+    bars[friend] = bar
 
     return bar
 end
 
-function module:DeleteBar(friend)    
+function module:DeleteBar(friend)
     if not friend then return end
     if not bars[friend] then return end
     bars[friend]:Hide()
@@ -68,9 +68,9 @@ function module:DeleteBar(friend)
 end
 
 function module:UpdateBar(friend, data)
-    if not data then return end    
+    if not data then return end
     local bar = bars[friend] or self:CreateBar(friend)
-    
+
     bar.data = data
 
     if data.isMaxLevel then
@@ -80,7 +80,7 @@ function module:UpdateBar(friend, data)
 
     bar:Show()
 
-    bar.to = parent:GetWidth() * data.p or 0
+    bar.to = bar:GetParent():GetWidth() * data.p or 0
     bar.anim.Start()
 
     if not bar.isPlayer then return end
@@ -100,6 +100,8 @@ function module:Update()
 
     if bars[D.nameRealm] then
         bars[D.nameRealm]:SetHeight(C.db.profile.bar.height)
+        bars[D.nameRealm]:ClearAllPoints()
+        bars[D.nameRealm]:SetPoint(unpack(C.positions[C.db.profile.bar.position]))
     end
 
     if bars[D.nameRealm] and bars[D.nameRealm].data then
