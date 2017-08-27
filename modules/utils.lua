@@ -58,10 +58,12 @@ local function CreateUpdateAnimation(f, cb)
     return anim
 end
 
+-- refactor dont need it here
 local function GetXpColor()
     return GetXPExhaustion() and C.player.colorRested or C.player.color
 end
 
+-- refactor dont need it here
 local function GetMarkTexture(friend, player)
     local texture = C.mark.texture.default
     if tonumber(friend) < tonumber(player) then
