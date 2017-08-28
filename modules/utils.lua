@@ -4,10 +4,13 @@ local _G = _G
 local min = math.min;
 local max = math.max;
 local floor = math.floor
+local abs = math.abs
 local GetXPExhaustion = _G.GetXPExhaustion
 local GetFramerate = _G.GetFramerate
 local GetExpansionLevel = _G.GetExpansionLevel
+local CreateFrame = _G.CreateFrame
 local UnitLevel = _G.UnitLevel
+local MAX_PLAYER_LEVEL_TABLE = _G.MAX_PLAYER_LEVEL_TABLE
 
 local function CopyTable(src, dest)
     if type(dest) ~= "table" then

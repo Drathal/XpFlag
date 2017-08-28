@@ -8,7 +8,7 @@
 ## 0.12.2
 
   * fix: disable marks on max level did not work
-  
+
 ## 0.12.1
 
   * feature: show version number in the options page
@@ -18,7 +18,7 @@
   * *with this release its no longer possible to communicate with friends that use an older version*
   * feature: add option to change bar position
   * feature: add option to change marker position
-  * fix: communication button on firendlist
+  * fix: communication button on friend list
   * fix: removing offline friends
   * refactor: some internals (prepare different data sources)
 
@@ -33,4 +33,3 @@
   * feature: new option to scale the xp markers
   * refactor: animation code
   * refactor: bar and marker module
- 

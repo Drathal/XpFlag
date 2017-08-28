@@ -1,6 +1,7 @@
 local D, C, L = unpack(select(2, ...))
 
 local _G = _G
+local CreateFrame = _G.CreateFrame
 local random = math.random
 local module = D:NewModule("Spark", "AceEvent-3.0")
 
@@ -11,12 +12,12 @@ local function PlaySpark(xp, sparks, parent)
             local x = (xOfs + (C.db.profile.mark.size / 2)) --* UIParent:GetEffectiveScale()
 
             spark:ClearAllPoints()
-            spark:SetPoint(f1, p, f2, x , yOfs);
-            
+            spark:SetPoint(f1, p, f2, x, yOfs);
+
             local ySpread1, ySpread2 = unpack(C.sparkXP.ySpread)
-            if not C.db.profile.mark.flip then                
-                ySpread1 = C.sparkXP.ySpread[2] * -1
-                ySpread2 = C.sparkXP.ySpread[1] * -1                
+            if not C.db.profile.mark.flip then
+                ySpread1 = C.sparkXP.ySpread[2] * - 1
+                ySpread2 = C.sparkXP.ySpread[1] * - 1
             end
 
             spark.ag.a1:SetOffset(random(unpack(C.sparkXP.xSpread)), random(ySpread1, ySpread2))
@@ -47,7 +48,7 @@ local function OnSparkFinished(self)
     self:GetParent().text:SetText("")
 end
 
-local function AddSpark(parent)    
+local function AddSpark(parent)
     local f = CreateFrame("Frame", nil, parent)
     f:SetHeight(1)
     f:SetWidth(1)

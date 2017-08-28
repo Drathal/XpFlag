@@ -5,6 +5,7 @@ local UnitXP = _G.UnitXP
 local UnitXPMax = _G.UnitXPMax
 local UnitLevel = _G.UnitLevel
 local SendAddonMessage = _G.SendAddonMessage
+local RegisterAddonMessagePrefix = _G.RegisterAddonMessagePrefix
 
 local MessagePrefix = "XPF1b"
 local MSG_TYPE_DATA = "DATA"

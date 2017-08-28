@@ -2,6 +2,7 @@ local D, C, L = unpack(select(2, ...))
 
 local _G = _G
 local GameFontNormal = _G.GameFontNormal
+local LibStub = _G.LibStub
 
 local options = nil
 
@@ -112,7 +113,7 @@ D.options = {
 
 function D:OnInitialize()
     local default = {}
-    default.profile = CopyTable(C)
+    default.profile = D.CopyTable(C)
 
     C.db = LibStub("AceDB-3.0"):New("XpFlagDB", default, "Default")
 

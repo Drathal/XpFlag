@@ -4,25 +4,25 @@
 	<!-- 3rd party libs -->
 	<Script file="libs\LibStub\LibStub.lua"/>
 	<Include file="libs\CallbackHandler-1.0\CallbackHandler-1.0.xml"/>
-	<Include file="libs\AceAddon-3.0\AceAddon-3.0.xml" />
-    <Include file="libs\AceGUI-3.0\AceGUI-3.0.xml" />
-	<Include file="libs\AceEvent-3.0\AceEvent-3.0.xml" />
-    <Include file="libs\AceDB-3.0\AceDB-3.0.xml" />
-    <Include file="libs\AceConfig-3.0\AceConfig-3.0.xml" />
-    <Include file="libs\AceDBOptions-3.0\AceDBOptions-3.0.xml" />
+	<Include file="libs\AceAddon-3.0\AceAddon-3.0.xml"/>
+	<Include file="libs\AceGUI-3.0\AceGUI-3.0.xml"/>
+	<Include file="libs\AceEvent-3.0\AceEvent-3.0.xml"/>
+	<Include file="libs\AceDB-3.0\AceDB-3.0.xml"/>
+	<Include file="libs\AceConfig-3.0\AceConfig-3.0.xml"/>
+	<Include file="libs\AceDBOptions-3.0\AceDBOptions-3.0.xml"/>
 
 	<!-- app -->
-    <Script file="XpFlag.lua" />
-    <Include file="locales\locales.xml" />
-    <Script file="config.lua" />	
-    <Script file="modules\dataXp.lua" />    
-	<Script file="modules\utils.lua" />
-    <Script file="modules\friends.lua" />
-	<Script file="modules\communication.lua" />
-	<Script file="modules\markTooltip.lua" />
-	<Script file="modules\mark.lua" />
-	<Script file="modules\markSparks.lua" />
-	<Script file="modules\markModel.lua" />	
-	<Script file="modules\bar.lua" />
+	<Script file="XpFlag.lua"/>
+	<Include file="locales\locales.xml"/>
+	<Script file="config.lua"/>
+	<Script file="modules\dataXp.lua"/>
+	<Script file="modules\utils.lua"/>
+	<Script file="modules\friends.lua"/>
+	<Script file="modules\communication.lua"/>
+	<Script file="modules\markTooltip.lua"/>
+	<Script file="modules\mark.lua"/>
+	<Script file="modules\markSparks.lua"/>
+	<Script file="modules\markModel.lua"/>
+	<Script file="modules\bar.lua"/>
 
 </Ui>

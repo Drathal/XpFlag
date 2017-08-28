@@ -1,7 +1,14 @@
 local D, C, L = unpack(select(2, ...))
 
 local _G = _G
+local select = select
+local unpack = unpack
 local CreateFrame = _G.CreateFrame
+local UnitXP = _G.UnitXP
+local UnitXPMax = _G.UnitXPMax
+local UnitLevel = _G.UnitLevel
+
+local RAID_CLASS_COLORS = RAID_CLASS_COLORS
 
 local marks = {}
 
