@@ -11,28 +11,34 @@ local module = D:NewModule("dataXp", "AceEvent-3.0")
 function module:OnEnable()
     self:RegisterEvent("PLAYER_ENTERING_WORLD")
     self:RegisterEvent("PLAYER_UPDATE_RESTING")
+    self:RegisterEvent("ZONE_CHANGED_NEW_AREA")
     self:RegisterEvent("PLAYER_XP_UPDATE")
     self:RegisterEvent("PLAYER_LEVEL_UP")
-    self:Update()   
+    self:Update()
 end
 
 function module:OnDisable()
     self:UnregisterEvent("PLAYER_UPDATE_RESTING")
+    self:UnregisterEvent("ZONE_CHANGED_NEW_AREA")
     self:UnregisterEvent("PLAYER_XP_UPDATE")
     self:UnregisterEvent("PLAYER_LEVEL_UP")
 end
 
 function module:PLAYER_ENTERING_WORLD()
-    self:Update()    
+    self:Update()
     self:UnregisterEvent("PLAYER_ENTERING_WORLD");
 end
 
-function module:PLAYER_UPDATE_RESTING()
-    self:Update()   
+function module:ZONE_CHANGED_NEW_AREA()
+    self:Update()
 end
 
-function module:PLAYER_LEVEL_UP()    
-    self:Update()   
+function module:PLAYER_UPDATE_RESTING()
+    self:Update()
+end
+
+function module:PLAYER_LEVEL_UP()
+    self:Update()
 end
 
 function module:PLAYER_XP_UPDATE(event, unit)
@@ -52,9 +58,9 @@ function module:GetData(mix)
     }
 end
 
-function module:Update() 
+function module:Update()
     local data = self:GetData()
-    
+
     D:SendMessage("DataXpUpdate", D.nameRealm, data)
 
     if data.isMaxLevel then
