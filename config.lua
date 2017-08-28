@@ -88,10 +88,15 @@ D.options = {
                     type = 'select',
                     order = 2,
                     width = 'full',
-                    values = {
-                        ["SCREENTOP"] = L["POS_SCREENTOP"],
-                        ["SCREENBOTTOM"] = L["POS_SCREENBOTTOM"],
-                    },
+                    values = function()
+                        local items = {}
+                        items["SCREENTOP"] = L["POS_SCREENTOP"]
+                        items["SCREENBOTTOM"] = L["POS_SCREENBOTTOM"]
+                        if _G['MainMenuExpBar']:IsVisible() then
+                            items["BLIZZEXPBAR"] = L["POS_BLIZZ_EXPBAR"]
+                        end
+                        return items
+                    end,
                     name = L["MARK_POS_LABEL"],
                     desc = L["Mark_POS_DESC"]
                 },
@@ -124,7 +129,10 @@ end
 C["positions"] = {
     ["SCREENTOP"] = { "TOPLEFT", _G['UIParent'], "TOPLEFT", 0, 0 },
     ["SCREENBOTTOM"] = { "BOTTOMLEFT", _G['UIParent'], "BOTTOMLEFT", 0, 0 },
+    ["BLIZZEXPBAR"] = { "BOTTOMLEFT", _G['MainMenuExpBar'], "BOTTOMLEFT", 0, 2 },
 }
+
+-- MainMenuExpBar
 
 C["player"] = {
     ["show"] = true,

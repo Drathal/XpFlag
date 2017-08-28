@@ -18,5 +18,6 @@ L["Mark_POS_DESC"] = "Position of bar"
 L["MARK_SIZE_LABEL"] = "Size"
 L["MARK_SIZE_DESC"] = "Size of all Markers"
 
-L["POS_SCREENTOP"] = "Top"
-L["POS_SCREENBOTTOM"] = "Bottom"
+L["POS_SCREENTOP"] = "Screen Top"
+L["POS_SCREENBOTTOM"] = "Screen Bottom"
+L["POS_BLIZZ_EXPBAR"] = "Blizzard experience bar"

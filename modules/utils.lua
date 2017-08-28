@@ -109,7 +109,7 @@ local function AnimateX(f)
 
     local p1, p, p2, xOfs, yOfs = f:GetPoint()
     f:ClearAllPoints();
-    f:SetPoint(p1, p, p2, new - f:GetWidth() / 2, 0);
+    f:SetPoint(p1, p, p2, new - f:GetWidth() / 2, yOfs);
 
     f.cur = new
     return f.to
@@ -120,7 +120,6 @@ local function IsMaxLevel(level)
 end
 
 -- API
-D.FormatNumber = FormatNumber
 D.Throttle = Throttle
 D.GetXpColor = GetXpColor
 D.GetMarkTexture = GetMarkTexture
