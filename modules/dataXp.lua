@@ -5,10 +5,27 @@ local GetXPExhaustion = _G.GetXPExhaustion
 local UnitLevel = _G.UnitLevel
 local UnitXP = _G.UnitXP
 local UnitXPMax = _G.UnitXPMax
+local UnitName = _G.UnitName
+local GameTooltip = _G.GameTooltip
+local UnitClass = _G.UnitClass
+local GetRealmName = _G.GetRealmName
+local MAX_PLAYER_LEVEL_TABLE = _G.MAX_PLAYER_LEVEL_TABLE
+local GetExpansionLevel = _G.GetExpansionLevel
+local format = _G.format
+local tonumber = _G.tonumber
+local select = _G.select
+local pairs = _G.pairs
 
-local module = D:NewModule("dataXp", "AceEvent-3.0")
+local nameRealm = UnitName("player").."-"..GetRealmName()
+local prevData = {}
+local moduleName = "dataXp"
+local module = D:NewModule(moduleName, "AceEvent-3.0")
 
 function module:OnEnable()
+    --@alpha@
+    D.Debug(moduleName, "OnEnable")
+    --@end-alpha@
+
     self:RegisterEvent("PLAYER_ENTERING_WORLD")
     self:RegisterEvent("PLAYER_UPDATE_RESTING")
     self:RegisterEvent("ZONE_CHANGED_NEW_AREA")
@@ -18,6 +35,10 @@ function module:OnEnable()
 end
 
 function module:OnDisable()
+    --@alpha@
+    D.Debug(moduleName, "OnDisable")
+    --@end-alpha@
+
     self:UnregisterEvent("PLAYER_UPDATE_RESTING")
     self:UnregisterEvent("ZONE_CHANGED_NEW_AREA")
     self:UnregisterEvent("PLAYER_XP_UPDATE")
@@ -25,48 +46,97 @@ function module:OnDisable()
 end
 
 function module:PLAYER_ENTERING_WORLD()
+    --@alpha@
+    D.Debug(moduleName, "PLAYER_ENTERING_WORLD")
+    --@end-alpha@
+
     self:Update()
     self:UnregisterEvent("PLAYER_ENTERING_WORLD");
 end
 
 function module:ZONE_CHANGED_NEW_AREA()
+    --@alpha@
+    D.Debug(moduleName, "ZONE_CHANGED_NEW_AREA")
+    --@end-alpha@
+
     self:Update()
 end
 
 function module:PLAYER_UPDATE_RESTING()
+    --@alpha@
+    D.Debug(moduleName, "PLAYER_UPDATE_RESTING")
+    --@end-alpha@
+
     self:Update()
 end
 
 function module:PLAYER_LEVEL_UP()
+    --@alpha@
+    D.Debug(moduleName, "PLAYER_LEVEL_UP")
+    --@end-alpha@
+
     self:Update()
 end
 
 function module:PLAYER_XP_UPDATE(event, unit)
     if unit ~= 'player' then return end
+    --@alpha@
+    D.Debug(moduleName, "PLAYER_XP_UPDATE")
+    --@end-alpha@
+
     self:Update()
 end
 
 function module:GetData(mix)
-    return {
-        level = mix and mix.level or UnitLevel("player"),
-        xp = mix and mix.xp or UnitXP("PLAYER"),
-        max = mix and mix.max or UnitXPMax("PLAYER"),
-        p = mix and mix.p or UnitXP("PLAYER") / UnitXPMax("PLAYER"),
-        rested = mix and mix.rested or GetXPExhaustion(),
-        isMaxLevel = mix and mix.isMaxLevel or D.IsMaxLevel(UnitLevel("player")),
-        class = mix and mix.class or D.class
-    }
+    --@alpha@
+    D.Debug(moduleName, "GetData")
+    --@end-alpha@
+
+    local d = mix or {}
+
+    d.dataType = "dataXp"
+    d.name = d.name or UnitName("PLAYER")
+    d.realm = d.realm or GetRealmName()
+    d.level = d.level or UnitLevel("PLAYER")
+    d.class = d.class or select(2, UnitClass("PLAYER"))
+    d.disable = d.disable or MAX_PLAYER_LEVEL_TABLE[GetExpansionLevel()] == UnitLevel("PLAYER")
+
+    d.value = d.value or UnitXP("PLAYER")
+    d.max = d.max or UnitXPMax("PLAYER")
+    d.gain = tonumber(d.value) - tonumber(prevData.value or 0) or 0
+    d.rested = d.rested or (GetXPExhaustion() or 0)
+
+    d.cR = d.cR or d.rested and C.player.colorRested[1] or C.player.color[1]
+    d.cG = d.cG or d.rested and C.player.colorRested[2] or C.player.color[2]
+    d.cB = d.cB or d.rested and C.player.colorRested[3] or C.player.color[3]
+
+    return d
+end
+
+function module:IsUpdated(data)
+    if (prevData.dataType) then
+        for k1, v1 in pairs(data) do
+            if v1 ~= prevData[k1] then
+                return true
+            end
+        end
+    end
 end
 
 function module:Update()
     local data = self:GetData()
 
-    D:SendMessage("DataXpUpdate", D.nameRealm, data)
+    if self:IsUpdated(data) then
+        --@alpha@
+        D.Debug(moduleName, "Update - SendMessage", moduleName..":Update", nameRealm )
+        D:SendMessage(moduleName..":Update", "dummy-Madmortem", self:GetData({ name = "dummy", value = data.value * 0.8 }))
+        --@end-alpha@
+        D:SendMessage(moduleName..":Update", nameRealm, data)
+    end
 
-    if data.isMaxLevel then
+    prevData = data
+
+    if data.disable then
         self:Disable()
     end
 end
-
--- API
-D.DataXpGet = module.GetData

@@ -1,153 +1,177 @@
 local D, C, L = unpack(select(2, ...))
 
 local _G = _G
-local select = select
-local unpack = unpack
+local pairs = _G.pairs
+local select = _G.select
+local unpack = _G.unpack
+local match = _G.string.match
+local assert = _G.assert
 local CreateFrame = _G.CreateFrame
 local UnitXP = _G.UnitXP
 local UnitXPMax = _G.UnitXPMax
 local UnitLevel = _G.UnitLevel
+local RAID_CLASS_COLORS = _G.RAID_CLASS_COLORS
 
-local RAID_CLASS_COLORS = RAID_CLASS_COLORS
-
+-- local debug = true
 local marks = {}
 
-local module = D:NewModule("mark", "AceEvent-3.0")
+local moduleName = "mark"
+local module = D:NewModule(moduleName, "AceEvent-3.0")
 
-function module:OnAnimation(mark, elapsed)
+function module:OnAnimation(mark)
     D.AnimateX(mark)
 end
 
-function module:CreateMark(name, class)
-    local rcolor = RAID_CLASS_COLORS[class]
+function module:CreateMark(id, data)
+    --@alpha@
+    D.Debug(moduleName, "CreateMark", id)
+    assert(id, 'mark:CreateMark - id is missing')
+    assert(data, 'mark:CreateMark - data is missing')
+    --@end-alpha@
+
+    local rcolor = RAID_CLASS_COLORS[data.class]
     local parent = select(2, unpack(C.positions[C.db.profile.mark.position]))
+    C.db.profile.mark.flip = match(C.db.profile.mark.position, "TOP") ~= nil
+
     local m = CreateFrame("Frame", nil, parent)
     m:SetHeight(C.db.profile.mark.size)
     m:SetWidth(C.db.profile.mark.size)
     m:SetPoint(unpack(C.positions[C.db.profile.mark.position]))
-    m:EnableMouse()
-    m:SetScript("OnEnter", D.OnMarkTooltipEnter)
-    m:SetScript("OnLeave", D.OnMarkTooltipLeave)
     m:SetFrameStrata("DIALOG")
     m:SetFrameLevel(2)
     m:SetAlpha(1)
-    m:Show()
-
-    if string.match(C.db.profile.mark.position, "TOP") then
-        C.db.profile.mark.flip = true
-    else
-        C.db.profile.mark.flip = nil
-    end
-
-    marks[name] = m
-
+    m:EnableMouse()
+    m:SetScript("OnEnter", D:GetModule("markTooltip").OnMarkTooltipEnter )
+    m:SetScript("OnLeave", D:GetModule("markTooltip").OnMarkTooltipLeave )
     m.texture = m:CreateTexture(nil, "OVERLAY")
     m.texture:SetAllPoints(m)
     m.texture:SetTexture(C.mark.texture.default)
     m.texture:SetTexCoord(unpack(C.db.profile.mark.flip and {0, 1, 1, 0} or {0, 1, 0, 1}))
     m.texture:SetVertexColor(rcolor.r, rcolor.g, rcolor.b, 1)
+    m:Show()
 
-    m.name = name
-    m.class = class
-
+    m.data = data
     m.anim = D.CreateUpdateAnimation(m, self.OnAnimation)
 
-    D:SendMessage("CreateMark", name)
+    --@alpha@
+    D.Debug(moduleName, "CreateMark - SendMessage", moduleName..":Create", id )
+    --@end-alpha@
+    D:SendMessage(moduleName..":Create", id)
 
-    if name ~= D.nameRealm then return m end
+    marks[id] = m
+
+    if id ~= D.nameRealm then return m end
 
     m.player = true;
-    m.texture:SetVertexColor(unpack(D.GetXpColor()))
+
+    m.texture:SetVertexColor(data.cR, data.cG, data.cB)
     m:SetFrameLevel(5)
-    m.model = D.CreateSparkModel(m)
-    m.xpSparks = D.CreateSparks(m)
+    m.model = D:GetModule("markModel"):Create(m)
+    m.xpSparks = D:GetModule("markSpark"):Create(m)
 
     return m
 end
 
-function module:UpdateMark(name, value, maxvalue, level, class)
-    if not marks then return end
+function module:UpdateMark(id, data)
+    --@alpha@
+    D.Debug(moduleName, "UpdateMark", id)
+    assert(id, 'mark:UpdateMark - id is missing')
+    assert(data, 'mark:UpdateMark - data is missing')
+    --@end-alpha@
 
-    local name = name or D.nameRealm
-    local value = value or UnitXP("PLAYER")
-    local maxvalue = maxvalue or UnitXPMax("PLAYER")
-    local level = level or UnitLevel("player")
-    local class = class or D.class
-    local m = marks[name] or self:CreateMark(name, class);
+    local rcolor = RAID_CLASS_COLORS[data.class]
+    local m = marks[id] or self:CreateMark(id, data);
+    m.data = data
 
-    if D.IsMaxLevel(level) then
+    if data.disabled then
         m:Hide()
         return
     end
 
-    m.prev = m.value or value
-    m.value = value
-    m.maxvalue = maxvalue
-    m.level = level
-    m.gain = tonumber(value) - tonumber(m.prev) or 0
-    m.to = m:GetParent():GetWidth() * value / maxvalue
-    m.texture:SetTexture(D.GetMarkTexture(level, UnitLevel("player")))
-    m.texture:SetVertexColor(RAID_CLASS_COLORS[class].r, RAID_CLASS_COLORS[class].g, RAID_CLASS_COLORS[class].b)
+    m.to = m:GetParent():GetWidth() * data.value / data.max
+    m.texture:SetTexture(D.GetMarkTexture(data.level, UnitLevel("player")))
+    m.texture:SetVertexColor(rcolor.r, rcolor.g, rcolor.b)
     m:Show()
 
     m.anim.Start()
 
-    D:SendMessage("UpdateMark", name, m)
+    --@alpha@
+    D.Debug(moduleName, "UpdateMark - SendMessage", moduleName..":Update", id )
+    --@end-alpha@
+    D:SendMessage(moduleName..":Update", id, m)
 
     if not m.player then return end
-    m.texture:SetVertexColor(unpack(D.GetXpColor()))
-
-    D:SendMessage("UpdatePlayerMark", name, m)
+    m.texture:SetVertexColor(data.cR, data.cG, data.cB)
 end
 
-function module:OnUpdateMark(event, friend, data )
-    -- print("MARK: OnUpdateMark", event, friend, data)
-    self:UpdateMark(friend, data.xp, data.max, data.level, data.class)
+function module:OnUpdateMark(event, id, data)
+    --@alpha@
+    D.Debug(moduleName, "OnUpdateMark", id)
+    assert(id, 'mark:OnUpdateMark - id is missing')
+    assert(data, 'mark:OnUpdateMark - data is missing')
+    --@end-alpha@
+
+    self:UpdateMark(id, data)
 end
 
-function module:OnDeleteMark(event, friend )
-    -- print("MARK: OnDeleteMark", event, friend, data)
-    self:DeleteMark(friend)
+function module:OnDeleteMark(event, id)
+    --@alpha@
+    D.Debug(moduleName, "OnDeleteMark", id)
+    --@end-alpha@
+
+    self:DeleteMark(id)
 end
 
 function module:OnEnable()
+    --@alpha@
+    D.Debug(moduleName, "OnEnable")
+    --@end-alpha@
+
     self:RegisterMessage("ReceiveData", "OnUpdateMark")
     self:RegisterMessage("ReceiveRequest", "OnUpdateMark")
     self:RegisterMessage("ReceiveDelete", "OnDeleteMark")
-    self:RegisterMessage(C.db.profile.mark.dataSource, "OnUpdateMark")
+    self:RegisterMessage(C.db.profile.mark.dataSource..":Update", "OnUpdateMark")
 end
 
 function module:OnDisable()
+    --@alpha@
+    D.Debug(moduleName, "OnDisable")
+    --@end-alpha@
+
     self:UnregisterMessage("ReceiveData")
     self:UnregisterMessage("ReceiveRequest")
     self:UnregisterMessage("ReceiveDelete")
-    self:UnregisterMessage(C.db.profile.mark.dataSource)
+    self:UnregisterMessage(C.db.profile.mark.dataSource..":Update")
 end
 
-function module:DeleteMark(friend)
-    if not friend then return end
-    if not marks[friend] then return end
-    marks[friend]:Hide()
-    marks[friend] = nil
-    D:SendMessage("DeleteMark", friend)
+function module:DeleteMark(id)
+    --@alpha@
+    D.Debug(moduleName, "DeleteMark", id)
+    --@end-alpha@
+
+    if not id then return end
+    if not marks[id] then return end
+    marks[id]:Hide()
+    marks[id] = nil
+    D:SendMessage("DeleteMark", id)
 end
 
 function module:Update()
+    --@alpha@
+    D.Debug(moduleName, "Update")
+    --@end-alpha@
+
     if not C.db.profile.mark.showPlayer then
         self:DeleteMark(D.nameRealm)
     else
-        self:UpdateMark(D.nameRealm)
+        self:UpdateMark(D.nameRealm, D:GetModule(C.db.profile.mark.dataSource):GetData())
     end
 
-    if string.match(C.db.profile.mark.position, "TOP") then
-        C.db.profile.mark.flip = true
-    else
-        C.db.profile.mark.flip = nil
-    end
+    C.db.profile.mark.flip = match(C.db.profile.mark.position, "TOP") ~= nil
 
     local newPos = C.positions[C.db.profile.mark.position]
 
-    for name, mark in pairs(marks) do
+    for id, mark in pairs(marks) do
         if not mark then return end
 
         local _, p, _, xOfs, _ = mark:GetPoint()
@@ -160,19 +184,26 @@ function module:Update()
         mark:SetWidth(C.db.profile.mark.size)
         mark.texture:SetTexCoord(unpack(C.db.profile.mark.flip and {0, 1, 1, 0} or {0, 1, 0, 1}))
 
-        self:UpdateMark(mark.name, mark.value, mark.maxvalue, mark.level, mark.class)
+        --@alpha@
+        assert(mark.data, 'mark:Update - mark.data is missing for '..id)
+        --@end-alpha@
+
+        self:UpdateMark(id, mark.data)
     end
 end
 
-local function GetMark(friend)
-    return marks[friend]
+function module:GetMark(id)
+    --@alpha@
+    D.Debug(moduleName, "GetMark")
+    --@end-alpha@
+
+    return marks[id]
 end
 
-local function GetMarks()
+function module:GetMarks()
+    --@alpha@
+    D.Debug(moduleName, "GetMarks")
+    --@end-alpha@
+
     return marks
 end
-
--- API
-D.DeleteMark = module.DeleteMark
-D.GetMark = GetMark
-D.GetMarks = GetMarks

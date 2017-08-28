@@ -1,16 +1,30 @@
 local D, C, L = unpack(select(2, ...))
 
 local _G = _G
-local min = math.min;
-local max = math.max;
-local floor = math.floor
-local abs = math.abs
+local tonumber = _G.tonumber
+local print = _G.print
+local type = _G.type
+local min = _G.math.min;
+local max = _G.math.max;
+local floor = _G.math.floor
+local abs = _G.math.abs
 local GetXPExhaustion = _G.GetXPExhaustion
 local GetFramerate = _G.GetFramerate
 local GetExpansionLevel = _G.GetExpansionLevel
 local CreateFrame = _G.CreateFrame
 local UnitLevel = _G.UnitLevel
 local MAX_PLAYER_LEVEL_TABLE = _G.MAX_PLAYER_LEVEL_TABLE
+
+local debug = {
+    mark = true,
+    dataXp = true,
+    markSpark = true
+}
+
+local function Debug(module, msg, a1, a2)
+    if not debug[module] then return end
+    print("|cffffff78" .. module .. ":|r".. msg .. " |cff88ff88", a1 or "", a2 or "", "|r")
+end
 
 local function CopyTable(src, dest)
     if type(dest) ~= "table" then
@@ -120,6 +134,7 @@ local function IsMaxLevel(level)
 end
 
 -- API
+D.Debug = Debug
 D.Throttle = Throttle
 D.GetXpColor = GetXpColor
 D.GetMarkTexture = GetMarkTexture

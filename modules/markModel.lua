@@ -5,9 +5,9 @@ local CreateFrame = _G.CreateFrame
 local UIFrameFadeIn = _G.UIFrameFadeIn
 local UIFrameFadeOut = _G.UIFrameFadeOut
 
-local module = D:NewModule("SparkModel", "AceEvent-3.0")
+local module = D:NewModule("markModel", "AceEvent-3.0")
 
-D.CreateSparkModel = function(parent)
+function module:Create(parent)
     local m = CreateFrame('PlayerModel', D.addonName..'-SparkModel', parent)
     m:SetPoint('CENTER')
     m:SetSize(C.sparkModel.size, C.sparkModel.size)
@@ -16,17 +16,17 @@ D.CreateSparkModel = function(parent)
     return m
 end
 
-local function FadeInMarkModel(msg, name, f)
+function module:FadeInMarkModel(msg, name, f)
     if not f or not f.model then return end
     UIFrameFadeIn(f.model, 0.1, f.model:GetAlpha(), 0.5)
 end
 
-local function FadeOutMarkModel(msg, f)
+function module:FadeOutMarkModel(msg, f)
     if not f or not f.model then return end
     UIFrameFadeOut(f.model, 1, f.model:GetAlpha(), 0)
 end
 
 function module:OnEnable()
-    self:RegisterMessage("UpdatePlayerMark", FadeInMarkModel)
-    self:RegisterMessage("AnimateXEnd", FadeOutMarkModel)
+    self:RegisterMessage("UpdatePlayerMark", "FadeInMarkModel")
+    self:RegisterMessage("AnimateXEnd", "FadeOutMarkModel")
 end

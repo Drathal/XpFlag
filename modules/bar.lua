@@ -2,6 +2,8 @@ local D, C, L = unpack(select(2, ...))
 
 local _G = _G
 local CreateFrame = _G.CreateFrame
+local select = _G.select
+local unpack = _G.unpack
 
 local bars = {}
 
@@ -14,18 +16,18 @@ end
 function module:OnEnable()
     if not C.db.profile.bar.show then return end
     if not C.db.profile.bar.dataSource then return end
-    self:RegisterMessage(C.db.profile.bar.dataSource, "UpdatePlayerBar")
+    self:RegisterMessage(C.db.profile.bar.dataSource..":Update", "UpdatePlayerBar")
 end
 
 function module:OnDisable()
     self.DeleteBar(D.nameRealm)
-    self:UnregisterMessage(C.db.profile.bar.dataSource)
+    self:UnregisterMessage(C.db.profile.bar.dataSource..":Update")
 end
 
-function module:CreateBar(friend)
+function module:CreateBar(id)
     local parent = select(2, unpack(C.positions[C.db.profile.bar.position]))
     local bar = CreateFrame("Frame", nil, parent)
-    bar.name = friend
+    bar.name = id
     bar:SetHeight(C.db.profile.bar.height)
     bar:SetWidth(0)
     bar:SetPoint(unpack(C.positions[C.db.profile.bar.position]))
@@ -48,54 +50,54 @@ function module:CreateBar(friend)
     bar:SetBackdropBorderColor(0, 0, 0, 0.5)
     bar:Show()
 
-    if friend == D.nameRealm then
+    if id == D.nameRealm then
         bar.isPlayer = true
     end
 
     bar.anim = D.CreateUpdateAnimation(bar, self.OnAnimation)
 
-    bars[friend] = bar
+    bars[id] = bar
 
     return bar
 end
 
-function module:DeleteBar(friend)
-    if not friend then return end
-    if not bars[friend] then return end
-    bars[friend]:Hide()
-    bars[friend] = nil
-    D:SendMessage("DeleteBar", friend)
+function module:DeleteBar(id)
+    if not id then return end
+    if not bars[id] then return end
+    bars[id]:Hide()
+    bars[id] = nil
+    D:SendMessage("DeleteBar", id)
 end
 
-function module:UpdateBar(friend, data)
+function module:UpdateBar(id, data)
     if not data then return end
-    local bar = bars[friend] or self:CreateBar(friend)
+    local bar = bars[id] or self:CreateBar(id)
 
     bar.data = data
 
     if data.isMaxLevel then
-        self.DeleteBar(friend)
+        self:DeleteBar(id)
         return
     end
 
     bar:Show()
 
-    bar.to = bar:GetParent():GetWidth() * data.p or 0
+    bar.to = bar:GetParent():GetWidth() * data.value / data.max or 0
     bar.anim.Start()
 
     if not bar.isPlayer then return end
     bar.texture:SetVertexColor(unpack(D.GetXpColor()))
 end
 
-function module:UpdatePlayerBar(msg, friend, data)
-    self:UpdateBar(friend, data)
+function module:UpdatePlayerBar(msg, id, data)
+    self:UpdateBar(id, data)
 end
 
 function module:Update()
     if not C.db.profile.bar.show then
         self:DeleteBar(D.nameRealm)
     else
-        self:UpdateBar(D.nameRealm, D.DataXpGet())
+        self:UpdateBar(D.nameRealm, D:GetModule(C.db.profile.bar.dataSource):GetData())
     end
 
     if bars[D.nameRealm] then
@@ -105,19 +107,14 @@ function module:Update()
     end
 
     if bars[D.nameRealm] and bars[D.nameRealm].data then
-        self.UpdateBar(D.nameRealm, bars[D.nameRealm].data)
+        self:UpdateBar(D.nameRealm, bars[D.nameRealm].data)
     end
 end
 
-local function GetBar(friend)
-    return bars[friend]
+function module:GetBar(id)
+    return bars[id]
 end
 
-local function GetBarks()
+function module:GetBars()
     return bars
 end
-
--- API
-D.DeleteBar = module.DeleteBar
-D.GetBar = GetBar
-D.GetBars = GeBars

@@ -2,11 +2,21 @@ local D, C, L = unpack(select(2, ...))
 
 local _G = _G
 local CreateFrame = _G.CreateFrame
-local random = math.random
-local module = D:NewModule("Spark", "AceEvent-3.0")
+local random = _G.math.random
+local assert = _G.assert
+local unpack = _G.unpack
+local pairs = _G.pairs
+local tostring = _G.tostring
 
-local function PlaySpark(xp, sparks, parent)
-    for k, spark in pairs(sparks) do
+local moduleName = "markSpark"
+local module = D:NewModule(moduleName, "AceEvent-3.0")
+
+function module:PlaySpark(sparkList, parent)
+    --@alpha@
+    D.Debug(moduleName, "PlaySpark")
+    --@end-alpha@
+
+    for k, spark in pairs(sparkList) do
         if not spark.ag:IsPlaying() then
             local f1, p, f2, xOfs, yOfs = parent:GetPoint()
             local x = (xOfs + (C.db.profile.mark.size / 2)) --* UIParent:GetEffectiveScale()
@@ -25,30 +35,43 @@ local function PlaySpark(xp, sparks, parent)
             local d = random(unpack(C.sparkXP.durationSpread))
             spark.ag.a1:SetDuration(d)
             spark.ag.a2:SetDuration(d)
-
-            spark.xp = xp
+            spark.ag.a3:SetDuration(d)
             spark.ag:Play()
             break
         end
     end
 end
 
-local function OnSparkPlay(self)
-    local xp = self:GetParent().xp
-    if not xp or xp == "0" then
-        self:GetParent().text:SetText("")
-        self.ag:Stop()
+function module:OnSparkPlay(f)
+    --@alpha@
+    D.Debug(moduleName, "OnSparkPlay", f)
+    assert(f, 'markSparks:OnSparkPlay - f is missing')
+    assert(f.text, 'markSparks:OnSparkPlay - f.text is missing')
+    assert(f:GetParent().data, 'markSparks:OnSparkPlay - f:GetParent().data is missing')
+    --@end-alpha@
+
+    local value = f:GetParent().data.value
+    if not value or value == "0" then
+        f.ag:Stop()
         return
     end
 
-    self:GetParent().text:SetFormattedText(C.sparkXP.format, tostring(xp))
+    f.text:SetFormattedText(C.sparkXP.format, tostring(value))
 end
 
-local function OnSparkFinished(self)
-    self:GetParent().text:SetText("")
+function module:OnSparkFinished(f)
+    --@alpha@
+    D.Debug(moduleName, "OnSparkFinished", f)
+    --@end-alpha@
+
+    f.text:SetText("")
 end
 
-local function AddSpark(parent)
+function module:AddSpark(parent)
+    --@alpha@
+    D.Debug(moduleName, "AddSpark")
+    --@end-alpha@
+
     local f = CreateFrame("Frame", nil, parent)
     f:SetHeight(1)
     f:SetWidth(1)
@@ -60,7 +83,6 @@ local function AddSpark(parent)
     f.text:SetShadowColor(0, 0, 0, 0)
     f.text:SetShadowOffset(0, 0)
     f.text:SetTextColor(unpack(C.sparkXP.fontColor))
-    --f.text:SetText("DEBUG")
 
     f.ag = f:CreateAnimationGroup()
 
@@ -77,35 +99,47 @@ local function AddSpark(parent)
     f.ag.a2:SetDuration(0)
     f.ag.a2:SetSmoothing("IN_OUT")
 
-    f.ag:HookScript("OnPlay", OnSparkPlay)
-    f.ag:HookScript("OnFinished", OnSparkFinished)
+    f.ag.a3 = f.ag:CreateAnimation("Scale")
+    f.ag.a3:SetFromScale(1, 1)
+    f.ag.a3:SetToScale(0.85, 0.85)
+    f.ag.a3:SetDuration(0)
+    f.ag.a3:SetSmoothing("OUT")
+
+    f.ag:HookScript("OnPlay", function() self:OnSparkPlay(f) end)
+    f.ag:HookScript("OnFinished", function() self:OnSparkFinished(f) end)
 
     return f
 end
 
-local function PlayXpSpark(msg, name, f)
-    if not f.xpSparks then return end
+function module:PlayXpSpark(msg, name, f)
+    --@alpha@
+    D.Debug(moduleName, "PlayXpSpark", msg, name)
+    --@end-alpha@
+
+    if not f.sparks then return end
     if not f.gain or f.gain == 0 then return end
-    f.xpSparks.Play(f.gain)
+    f.sparks.Play(f.gain)
 end
 
-local function CreateSparks(parent)
+function module:Create(parent)
+    --@alpha@
+    D.Debug(moduleName, "Create")
+    assert(parent, 'markSparks:Create - parent is missing')
+    --@end-alpha@
+
     local f = {}
-    f.sparks = {}
-    f.Play = function(xp) PlaySpark(xp, f.sparks, parent) end
+    f.sparkList = {}
+    f.Play = function() self:PlaySpark(f.sparkList, parent) end
 
     -- debug
     _G[D.addonName.."PlaySpark"] = f.Play
 
     for i = 1, C.sparkXP.max, 1 do
-        f.sparks[i] = AddSpark(parent)
+        f.sparkList[i] = self:AddSpark(parent)
     end
     return f
 end
 
 function module:OnEnable()
-    self:RegisterMessage("UpdatePlayerMark", PlayXpSpark)
+    self:RegisterMessage("mark:Update", "PlayXpSpark")
 end
-
--- API
-D.CreateSparks = CreateSparks
