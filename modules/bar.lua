@@ -95,7 +95,7 @@ function module:Update()
     if not C.db.profile.bar.show then
         self:DeleteBar(D.nameRealm)
     else
-        self:UpdateBar(D.nameRealm, D.DataXpGet())
+        self:UpdateBar(D.nameRealm, D.dataXp.GetData())
     end
 
     if bars[D.nameRealm] then

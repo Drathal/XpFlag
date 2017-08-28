@@ -6,68 +6,47 @@ local UnitXPMax = _G.UnitXPMax
 local UnitLevel = _G.UnitLevel
 local SendAddonMessage = _G.SendAddonMessage
 local RegisterAddonMessagePrefix = _G.RegisterAddonMessagePrefix
+local LibStub = _G.LibStub
 
-local MessagePrefix = "XPF1b"
+local MessagePrefix = "XPF1"
 local MSG_TYPE_DATA = "DATA"
 local MSG_TYPE_REQUEST = "RESQUEST"
 local MSG_TYPE_DELETE = "DELETE"
 local MSG_TYPE_PING = "PING"
 local MSG_TYPE_PONG = "PONG"
 
-local module = D:NewModule("Communication", "AceEvent-3.0")
+local module = D:NewModule("com", "AceEvent-3.0", "AceSerializer-3.0")
 
-local function CreateMessage(type, xp, max, level, class)
-    local data = D.DataXpGet({
-        xp = xp,
-        max = max,
-        level = level,
-        class = class
-    })
-    return (type or MSG_TYPE_DATA)..":"..data.xp..":"..data.max..":"..data.level..":"..data.class
-end
-
-local function DecodeMessage(msg)
-    local type, xp, max, level, class = msg:match("^(.-):(.-):(.-):(.-):(.-)$");
-
-    return {
-        type = type,
-        xp = xp,
-        max = max,
-        level = level,
-        class = class
-    }
-end
-
-local function Send(type, target)
+function module:Send(type, target)
     -- print("COM: Send", type, target, CreateMessage(type))
     if not string.match(target, "%-") then return end
-    SendAddonMessage(MessagePrefix, CreateMessage(type), "WHISPER", target)
+    SendAddonMessage(MessagePrefix, self:Serialize(D[C.db.profile.mark.dataSource].GetData({type = type})), "WHISPER", target)
 end
 
-local function SendRequest(target)
-    Send(MSG_TYPE_REQUEST, target)
+function module:SendRequest(target)
+    self:Send(MSG_TYPE_REQUEST, target)
 end
 
-local function SendDelete(target)
-    Send(MSG_TYPE_DELETE, target)
+function module:SendDelete(target)
+    self:Send(MSG_TYPE_DELETE, target)
 end
 
-local function SendPing(target)
-    Send(MSG_TYPE_PING, target)
+function module:SendPing(target)
+    self:Send(MSG_TYPE_PING, target)
 end
 
-local function SendPong(target)
-    Send(MSG_TYPE_PONG, target)
+function module:SendPong(target)
+    self:Send(MSG_TYPE_PONG, target)
 end
 
-local function SendUpdate(target)
-    Send(MSG_TYPE_DATA, target)
+function module:SendUpdate(target)
+    self:Send(MSG_TYPE_DATA, target)
 end
 
-local function SendUpdates()
+function module:SendUpdates()
     for target, _ in pairs(D.GetMarks()) do
         if target and target ~= D.nameRealm then
-            SendUpdate(target)
+            self:SendUpdate(target)
         end
     end
 end
@@ -75,7 +54,7 @@ end
 function module:OnEnable()
     RegisterAddonMessagePrefix(MessagePrefix)
     self:RegisterEvent("CHAT_MSG_ADDON")
-    self:RegisterMessage("DataXpUpdate", SendUpdates)
+    self:RegisterMessage("DataXpUpdate", "SendUpdates")
 end
 
 function module:OnDisable()
@@ -92,23 +71,23 @@ function module:CHAT_MSG_ADDON(event, pre, rawmsg, chan, sender)
         sender = sender.."-"..D.realm
     end
 
-    local data = DecodeMessage(rawmsg)
+    local data = self:Deserialize(rawmsg)
 
     if data.type == MSG_TYPE_DATA then
         D:SendMessage("ReceiveData", sender, data)
     end
 
     if data.type == MSG_TYPE_PING then
-        SendPong(sender)
+        self:SendPong(sender)
         D:SendMessage("ReceivePing", sender, data)
     end
 
     if data.type == MSG_TYPE_PONG then
-        D:SendMessage("ReceivePong", sender, data)
+        self:SendMessage("ReceivePong", sender, data)
     end
 
     if data.type == MSG_TYPE_REQUEST then
-        SendUpdate(sender)
+        self:SendUpdate(sender)
         D:SendMessage("ReceiveRequest", sender, data)
     end
 
@@ -116,11 +95,3 @@ function module:CHAT_MSG_ADDON(event, pre, rawmsg, chan, sender)
         D:SendMessage("ReceiveDelete", sender, data)
     end
 end
-
--- API
-D.SendRequest = SendRequest
-D.SendDelete = SendDelete
-D.SendPing = SendPing
-D.SendPong = SendPong
-D.SendUpdate = SendUpdate
-D.SendUpdates = SendUpdates

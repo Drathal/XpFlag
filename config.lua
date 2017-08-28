@@ -124,6 +124,7 @@ function D:OnInitialize()
 
     LibStub("AceConfigRegistry-3.0"):RegisterOptionsTable(self.addonName, self.options)
     LibStub("AceConfigDialog-3.0"):AddToBlizOptions(self.addonName)
+
 end
 
 C["positions"] = {
@@ -164,19 +165,19 @@ C["bar"] = {
     ["show"] = true,
     ["texture"] = "Interface\\AddOns\\"..D.addonName.."\\media\\bar.blp",
     ["backdrop"] = [[Interface\BUTTONS\WHITE8X8]],
-	["edge"] = [[Interface\BUTTONS\WHITE8X8]],
-	["height"] = 1,
-	["animationSpeed"] = 6
+	  ["edge"] = [[Interface\BUTTONS\WHITE8X8]],
+	  ["height"] = 1,
+	  ["animationSpeed"] = 6
 }
 
 C["mark"] = {
     ["position"] = "SCREENTOP",
-	["size"] = 15,
+	  ["size"] = 15,
     ["dataSource"] = "DataXpUpdate",
-	["flip"] = true,
+	  ["flip"] = true,
     ["showPlayer"] = true,
-	["animationSpeed"] = 6,
-	["texture"] = {
+	  ["animationSpeed"] = 6,
+    ["texture"] = {
 		["default"] = "Interface\\AddOns\\"..D.addonName.."\\media\\circle.tga",
 		["below"] = "Interface\\AddOns\\"..D.addonName.."\\media\\circle-minus.tga",
 		["over"] = "Interface\\AddOns\\"..D.addonName.."\\media\\circle-plus.tga",
