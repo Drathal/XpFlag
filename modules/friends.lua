@@ -23,9 +23,15 @@ local online = {}
 local hasAddon = {}
 local throttleTime = 10
 
-local module = D:NewModule("friends", "AceEvent-3.0")
+local moduleName = "friends"
+local module = D:NewModule(moduleName, "AceEvent-3.0")
 
 function module:GetBNFriendName(id)
+    --@alpha@
+    D.Debug(moduleName, "GetBNFriendName", id)
+    assert(id, 'friends:GetBNFriendName - id is missing')
+    --@end-alpha@
+
     local bnetIDAccount, _, _, isBattleTagPresence, characterName, bnetIDGameAccount, client, isOnline, _, isAFK, isDND, _, _, isRIDFriend, _, _ = BNGetFriendInfo(id)
     if not bnetIDGameAccount then return end
     if not CanCooperateWithGameAccount(bnetIDGameAccount) then return end
@@ -35,6 +41,11 @@ function module:GetBNFriendName(id)
 end
 
 function module:GetFriendName(id)
+    --@alpha@
+    D.Debug(moduleName, "GetFriendName", id)
+    assert(id, 'friends:GetFriendName - id is missing')
+    --@end-alpha@
+
     local name, level, class, area, connected, status, note, raf, id = GetFriendInfo(id)
     if not name or not connected then return nil end
     if not match(name, "-") then
@@ -44,6 +55,12 @@ function module:GetFriendName(id)
 end
 
 function module:GetFriendNameByButton(button)
+    --@alpha@
+    D.Debug(moduleName, "GetFriendNameByButton", button)
+    assert(button, 'friends:GetFriendNameByButton - button is missing')
+    assert(button.id, 'friends:GetFriendNameByButton - button.id is missing')
+    --@end-alpha@
+
     if button and not button.id then return end
     local data = nil
     if button.buttonType == FRIENDS_BUTTON_TYPE_BNET then
@@ -55,8 +72,13 @@ function module:GetFriendNameByButton(button)
     return data
 end
 
-function module:OnStateButtonClick(self)
-    local friend = self:GetParent().friend
+function module:OnStateButtonClick(f)
+    --@alpha@
+    D.Debug(moduleName, "OnStateButtonClick", f)
+    assert(f, 'friends:OnStateButtonClick - f is missing')
+    --@end-alpha@
+
+    local friend = f:GetParent().friend
     if not friend then return end
     if D.GetMark(friend) then
         D:DeleteMark(friend)
@@ -80,6 +102,11 @@ function module:SetButtonTexture(button, state)
 end
 
 function module:CreateMiniButton(parent)
+    --@alpha@
+    D.Debug(moduleName, "CreateMiniButton", parent)
+    assert(parent, 'friends:CreateMiniButton - parent is missing')
+    --@end-alpha@
+
     local b = CreateFrame("Button", parent:GetName().."FriendButton", parent)
     b:SetFrameLevel(8)
     b:SetFrameStrata("DIALOG")
@@ -92,6 +119,9 @@ function module:CreateMiniButton(parent)
 end
 
 function module:RemoveOffineFriends()
+    --@alpha@
+    D.Debug(moduleName, "RemoveOffineFriends")
+    --@end-alpha@
     for friend, _ in pairs(D.GetMarks()) do
         if friend and friend ~= D.nameRealm and not online[friend] then
             D:DeleteMark(friend)
@@ -100,20 +130,30 @@ function module:RemoveOffineFriends()
 end
 
 function module:Ping(friend)
+    --@alpha@
+    assert(friend, 'friends:Ping - friend is missing')
+    --@end-alpha@
     if pinged[friend] and pinged[friend] > GetTime() - throttleTime then return end
     if hasAddon[friend] then return end
+    --@alpha@
+    D.Debug(moduleName, "Ping", friend)
+    --@end-alpha@
     D:SendPing(friend)
     pinged[friend] = GetTime()
 end
 
-function module:OnFriendsFrameUpdate()
+function module:OnFriendsFrameUpdate(self)
     if not FriendsFrame:IsShown() then return end
+
+    --@alpha@
+    D.Debug(moduleName, "OnFriendsFrameUpdate")
+    --@end-alpha@
 
     wipe(online)
     local buttons = FriendsFrameFriendsScrollFrame.buttons
 
     for i = 1, #buttons do
-        local friend = self:GetFriendNameByButton(buttons[i])
+        local friend = module:GetFriendNameByButton(buttons[i])
         buttons[i].friend = friend
         if buttons[i].statusButton then
             buttons[i].statusButton:Hide()
@@ -133,24 +173,43 @@ function module:OnFriendsFrameUpdate()
         end
     end
 
-    self:RemoveOffineFriends()
-
+    module:RemoveOffineFriends()
 end
 
 function module:OnPong(event, friend)
+    --@alpha@
+    D.Debug(moduleName, "OnPong", event, friend)
+    assert(event, 'friends:OnPong - event is missing')
+    assert(friend, 'friends:OnPong - friend is missing')
+    --@end-alpha@
     hasAddon[friend] = true
     self:OnFriendsFrameUpdate()
 end
 
 function module:OnNewMark(event, friend)
+    --@alpha@
+    D.Debug(moduleName, "OnNewMark", event, friend)
+    assert(event, 'friends:OnNewMark - event is missing')
+    assert(friend, 'friends:OnNewMark - friend is missing')
+    --@end-alpha@
     self:OnFriendsFrameUpdate()
 end
 
 function module:OnDeleteMark(event, friend)
+    --@alpha@
+    D.Debug(moduleName, "OnDeleteMark", event, friend)
+    assert(event, 'friends:OnDeleteMark - event is missing')
+    assert(friend, 'friends:OnDeleteMark - friend is missing')
+    --@end-alpha@
     self:OnFriendsFrameUpdate()
 end
 
 function module:OnEnable()
+    --@alpha@
+    D.Debug(moduleName, "OnEnable")
+    --@end-alpha@
+
+    print("------------", self.OnFriendsFrameUpdate)
     hooksecurefunc(_G['FriendsFrameFriendsScrollFrame'], 'update', self.OnFriendsFrameUpdate)
     hooksecurefunc('FriendsFrame_UpdateFriends', self.OnFriendsFrameUpdate)
     self:RegisterMessage("ReceivePong", "OnPong")

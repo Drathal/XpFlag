@@ -16,14 +16,19 @@ local UnitLevel = _G.UnitLevel
 local MAX_PLAYER_LEVEL_TABLE = _G.MAX_PLAYER_LEVEL_TABLE
 
 local debug = {
+    --@alpha@
     mark = true,
     dataXp = true,
-    markSpark = true
+    markSpark = true,
+    com = true,
+    bar = true,
+    friends = true
+    --@end-alpha@
 }
 
-local function Debug(module, msg, a1, a2)
+local function Debug(module, msg, a1, a2, a3, a4)
     if not debug[module] then return end
-    print("|cffffff78" .. module .. ":|r".. msg .. " |cff88ff88", a1 or "", a2 or "", "|r")
+    print("|cffffff78" .. module .. ":|r".. msg .. " |cff88ff88", a1 or "", a2 or "", a3 or "", a4 or "", "|r")
 end
 
 local function CopyTable(src, dest)

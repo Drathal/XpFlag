@@ -7,7 +7,8 @@ local unpack = _G.unpack
 
 local bars = {}
 
-local module = D:NewModule("bar", "AceEvent-3.0")
+local moduleName = "bar"
+local module = D:NewModule(moduleName, "AceEvent-3.0")
 
 function module:OnAnimation(bar, elapsed)
     D.AnimateWidth(bar)
@@ -66,7 +67,6 @@ function module:DeleteBar(id)
     if not bars[id] then return end
     bars[id]:Hide()
     bars[id] = nil
-    D:SendMessage("DeleteBar", id)
 end
 
 function module:UpdateBar(id, data)

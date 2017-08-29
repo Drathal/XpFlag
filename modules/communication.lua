@@ -3,6 +3,7 @@ local D, C, L = unpack(select(2, ...))
 local _G = _G
 local match = _G.string.match
 local pairs = _G.pairs
+local split = _G.split
 local UnitXP = _G.UnitXP
 local UnitXPMax = _G.UnitXPMax
 local UnitLevel = _G.UnitLevel
@@ -17,11 +18,61 @@ local MSG_TYPE_DELETE = "DELETE"
 local MSG_TYPE_PING = "PING"
 local MSG_TYPE_PONG = "PONG"
 
-local module = D:NewModule("com", "AceEvent-3.0", "AceSerializer-3.0")
+local moduleName = "com"
+local module = D:NewModule(moduleName, "AceEvent-3.0", "AceSerializer-3.0")
+
+--@alpha@
+-- mock communication
+local fakeCom = true
+local message = nil
+local random = _G.math.random
+function module:FakeSendAddonMessage(prefix, msg, type, target)
+    D.Debug(moduleName, "FakeSendAddonMessage", prefix, msg, type, target)
+
+    local data = self:Deserialize(msg)
+
+    local fakeData = {
+        dataType = "dataXp",
+        name = select(1, split(target, "-")),
+        realm = select(2, split(target, "-")),
+        level = random(1, 110),
+        class = "HUNTER",
+        disable = false,
+        value = 233,
+        max = 5000,
+        gain = 112,
+        rested = 0
+    }
+
+    -- when we send a ping -- other player is sending pong back
+    if data.type == MSG_TYPE_PING then
+        fakeData.type = MSG_TYPE_PONG
+        self:CHAT_MSG_ADDON("CHAT_MSG_ADDON", MessagePrefix, self:Serialize(D["dataXp"]:GetData(fakeData)), "WHISPER", fakeData.name .."-"..fakeData.realm)
+    end
+end
+--@end-alpha@
 
 function module:Send(type, target)
+    --@alpha@
+    D.Debug(moduleName, "Send", type, target)
+    assert(type, 'com:Send - type is missing')
+    assert(not match(target, "%-"), 'com:Send - target has no relam')
+    assert(target, 'com:Send - target is missing')
+    --@end-alpha@
+
     if not match(target, "%-") then return end
-    SendAddonMessage(MessagePrefix, self:Serialize(D[C.db.profile.mark.dataSource]:GetData({type = type})), "WHISPER", target)
+
+    --@alpha@
+    if not fakeCom then
+        --@end-alpha@
+        SendAddonMessage(MessagePrefix, self:Serialize(D[C.db.profile.mark.dataSource]:GetData({type = type})), "WHISPER", target)
+        --@alpha@
+    end
+
+    if fakeCom then
+        self:FakeSendAddonMessage(MessagePrefix, self:Serialize(D[C.db.profile.mark.dataSource]:GetData({type = type})), "WHISPER", target)
+    end
+    --@end-alpha@
 end
 
 function module:SendRequest(target)

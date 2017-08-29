@@ -153,7 +153,10 @@ function module:DeleteMark(id)
     if not marks[id] then return end
     marks[id]:Hide()
     marks[id] = nil
-    D:SendMessage("DeleteMark", id)
+    --@alpha@
+    D.Debug(moduleName, "DeleteMark - SendMessage", moduleName..":Delete", id )
+    --@end-alpha@
+    D:SendMessage(moduleName..":Delete", id)
 end
 
 function module:Update()
@@ -173,6 +176,9 @@ function module:Update()
 
     for id, mark in pairs(marks) do
         if not mark then return end
+        --@alpha@
+        assert(mark.data, 'mark:Update - mark.data is missing for '..id)
+        --@end-alpha@
 
         local _, p, _, xOfs, _ = mark:GetPoint()
         newPos[4] = xOfs
@@ -183,10 +189,6 @@ function module:Update()
         mark:SetHeight(C.db.profile.mark.size)
         mark:SetWidth(C.db.profile.mark.size)
         mark.texture:SetTexCoord(unpack(C.db.profile.mark.flip and {0, 1, 1, 0} or {0, 1, 0, 1}))
-
-        --@alpha@
-        assert(mark.data, 'mark:Update - mark.data is missing for '..id)
-        --@end-alpha@
 
         self:UpdateMark(id, mark.data)
     end

@@ -14,6 +14,7 @@ local module = D:NewModule(moduleName, "AceEvent-3.0")
 function module:PlaySpark(sparkList, parent)
     --@alpha@
     D.Debug(moduleName, "PlaySpark")
+    assert(sparkList, 'markSpark:PlaySpark - sparkList is missing for ')
     --@end-alpha@
 
     for k, spark in pairs(sparkList) do
@@ -69,7 +70,7 @@ end
 
 function module:AddSpark(parent)
     --@alpha@
-    D.Debug(moduleName, "AddSpark")
+    -- D.Debug(moduleName, "AddSpark")
     --@end-alpha@
 
     local f = CreateFrame("Frame", nil, parent)
@@ -141,5 +142,8 @@ function module:Create(parent)
 end
 
 function module:OnEnable()
+    --@alpha@
+    D.Debug(moduleName, "OnEnable")
+    --@end-alpha@
     self:RegisterMessage("mark:Update", "PlayXpSpark")
 end

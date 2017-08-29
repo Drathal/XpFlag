@@ -5,7 +5,8 @@ local CreateFrame = _G.CreateFrame
 local UIFrameFadeIn = _G.UIFrameFadeIn
 local UIFrameFadeOut = _G.UIFrameFadeOut
 
-local module = D:NewModule("markModel", "AceEvent-3.0")
+local moduleName = "markModel"
+local module = D:NewModule(moduleName, "AceEvent-3.0")
 
 function module:Create(parent)
     local m = CreateFrame('PlayerModel', D.addonName..'-SparkModel', parent)
@@ -27,6 +28,6 @@ function module:FadeOutMarkModel(msg, f)
 end
 
 function module:OnEnable()
-    self:RegisterMessage("UpdatePlayerMark", "FadeInMarkModel")
+    self:RegisterMessage("mark:Update", "FadeInMarkModel")
     self:RegisterMessage("AnimateXEnd", "FadeOutMarkModel")
 end

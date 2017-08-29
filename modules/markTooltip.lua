@@ -8,9 +8,14 @@ local COLORS = _G.RAID_CLASS_COLORS
 local format = _G.string.format
 local pairs = _G.pairs
 
-local module = D:NewModule("markTooltip")
+local moduleName = "markTooltip"
+local module = D:NewModule(moduleName)
 
 function module:CreateMarkTooltip()
+    --@alpha@
+    D.Debug(moduleName, "CreateMarkTooltip")
+    --@end-alpha@
+
     local t = CreateFrame("Frame")
     t:Hide()
     t.delay = 0.25
@@ -40,16 +45,29 @@ function module:CreateMarkTooltip()
     return t
 end
 
-function module:OnMarkTooltipEnter(self)
-    GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+function module:OnMarkTooltipEnter(owner)
+    --@alpha@
+    D.Debug(moduleName, "CreateMarkTooltip")
+    assert(owner, 'markTooltip:OnMarkTooltipEnter - owner is missing')
+    --@end-alpha@
+
+    GameTooltip:SetOwner(owner, "ANCHOR_RIGHT")
     module.t:Show();
 end
 
-function module:OnMarkTooltipLeave(self)
+function module:OnMarkTooltipLeave()
+    --@alpha@
+    D.Debug(moduleName, "OnMarkTooltipLeave")
+    --@end-alpha@
+
     module.t:Hide();
     GameTooltip:Hide()
 end
 
 function module:OnEnable()
+    --@alpha@
+    D.Debug(moduleName, "OnEnable")
+    --@end-alpha@
+
     module.t = self:CreateMarkTooltip()
 end
