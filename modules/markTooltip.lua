@@ -7,67 +7,54 @@ local GameTooltip = _G.GameTooltip
 local COLORS = _G.RAID_CLASS_COLORS
 local format = _G.string.format
 local pairs = _G.pairs
+--@alpha@
+local assert = _G.assert
+--@end-alpha@
 
 local moduleName = "markTooltip"
 local module = D:NewModule(moduleName)
+local delay = 1
 
-function module:CreateMarkTooltip()
+local function UpdateTooltip(parent)
+    local data = parent.data
+    GameTooltip:ClearLines()
+    GameTooltip:AddLine(format("%s XP", D.addonName))
+    GameTooltip:AddLine(data.name, COLORS[data.class].r, COLORS[data.class].g, COLORS[data.class].b, 1)
+    GameTooltip:AddLine(format("Level: %s", data.level), 1, 1, 1, 1)
+    GameTooltip:AddLine(format("XP: %s/%s (%.2f %%)", data.value, data.max, data.value / data.max * 100 ), 1, 1, 1, 1)
+    if data.rested then
+        GameTooltip:AddLine(format("Rested: %s (%.2f %%)", data.rested, data.rested / data.max * 100 ), 1, 1, 1, 1)
+    end
+    GameTooltip:Show()
+end
+
+local function OnUpdate(parent, elapsed)
+    parent.tooltip.delay = parent.tooltip.delay - elapsed;
+    if parent.tooltip.delay > 0 then return end
+    UpdateTooltip(parent)
+    parent.tooltip.delay = delay
+end
+
+function module:SetTooltip(parent)
     --@alpha@
-    D.Debug(moduleName, "CreateMarkTooltip")
+    D.Debug(moduleName, "SetTooltip")
     --@end-alpha@
 
-    local t = CreateFrame("Frame")
-    t:Hide()
-    t.delay = 0.25
-    t:SetScript("OnUpdate", function(self, elapsed)
-        t.delay = t.delay - elapsed;
-        if t.delay > 0 then return end
+    parent.tooltip = CreateFrame("Frame", nil, parent)
+    parent.tooltip:Hide()
 
-        local rested = GetXPExhaustion()
-
-        for _, mark in pairs(D.GetMarks()) do
-            if mark:IsMouseOver() and mark.data then
-                local data = mark.data
-                GameTooltip:ClearLines()
-                GameTooltip:AddLine(format("%s XP", D.addonName))
-                GameTooltip:AddLine(data.name, COLORS[data.class].r, COLORS[data.class].g, COLORS[data.class].b, 1)
-                GameTooltip:AddLine(format("Level: %s", data.level), 1, 1, 1, 1)
-                GameTooltip:AddLine(format("XP: %s/%s (%.2f %)", data.value, data.max, data.value / data.max * 100 ), 1, 1, 1, 1)
-                if data.rested then
-                    GameTooltip:AddLine(format("Rested: %s (%.2f %)", data.rested, data.rested / data.max * 100 ), 1, 1, 1, 1)
-                end
-                GameTooltip:Show()
-            end
-        end
-        t.delay = 0.25
+    parent:SetScript("OnEnter", function(self)
+        parent.tooltip:SetScript("OnUpdate", function(self, elapsed) OnUpdate(parent, elapsed) end)
+        parent.tooltip.delay = 0
+        parent.tooltip:Show()
+        GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+        GameTooltip:ClearLines()
+        GameTooltip:AddLine(format("%s XP", D.addonName))
+        GameTooltip:Show()
     end)
-
-    return t
-end
-
-function module:OnMarkTooltipEnter(owner)
-    --@alpha@
-    D.Debug(moduleName, "CreateMarkTooltip")
-    assert(owner, 'markTooltip:OnMarkTooltipEnter - owner is missing')
-    --@end-alpha@
-
-    GameTooltip:SetOwner(owner, "ANCHOR_RIGHT")
-    module.t:Show();
-end
-
-function module:OnMarkTooltipLeave()
-    --@alpha@
-    D.Debug(moduleName, "OnMarkTooltipLeave")
-    --@end-alpha@
-
-    module.t:Hide();
-    GameTooltip:Hide()
-end
-
-function module:OnEnable()
-    --@alpha@
-    D.Debug(moduleName, "OnEnable")
-    --@end-alpha@
-
-    module.t = self:CreateMarkTooltip()
+    parent:SetScript("OnLeave", function(self)
+        parent.tooltip:Hide()
+        GameTooltip:Hide()
+        parent.tooltip:SetScript("OnUpdate", nil)
+    end)
 end

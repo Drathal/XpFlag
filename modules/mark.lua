@@ -41,8 +41,8 @@ function module:CreateMark(id, data)
     m:SetFrameLevel(2)
     m:SetAlpha(1)
     m:EnableMouse()
-    m:SetScript("OnEnter", D:GetModule("markTooltip").OnMarkTooltipEnter )
-    m:SetScript("OnLeave", D:GetModule("markTooltip").OnMarkTooltipLeave )
+    D:GetModule("markTooltip"):SetTooltip(m)
+
     m.texture = m:CreateTexture(nil, "OVERLAY")
     m.texture:SetAllPoints(m)
     m.texture:SetTexture(C.mark.texture.default)
@@ -67,7 +67,7 @@ function module:CreateMark(id, data)
     m.texture:SetVertexColor(data.cR, data.cG, data.cB)
     m:SetFrameLevel(5)
     m.model = D:GetModule("markModel"):Create(m)
-    m.xpSparks = D:GetModule("markSpark"):Create(m)
+    m.sparks = D:GetModule("markSpark"):Create(m)
 
     return m
 end
@@ -153,10 +153,7 @@ function module:DeleteMark(id)
     if not marks[id] then return end
     marks[id]:Hide()
     marks[id] = nil
-    --@alpha@
-    D.Debug(moduleName, "DeleteMark - SendMessage", moduleName..":Delete", id )
-    --@end-alpha@
-    D:SendMessage(moduleName..":Delete", id)
+    D:SendMessage("DeleteMark", id)
 end
 
 function module:Update()
@@ -176,9 +173,6 @@ function module:Update()
 
     for id, mark in pairs(marks) do
         if not mark then return end
-        --@alpha@
-        assert(mark.data, 'mark:Update - mark.data is missing for '..id)
-        --@end-alpha@
 
         local _, p, _, xOfs, _ = mark:GetPoint()
         newPos[4] = xOfs
@@ -189,6 +183,10 @@ function module:Update()
         mark:SetHeight(C.db.profile.mark.size)
         mark:SetWidth(C.db.profile.mark.size)
         mark.texture:SetTexCoord(unpack(C.db.profile.mark.flip and {0, 1, 1, 0} or {0, 1, 0, 1}))
+
+        --@alpha@
+        assert(mark.data, 'mark:Update - mark.data is missing for '..id)
+        --@end-alpha@
 
         self:UpdateMark(id, mark.data)
     end

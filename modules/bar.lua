@@ -4,6 +4,7 @@ local _G = _G
 local CreateFrame = _G.CreateFrame
 local select = _G.select
 local unpack = _G.unpack
+local assert = _G.assert
 
 local bars = {}
 
@@ -17,15 +18,28 @@ end
 function module:OnEnable()
     if not C.db.profile.bar.show then return end
     if not C.db.profile.bar.dataSource then return end
+    --@alpha@
+    D.Debug(moduleName, "OnEnable")
+    --@end-alpha@
+
     self:RegisterMessage(C.db.profile.bar.dataSource..":Update", "UpdatePlayerBar")
 end
 
 function module:OnDisable()
+    --@alpha@
+    D.Debug(moduleName, "OnDisable")
+    --@end-alpha@
+
     self.DeleteBar(D.nameRealm)
     self:UnregisterMessage(C.db.profile.bar.dataSource..":Update")
 end
 
 function module:CreateBar(id)
+    --@alpha@
+    D.Debug(moduleName, "CreateBar", id)
+    assert(id, 'bar:CreateBar - id is missing')
+    --@end-alpha@
+
     local parent = select(2, unpack(C.positions[C.db.profile.bar.position]))
     local bar = CreateFrame("Frame", nil, parent)
     bar.name = id
@@ -63,14 +77,23 @@ function module:CreateBar(id)
 end
 
 function module:DeleteBar(id)
-    if not id then return end
+    --@alpha@
+    D.Debug(moduleName, "DeleteBar", id)
+    assert(id, 'bar:DeleteBar - id is missing')
+    --@end-alpha@
+
     if not bars[id] then return end
     bars[id]:Hide()
     bars[id] = nil
 end
 
 function module:UpdateBar(id, data)
-    if not data then return end
+    --@alpha@
+    D.Debug(moduleName, "UpdateBar", id)
+    assert(id, 'bar:UpdateBar - id is missing')
+    assert(data, 'bar:UpdateBar - data is missing')
+    --@end-alpha@
+
     local bar = bars[id] or self:CreateBar(id)
 
     bar.data = data
@@ -90,10 +113,20 @@ function module:UpdateBar(id, data)
 end
 
 function module:UpdatePlayerBar(msg, id, data)
+    --@alpha@
+    D.Debug(moduleName, "UpdatePlayerBar", id)
+    assert(id, 'bar:UpdatePlayerBar - id is missing')
+    assert(data, 'bar:UpdatePlayerBar - data is missing')
+    --@end-alpha@
+
     self:UpdateBar(id, data)
 end
 
 function module:Update()
+    --@alpha@
+    D.Debug(moduleName, "Update")
+    --@end-alpha@
+
     if not C.db.profile.bar.show then
         self:DeleteBar(D.nameRealm)
     else
@@ -112,9 +145,18 @@ function module:Update()
 end
 
 function module:GetBar(id)
+    --@alpha@
+    D.Debug(moduleName, "GetBar", id)
+    assert(id, 'bar:GetBar - id is missing')
+    --@end-alpha@
+
     return bars[id]
 end
 
 function module:GetBars()
+    --@alpha@
+    D.Debug(moduleName, "GetBars")
+    --@end-alpha@
+
     return bars
 end

@@ -25,6 +25,8 @@ local module = D:NewModule(moduleName, "AceEvent-3.0", "AceSerializer-3.0")
 -- mock communication
 local fakeCom = true
 local message = nil
+local assert = _G.assert
+local select = _G.select
 local random = _G.math.random
 function module:FakeSendAddonMessage(prefix, msg, type, target)
     D.Debug(moduleName, "FakeSendAddonMessage", prefix, msg, type, target)

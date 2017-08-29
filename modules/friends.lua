@@ -15,6 +15,9 @@ local pairs = _G.pairs
 local hooksecurefunc = _G.hooksecurefunc
 local FRIENDS_BUTTON_TYPE_BNET = _G.FRIENDS_BUTTON_TYPE_BNET
 local FRIENDS_BUTTON_TYPE_WOW = _G.FRIENDS_BUTTON_TYPE_WOW
+--@alpha@
+local assert = _G.assert
+--@end-alpha@
 
 local buttonOff = "Interface\\COMMON\\Indicator-Gray"
 local buttonOn = "Interface\\COMMON\\Indicator-Green"
@@ -142,11 +145,12 @@ function module:Ping(friend)
     pinged[friend] = GetTime()
 end
 
-function module:OnFriendsFrameUpdate(self)
+function module:OnFriendsFrameUpdate(self, a, b)
     if not FriendsFrame:IsShown() then return end
 
     --@alpha@
-    D.Debug(moduleName, "OnFriendsFrameUpdate")
+    D.Debug(moduleName, "OnFriendsFrameUpdate", self, a, b)
+    assert(self, 'friends:OnFriendsFrameUpdate - self is missing')
     --@end-alpha@
 
     wipe(online)
@@ -209,10 +213,10 @@ function module:OnEnable()
     D.Debug(moduleName, "OnEnable")
     --@end-alpha@
 
-    print("------------", self.OnFriendsFrameUpdate)
-    hooksecurefunc(_G['FriendsFrameFriendsScrollFrame'], 'update', self.OnFriendsFrameUpdate)
-    hooksecurefunc('FriendsFrame_UpdateFriends', self.OnFriendsFrameUpdate)
+    local this = self
+    hooksecurefunc(_G['FriendsFrameFriendsScrollFrame'], 'update', function() module.OnFriendsFrameUpdate(this, 'bbbbb') end)
+    hooksecurefunc('FriendsFrame_UpdateFriends', function() module.OnFriendsFrameUpdate(this, 'aaaaa') end)
     self:RegisterMessage("ReceivePong", "OnPong")
-    self:RegisterMessage("CreateMark", "OnNewMark")
-    self:RegisterMessage("DeleteMark", "OnDeleteMark")
+    self:RegisterMessage("mark:Create", "OnNewMark")
+    self:RegisterMessage("mark:Delete", "OnDeleteMark")
 end

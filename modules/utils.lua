@@ -20,6 +20,7 @@ local debug = {
     mark = true,
     dataXp = true,
     markSpark = true,
+    markTooltip = true,
     com = true,
     bar = true,
     friends = true
