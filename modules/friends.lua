@@ -2,6 +2,18 @@ local D, C, L = unpack(select(2, ...))
 
 local _G = _G
 local GetTime = _G.GetTime
+local CanCooperateWithGameAccount = _G.CanCooperateWithGameAccount
+local BNGetGameAccountInfo = _G.BNGetGameAccountInfo
+local BNGetFriendInfo = _G.BNGetFriendInfo
+local GetFriendInfo = _G.GetFriendInfo
+local CreateFrame = _G.CreateFrame
+local FriendsFrame = _G.FriendsFrame
+local FriendsFrameFriendsScrollFrame = _G.FriendsFrameFriendsScrollFrame
+local wipe = _G.wipe
+local hooksecurefunc = _G.hooksecurefunc
+local FRIENDS_BUTTON_TYPE_BNET = _G.FRIENDS_BUTTON_TYPE_BNET
+local FRIENDS_BUTTON_TYPE_WOW = _G.FRIENDS_BUTTON_TYPE_WOW
+
 local buttonOff = "Interface\\COMMON\\Indicator-Gray"
 local buttonOn = "Interface\\COMMON\\Indicator-Green"
 local pinged = {}
@@ -91,7 +103,7 @@ end
 
 local function Ping(friend)
     if pinged[friend] and pinged[friend] > GetTime() - throttleTime then return end
-    if hasAddon[friends] then return end
+    if hasAddon[friend] then return end
     D.SendPing(friend)
     pinged[friend] = GetTime()
 end

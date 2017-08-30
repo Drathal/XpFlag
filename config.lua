@@ -2,6 +2,7 @@ local D, C, L = unpack(select(2, ...))
 
 local _G = _G
 local GameFontNormal = _G.GameFontNormal
+local LibStub = _G.LibStub
 
 local options = nil
 
@@ -87,10 +88,15 @@ D.options = {
                     type = 'select',
                     order = 2,
                     width = 'full',
-                    values = {
-                        ["SCREENTOP"] = L["POS_SCREENTOP"],
-                        ["SCREENBOTTOM"] = L["POS_SCREENBOTTOM"],
-                    },
+                    values = function()
+                        local items = {}
+                        items["SCREENTOP"] = L["POS_SCREENTOP"]
+                        items["SCREENBOTTOM"] = L["POS_SCREENBOTTOM"]
+                        if _G['MainMenuExpBar']:IsVisible() then
+                            items["BLIZZEXPBAR"] = L["POS_BLIZZ_EXPBAR"]
+                        end
+                        return items
+                    end,
                     name = L["MARK_POS_LABEL"],
                     desc = L["Mark_POS_DESC"]
                 },
@@ -112,7 +118,7 @@ D.options = {
 
 function D:OnInitialize()
     local default = {}
-    default.profile = CopyTable(C)
+    default.profile = D.CopyTable(C)
 
     C.db = LibStub("AceDB-3.0"):New("XpFlagDB", default, "Default")
 
@@ -123,7 +129,10 @@ end
 C["positions"] = {
     ["SCREENTOP"] = { "TOPLEFT", _G['UIParent'], "TOPLEFT", 0, 0 },
     ["SCREENBOTTOM"] = { "BOTTOMLEFT", _G['UIParent'], "BOTTOMLEFT", 0, 0 },
+    ["BLIZZEXPBAR"] = { "BOTTOMLEFT", _G['MainMenuExpBar'], "BOTTOMLEFT", 0, 2 },
 }
+
+-- MainMenuExpBar
 
 C["player"] = {
     ["show"] = true,

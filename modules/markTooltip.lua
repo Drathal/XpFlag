@@ -1,7 +1,9 @@
 local D, C, L = unpack(select(2, ...))
 
 local _G = _G
+local CreateFrame = _G.CreateFrame
 local GetXPExhaustion = _G.GetXPExhaustion
+local GameTooltip = _G.GameTooltip
 local RAID_CLASS_COLORS = _G.RAID_CLASS_COLORS
 local format = string.format
 

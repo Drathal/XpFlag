@@ -4,10 +4,13 @@ local _G = _G
 local min = math.min;
 local max = math.max;
 local floor = math.floor
+local abs = math.abs
 local GetXPExhaustion = _G.GetXPExhaustion
 local GetFramerate = _G.GetFramerate
 local GetExpansionLevel = _G.GetExpansionLevel
+local CreateFrame = _G.CreateFrame
 local UnitLevel = _G.UnitLevel
+local MAX_PLAYER_LEVEL_TABLE = _G.MAX_PLAYER_LEVEL_TABLE
 
 local function CopyTable(src, dest)
     if type(dest) ~= "table" then
@@ -106,7 +109,7 @@ local function AnimateX(f)
 
     local p1, p, p2, xOfs, yOfs = f:GetPoint()
     f:ClearAllPoints();
-    f:SetPoint(p1, p, p2, new - f:GetWidth() / 2, 0);
+    f:SetPoint(p1, p, p2, new - f:GetWidth() / 2, yOfs);
 
     f.cur = new
     return f.to
@@ -117,7 +120,6 @@ local function IsMaxLevel(level)
 end
 
 -- API
-D.FormatNumber = FormatNumber
 D.Throttle = Throttle
 D.GetXpColor = GetXpColor
 D.GetMarkTexture = GetMarkTexture

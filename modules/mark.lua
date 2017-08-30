@@ -1,7 +1,14 @@
 local D, C, L = unpack(select(2, ...))
 
 local _G = _G
+local select = select
+local unpack = unpack
 local CreateFrame = _G.CreateFrame
+local UnitXP = _G.UnitXP
+local UnitXPMax = _G.UnitXPMax
+local UnitLevel = _G.UnitLevel
+
+local RAID_CLASS_COLORS = RAID_CLASS_COLORS
 
 local marks = {}
 
@@ -78,7 +85,7 @@ function module:UpdateMark(name, value, maxvalue, level, class)
     m.maxvalue = maxvalue
     m.level = level
     m.gain = tonumber(value) - tonumber(m.prev) or 0
-    m.to = D.screenWidth * value / maxvalue
+    m.to = m:GetParent():GetWidth() * value / maxvalue
     m.texture:SetTexture(D.GetMarkTexture(level, UnitLevel("player")))
     m.texture:SetVertexColor(RAID_CLASS_COLORS[class].r, RAID_CLASS_COLORS[class].g, RAID_CLASS_COLORS[class].b)
     m:Show()
@@ -138,11 +145,17 @@ function module:Update()
         C.db.profile.mark.flip = nil
     end
 
+    local newPos = C.positions[C.db.profile.mark.position]
+
     for name, mark in pairs(marks) do
         if not mark then return end
 
+        local _, p, _, xOfs, _ = mark:GetPoint()
+        newPos[4] = xOfs
+
         mark:ClearAllPoints()
-        mark:SetPoint(unpack(C.positions[C.db.profile.mark.position]))
+        mark:SetParent(p)
+        mark:SetPoint(unpack(newPos))
         mark:SetHeight(C.db.profile.mark.size)
         mark:SetWidth(C.db.profile.mark.size)
         mark.texture:SetTexCoord(unpack(C.db.profile.mark.flip and {0, 1, 1, 0} or {0, 1, 0, 1}))
