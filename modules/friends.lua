@@ -125,9 +125,9 @@ function module:RemoveOffineFriends()
     --@alpha@
     D.Debug(moduleName, "RemoveOffineFriends")
     --@end-alpha@
-    for friend, _ in pairs(D.GetMarks()) do
+    for friend, _ in pairs(D:GetModule("mark"):GetMarks()) do
         if friend and friend ~= D.nameRealm and not online[friend] then
-            D:DeleteMark(friend)
+            D:GetModule("mark"):DeleteMark(friend)
         end
     end
 end
@@ -136,44 +136,71 @@ function module:Ping(friend)
     --@alpha@
     assert(friend, 'friends:Ping - friend is missing')
     --@end-alpha@
+
     if pinged[friend] and pinged[friend] > GetTime() - throttleTime then return end
     if hasAddon[friend] then return end
+
     --@alpha@
     D.Debug(moduleName, "Ping", friend)
     --@end-alpha@
-    D:SendPing(friend)
+
+    D:GetModule("com"):SendPing(friend)
     pinged[friend] = GetTime()
 end
 
-function module:OnFriendsFrameUpdate(self, a, b)
+function module:UpdateFriendButton(button)
+
+    local friend = nil
+
+    --@alpha@
+    if D.fakeCom then
+        friend = "dummy-Madmortem"
+    end
+    --@end-alpha@
+
+    friend = friend or module:GetFriendNameByButton(button)
+
+    button.friend = friend
+
+    if button.statusButton then
+        button.statusButton:Hide()
+    end
+
+    if friend then
+        online[friend] = true
+        self:Ping(friend)
+        if button:IsShown() then
+            if not button.statusButton then
+                button.statusButton = self:CreateMiniButton(button)
+            end
+            self:SetButtonTexture(button.statusButton, D:GetModule("module"):GetMark(friend))
+            if hasAddon[friend] then
+                button.statusButton:Show()
+            end
+        end
+    end
+end
+
+function module:OnFriendsFrameUpdate(self)
     if not FriendsFrame:IsShown() then return end
 
     --@alpha@
-    D.Debug(moduleName, "OnFriendsFrameUpdate", self, a, b)
+    D.Debug(moduleName, "OnFriendsFrameUpdate", self)
     assert(self, 'friends:OnFriendsFrameUpdate - self is missing')
     --@end-alpha@
 
     wipe(online)
     local buttons = FriendsFrameFriendsScrollFrame.buttons
 
+    --@alpha@
+    if D.fakeCom then
+        self:UpdateFriendButton(_G.FriendsFrameBattlenetFrame)
+    end
+    --@end-alpha@
+
     for i = 1, #buttons do
-        local friend = module:GetFriendNameByButton(buttons[i])
-        buttons[i].friend = friend
-        if buttons[i].statusButton then
-            buttons[i].statusButton:Hide()
-        end
-        if friend then
-            online[friend] = true
-            self:Ping(friend)
-            if buttons[i]:IsShown() then
-                if not buttons[i].statusButton then
-                    buttons[i].statusButton = self:CreateMiniButton(buttons[i])
-                end
-                self:SetButtonTexture(buttons[i].statusButton, D:GetMark(friend))
-                if hasAddon[friend] then
-                    buttons[i].statusButton:Show()
-                end
-            end
+        if (buttons[i].buttonType == FRIENDS_BUTTON_TYPE_WOW or buttons[i].buttonType == FRIENDS_BUTTON_TYPE_BNET) and buttons[i].gameIcon:IsVisible() then
+            self:UpdateFriendButton(buttons[i])
         end
     end
 
@@ -214,8 +241,8 @@ function module:OnEnable()
     --@end-alpha@
 
     local this = self
-    hooksecurefunc(_G['FriendsFrameFriendsScrollFrame'], 'update', function() module.OnFriendsFrameUpdate(this, 'bbbbb') end)
-    hooksecurefunc('FriendsFrame_UpdateFriends', function() module.OnFriendsFrameUpdate(this, 'aaaaa') end)
+    hooksecurefunc(_G['FriendsFrameFriendsScrollFrame'], 'update', function() module.OnFriendsFrameUpdate(self, this) end)
+    hooksecurefunc('FriendsFrame_UpdateFriends', function() module.OnFriendsFrameUpdate(self, this) end)
     self:RegisterMessage("ReceivePong", "OnPong")
     self:RegisterMessage("mark:Create", "OnNewMark")
     self:RegisterMessage("mark:Delete", "OnDeleteMark")

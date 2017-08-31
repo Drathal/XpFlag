@@ -29,3 +29,18 @@ AddOn.screenWidth = GetScreenWidth()
 AddOn.screenHeight = GetScreenHeight()
 AddOn.woWPatch, AddOn.woWBuild, AddOn.woWPatchReleaseDate, AddOn.tocVersion = GetBuildInfo()
 AddOn.woWBuild = tonumber(AddOn.woWBuild)
+
+--@alpha@
+AddOn.fakeCom = true
+AddOn.debug = {
+    --@alpha@
+    --mark = true,
+    --dataXp = true,
+    --markSpark = true,
+    --markTooltip = true,
+    com = true,
+    --bar = true,
+    friends = true
+    --@end-alpha@
+}
+--@end-alpha@

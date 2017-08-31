@@ -114,9 +114,13 @@ end
 
 function module:UpdatePlayerBar(msg, id, data)
     --@alpha@
-    D.Debug(moduleName, "UpdatePlayerBar", id)
     assert(id, 'bar:UpdatePlayerBar - id is missing')
     assert(data, 'bar:UpdatePlayerBar - data is missing')
+    --@end-alpha@
+
+    if id ~= D.nameRealm then return end
+    --@alpha@
+    D.Debug(moduleName, "UpdatePlayerBar")
     --@end-alpha@
 
     self:UpdateBar(id, data)

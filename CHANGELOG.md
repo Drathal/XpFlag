@@ -1,5 +1,16 @@
 ## CHANGELOG
 
+### 1.0.0
+
+  * chroe: communication mocking for alpha builds
+  * chore: logging for alpha builds
+  * chore: debug code for alpha builds
+
+### 0.14.0 
+
+  * add option to attach marker to the blizzard exp bar
+  * change toc file for wow 7.3.0 release
+
 ### 0.12.3
 
   * feature: flip marker now also flips xp animation

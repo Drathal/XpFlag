@@ -3,7 +3,7 @@ local D, C, L = unpack(select(2, ...))
 local _G = _G
 local match = _G.string.match
 local pairs = _G.pairs
-local split = _G.split
+local split = _G.strsplit
 local UnitXP = _G.UnitXP
 local UnitXPMax = _G.UnitXPMax
 local UnitLevel = _G.UnitLevel
@@ -23,15 +23,14 @@ local module = D:NewModule(moduleName, "AceEvent-3.0", "AceSerializer-3.0")
 
 --@alpha@
 -- mock communication
-local fakeCom = true
-local message = nil
 local assert = _G.assert
 local select = _G.select
 local random = _G.math.random
 function module:FakeSendAddonMessage(prefix, msg, type, target)
-    D.Debug(moduleName, "FakeSendAddonMessage", prefix, msg, type, target)
 
-    local data = self:Deserialize(msg)
+    local _, data = self:Deserialize(msg)
+
+    D.Debug(moduleName, "FakeSendAddonMessage", prefix, type, target)
 
     local fakeData = {
         dataType = "dataXp",
@@ -46,10 +45,12 @@ function module:FakeSendAddonMessage(prefix, msg, type, target)
         rested = 0
     }
 
+    local dataString = self:Serialize(D:GetModule(C.db.profile.mark.dataSource):GetData(fakeData))
+
     -- when we send a ping -- other player is sending pong back
     if data.type == MSG_TYPE_PING then
         fakeData.type = MSG_TYPE_PONG
-        self:CHAT_MSG_ADDON("CHAT_MSG_ADDON", MessagePrefix, self:Serialize(D["dataXp"]:GetData(fakeData)), "WHISPER", fakeData.name .."-"..fakeData.realm)
+        self:CHAT_MSG_ADDON("CHAT_MSG_ADDON", MessagePrefix, dataString, "WHISPER", fakeData.name .."-"..fakeData.realm)
     end
 end
 --@end-alpha@
@@ -58,21 +59,21 @@ function module:Send(type, target)
     --@alpha@
     D.Debug(moduleName, "Send", type, target)
     assert(type, 'com:Send - type is missing')
-    assert(not match(target, "%-"), 'com:Send - target has no relam')
     assert(target, 'com:Send - target is missing')
+    assert(match(target, "%-") == '-', 'com:Send - target has no relam ')
     --@end-alpha@
 
     if not match(target, "%-") then return end
 
     --@alpha@
-    if not fakeCom then
+    if not D.fakeCom then
         --@end-alpha@
-        SendAddonMessage(MessagePrefix, self:Serialize(D[C.db.profile.mark.dataSource]:GetData({type = type})), "WHISPER", target)
+        SendAddonMessage(MessagePrefix, self:Serialize(D:GetModule(C.db.profile.mark.dataSource):GetData({type = type})), "WHISPER", target)
         --@alpha@
     end
 
-    if fakeCom then
-        self:FakeSendAddonMessage(MessagePrefix, self:Serialize(D[C.db.profile.mark.dataSource]:GetData({type = type})), "WHISPER", target)
+    if D.fakeCom then
+        self:FakeSendAddonMessage(MessagePrefix, self:Serialize(D:GetModule(C.db.profile.mark.dataSource):GetData({type = type})), "WHISPER", target)
     end
     --@end-alpha@
 end
@@ -108,12 +109,12 @@ end
 function module:OnEnable()
     RegisterAddonMessagePrefix(MessagePrefix)
     self:RegisterEvent("CHAT_MSG_ADDON")
-    self:RegisterMessage("DataXpUpdate", "SendUpdates")
+    self:RegisterMessage(C.db.profile.mark.dataSource, "SendUpdates")
 end
 
 function module:OnDisable()
     self:UnregisterEvent("CHAT_MSG_ADDON")
-    self:UnregisterMessage("DataXpUpdate")
+    self:UnregisterMessage(C.db.profile.mark.dataSource)
 end
 
 function module:CHAT_MSG_ADDON(event, pre, rawmsg, chan, sender)
@@ -125,7 +126,9 @@ function module:CHAT_MSG_ADDON(event, pre, rawmsg, chan, sender)
         sender = sender.."-"..D.realm
     end
 
-    local data = self:Deserialize(rawmsg)
+    local success, data = self:Deserialize(rawmsg)
+
+    if not success then return end
 
     if data.type == MSG_TYPE_DATA then
         D:SendMessage("ReceiveData", sender, data)

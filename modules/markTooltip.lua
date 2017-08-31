@@ -22,7 +22,7 @@ local function UpdateTooltip(parent)
     GameTooltip:AddLine(data.name, COLORS[data.class].r, COLORS[data.class].g, COLORS[data.class].b, 1)
     GameTooltip:AddLine(format("Level: %s", data.level), 1, 1, 1, 1)
     GameTooltip:AddLine(format("XP: %s/%s (%.2f %%)", data.value, data.max, data.value / data.max * 100 ), 1, 1, 1, 1)
-    if data.rested then
+    if data.rested and data.rested > 0 then
         GameTooltip:AddLine(format("Rested: %s (%.2f %%)", data.rested, data.rested / data.max * 100 ), 1, 1, 1, 1)
     end
     GameTooltip:Show()
