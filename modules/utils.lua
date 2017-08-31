@@ -15,10 +15,12 @@ local CreateFrame = _G.CreateFrame
 local UnitLevel = _G.UnitLevel
 local MAX_PLAYER_LEVEL_TABLE = _G.MAX_PLAYER_LEVEL_TABLE
 
+--@alpha@
 local function Debug(module, msg, a1, a2, a3, a4)
-    if not D.debug[module] then return end
-    print("|cffffff78" .. module .. ":|r".. msg .. " |cff88ff88", a1 or "", a2 or "", a3 or "", a4 or "", "|r")
+    if D.debug and not D.debug[module] then return end
+    print("|cffffff78 " .. module .. "|r : ".. msg .. " |cff88ff88", a1 or "", a2 or "", a3 or "", a4 or "", "|r")
 end
+--@end-alpha@
 
 local function CopyTable(src, dest)
     if type(dest) ~= "table" then

@@ -31,7 +31,7 @@ local module = D:NewModule(moduleName, "AceEvent-3.0")
 
 function module:GetBNFriendName(id)
     --@alpha@
-    D.Debug(moduleName, "GetBNFriendName", id)
+    -- D.Debug(moduleName, "GetBNFriendName", id)
     assert(id, 'friends:GetBNFriendName - id is missing')
     --@end-alpha@
 
@@ -45,7 +45,7 @@ end
 
 function module:GetFriendName(id)
     --@alpha@
-    D.Debug(moduleName, "GetFriendName", id)
+    -- D.Debug(moduleName, "GetFriendName", id)
     assert(id, 'friends:GetFriendName - id is missing')
     --@end-alpha@
 
@@ -59,18 +59,26 @@ end
 
 function module:GetFriendNameByButton(button)
     --@alpha@
-    D.Debug(moduleName, "GetFriendNameByButton", button)
+    -- D.Debug(moduleName, "GetFriendNameByButton", button)
     assert(button, 'friends:GetFriendNameByButton - button is missing')
-    assert(button.id, 'friends:GetFriendNameByButton - button.id is missing')
     --@end-alpha@
 
-    if button and not button.id then return end
+    if not button then return end
+
     local data = nil
     if button.buttonType == FRIENDS_BUTTON_TYPE_BNET then
         data = self:GetBNFriendName(button.id)
     elseif button.buttonType == FRIENDS_BUTTON_TYPE_WOW then
         data = self:GetFriendName(button.id)
     end
+
+    --@alpha@
+    if button == _G.FriendsFrameBattlenetFrame then
+        data = D.fakeName
+        button:GetParent().friend = data
+        D.Debug(moduleName, "GetFriendNameByButton:fake", data)
+    end
+    --@end-alpha@
 
     return data
 end
@@ -83,11 +91,16 @@ function module:OnStateButtonClick(f)
 
     local friend = f:GetParent().friend
     if not friend then return end
-    if D.GetMark(friend) then
-        D:DeleteMark(friend)
-        D:SendDelete(friend)
+
+    --@alpha@
+    D.Debug(moduleName, "OnStateButtonClick friend:", friend)
+    --@end-alpha@
+
+    if D:GetModule("mark"):GetMark(friend) then
+        D:GetModule("mark"):DeleteMark(friend)
+        D:GetModule("com"):SendDelete(friend)
     else
-        D:SendRequest(friend)
+        D:GetModule("com"):SendRequest(friend)
     end
 end
 
@@ -115,7 +128,7 @@ function module:CreateMiniButton(parent)
     b:SetFrameStrata("DIALOG")
     b:SetSize(16, 16)
     b:SetPoint("LEFT", parent, "LEFT", 3, - 8)
-    b:SetScript("OnClick", "OnStateButtonClick")
+    b:SetScript("OnClick", function() self:OnStateButtonClick(parent) end )
     self:SetButtonTexture(b)
     b:Hide()
     return b
@@ -149,17 +162,7 @@ function module:Ping(friend)
 end
 
 function module:UpdateFriendButton(button)
-
-    local friend = nil
-
-    --@alpha@
-    if D.fakeCom then
-        friend = "dummy-Madmortem"
-    end
-    --@end-alpha@
-
-    friend = friend or module:GetFriendNameByButton(button)
-
+    local friend = module:GetFriendNameByButton(button)
     button.friend = friend
 
     if button.statusButton then
@@ -169,14 +172,12 @@ function module:UpdateFriendButton(button)
     if friend then
         online[friend] = true
         self:Ping(friend)
-        if button:IsShown() then
+        if button:IsShown() and hasAddon[friend] then
             if not button.statusButton then
                 button.statusButton = self:CreateMiniButton(button)
             end
-            self:SetButtonTexture(button.statusButton, D:GetModule("module"):GetMark(friend))
-            if hasAddon[friend] then
-                button.statusButton:Show()
-            end
+            self:SetButtonTexture(button.statusButton, D:GetModule("mark"):GetMark(friend))
+            button.statusButton:Show()
         end
     end
 end
@@ -214,7 +215,7 @@ function module:OnPong(event, friend)
     assert(friend, 'friends:OnPong - friend is missing')
     --@end-alpha@
     hasAddon[friend] = true
-    self:OnFriendsFrameUpdate()
+    self:OnFriendsFrameUpdate(self)
 end
 
 function module:OnNewMark(event, friend)
@@ -223,7 +224,7 @@ function module:OnNewMark(event, friend)
     assert(event, 'friends:OnNewMark - event is missing')
     assert(friend, 'friends:OnNewMark - friend is missing')
     --@end-alpha@
-    self:OnFriendsFrameUpdate()
+    self:OnFriendsFrameUpdate(self)
 end
 
 function module:OnDeleteMark(event, friend)
@@ -232,7 +233,7 @@ function module:OnDeleteMark(event, friend)
     assert(event, 'friends:OnDeleteMark - event is missing')
     assert(friend, 'friends:OnDeleteMark - friend is missing')
     --@end-alpha@
-    self:OnFriendsFrameUpdate()
+    self:OnFriendsFrameUpdate(self)
 end
 
 function module:OnEnable()

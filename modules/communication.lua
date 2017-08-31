@@ -30,12 +30,12 @@ function module:FakeSendAddonMessage(prefix, msg, type, target)
 
     local _, data = self:Deserialize(msg)
 
-    D.Debug(moduleName, "FakeSendAddonMessage", prefix, type, target)
+    D.Debug(moduleName, "FakeSendAddonMessage", data.type, prefix, type, target)
 
     local fakeData = {
         dataType = "dataXp",
-        name = select(1, split(target, "-")),
-        realm = select(2, split(target, "-")),
+        name = select(1, split("-", D.fakeName)),
+        realm = select(2, split("-", D.fakeName)),
         level = random(1, 110),
         class = "HUNTER",
         disable = false,
@@ -45,12 +45,17 @@ function module:FakeSendAddonMessage(prefix, msg, type, target)
         rested = 0
     }
 
-    local dataString = self:Serialize(D:GetModule(C.db.profile.mark.dataSource):GetData(fakeData))
-
     -- when we send a ping -- other player is sending pong back
     if data.type == MSG_TYPE_PING then
         fakeData.type = MSG_TYPE_PONG
-        self:CHAT_MSG_ADDON("CHAT_MSG_ADDON", MessagePrefix, dataString, "WHISPER", fakeData.name .."-"..fakeData.realm)
+        local dataString = self:Serialize(D:GetModule(C.db.profile.mark.dataSource):GetData(fakeData))
+        self:CHAT_MSG_ADDON("CHAT_MSG_ADDON", MessagePrefix, dataString, "WHISPER", D.fakeName)
+    end
+
+    if data.type == MSG_TYPE_REQUEST then
+        fakeData.type = MSG_TYPE_DATA
+        local dataString = self:Serialize(D:GetModule(C.db.profile.mark.dataSource):GetData(fakeData))
+        self:CHAT_MSG_ADDON("CHAT_MSG_ADDON", MessagePrefix, dataString, "WHISPER", D.fakeName)
     end
 end
 --@end-alpha@
@@ -66,13 +71,13 @@ function module:Send(type, target)
     if not match(target, "%-") then return end
 
     --@alpha@
-    if not D.fakeCom then
+    if target ~= D.fakeName then
         --@end-alpha@
         SendAddonMessage(MessagePrefix, self:Serialize(D:GetModule(C.db.profile.mark.dataSource):GetData({type = type})), "WHISPER", target)
         --@alpha@
     end
 
-    if D.fakeCom then
+    if target == D.fakeName then
         self:FakeSendAddonMessage(MessagePrefix, self:Serialize(D:GetModule(C.db.profile.mark.dataSource):GetData({type = type})), "WHISPER", target)
     end
     --@end-alpha@
@@ -127,6 +132,11 @@ function module:CHAT_MSG_ADDON(event, pre, rawmsg, chan, sender)
     end
 
     local success, data = self:Deserialize(rawmsg)
+
+    --@alpha@
+    assert(success, "CHAT_MSG_ADDON:Deserialize failed")
+    D.Debug(moduleName, "CHAT_MSG_ADDON", data.type, pre, chan, sender)
+    --@end-alpha@
 
     if not success then return end
 

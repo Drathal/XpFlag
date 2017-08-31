@@ -129,7 +129,6 @@ function module:Update()
     if self:IsUpdated(data) then
         --@alpha@
         D.Debug(moduleName, "Update - SendMessage", moduleName..":Update", nameRealm )
-        D:SendMessage(moduleName..":Update", "dummy-Madmortem", self:GetData({ name = "dummy", value = data.value * 0.8 }))
         --@end-alpha@
         D:SendMessage(moduleName..":Update", nameRealm, data)
     end
