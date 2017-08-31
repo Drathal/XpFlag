@@ -135,11 +135,11 @@ function module:CreateMiniButton(parent)
 end
 
 function module:RemoveOffineFriends()
-    --@alpha@
-    D.Debug(moduleName, "RemoveOffineFriends")
-    --@end-alpha@
     for friend, _ in pairs(D:GetModule("mark"):GetMarks()) do
         if friend and friend ~= D.nameRealm and not online[friend] then
+            --@alpha@
+            D.Debug(moduleName, "RemoveOffineFriends", friend)
+            --@end-alpha@
             D:GetModule("mark"):DeleteMark(friend)
         end
     end
@@ -205,7 +205,7 @@ function module:OnFriendsFrameUpdate(self)
         end
     end
 
-    module:RemoveOffineFriends()
+    self:RemoveOffineFriends()
 end
 
 function module:OnPong(event, friend)
@@ -215,6 +215,7 @@ function module:OnPong(event, friend)
     assert(friend, 'friends:OnPong - friend is missing')
     --@end-alpha@
     hasAddon[friend] = true
+
     self:OnFriendsFrameUpdate(self)
 end
 
@@ -224,6 +225,9 @@ function module:OnNewMark(event, friend)
     assert(event, 'friends:OnNewMark - event is missing')
     assert(friend, 'friends:OnNewMark - friend is missing')
     --@end-alpha@
+
+    if friend == D.nameRealm then return end
+
     self:OnFriendsFrameUpdate(self)
 end
 
@@ -233,6 +237,7 @@ function module:OnDeleteMark(event, friend)
     assert(event, 'friends:OnDeleteMark - event is missing')
     assert(friend, 'friends:OnDeleteMark - friend is missing')
     --@end-alpha@
+
     self:OnFriendsFrameUpdate(self)
 end
 

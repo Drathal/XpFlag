@@ -128,7 +128,8 @@ end
 C["positions"] = {
     ["SCREENTOP"] = { "TOPLEFT", _G['UIParent'], "TOPLEFT", 0, 0 },
     ["SCREENBOTTOM"] = { "BOTTOMLEFT", _G['UIParent'], "BOTTOMLEFT", 0, 0 },
-    ["BLIZZEXPBAR"] = { "BOTTOMLEFT", _G['MainMenuExpBar'], "BOTTOMLEFT", 0, 2 },
+    ["BLIZZEXPBAR"] = { "TOPLEFT", _G['MainMenuBarOverlayFrame'], "TOPLEFT", 0, 9 },
+    -- ["BLIZZEXPBAR"] = { "BOTTOMLEFT", _G['MainMenuExpBar'], "BOTTOMLEFT", 0, 2 },
 }
 
 -- MainMenuExpBar
@@ -146,7 +147,7 @@ C["sparkXP"] = {
     ["fontColor"] = { 1, .82, 0, 1 },
     ["xSpread"] = { - 15, 15 },
     ["ySpread"] = { - 120, - 80 },
-    ["durationSpread"] = { 1, 2 }
+    ["durationSpread"] = { 1.5, 2 }
 }
 
 C["sparkModel"] = {

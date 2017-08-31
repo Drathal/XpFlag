@@ -2,7 +2,11 @@
 
 ### 1.0.0
 
-  * chroe: communication mocking for alpha builds
+  * feature: spark animation for connected player marks
+  * feature: model animation for connected player marks
+  * feature: smoothing animation throttle
+  * chore: communication over AceComm-3
+  * chore: communication mocking for alpha builds
   * chore: logging for alpha builds
   * chore: debug code for alpha builds
 

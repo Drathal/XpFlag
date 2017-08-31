@@ -10,16 +10,23 @@ local GameTooltip = _G.GameTooltip
 local UnitClass = _G.UnitClass
 local GetRealmName = _G.GetRealmName
 local MAX_PLAYER_LEVEL_TABLE = _G.MAX_PLAYER_LEVEL_TABLE
+local ERR_EXHAUSTION_RESTED = _G.ERR_EXHAUSTION_RESTED
+local ERR_EXHAUSTION_WELLRESTED = _G.ERR_EXHAUSTION_WELLRESTED
+local ERR_EXHAUSTION_NORMAL = _G.ERR_EXHAUSTION_NORMAL
+local ERR_EXHAUSTION_TIRED = _G.ERR_EXHAUSTION_TIRED
 local GetExpansionLevel = _G.GetExpansionLevel
 local format = _G.format
 local tonumber = _G.tonumber
 local select = _G.select
 local pairs = _G.pairs
 
-local nameRealm = UnitName("player").."-"..GetRealmName()
-local prevData = {}
 local moduleName = "dataXp"
 local module = D:NewModule(moduleName, "AceEvent-3.0")
+
+local nameRealm = UnitName("player").."-"..GetRealmName()
+local data = nil
+local prevData = {}
+
 
 function module:OnEnable()
     --@alpha@
@@ -31,6 +38,8 @@ function module:OnEnable()
     self:RegisterEvent("ZONE_CHANGED_NEW_AREA")
     self:RegisterEvent("PLAYER_XP_UPDATE")
     self:RegisterEvent("PLAYER_LEVEL_UP")
+    self:RegisterEvent("CHAT_MSG_SYSTEM")
+
     self:Update()
 end
 
@@ -43,6 +52,20 @@ function module:OnDisable()
     self:UnregisterEvent("ZONE_CHANGED_NEW_AREA")
     self:UnregisterEvent("PLAYER_XP_UPDATE")
     self:UnregisterEvent("PLAYER_LEVEL_UP")
+    self:UnregisterEvent("CHAT_MSG_SYSTEM")
+end
+
+function module:CHAT_MSG_SYSTEM(event, msg)
+    --@alpha@
+    D.Debug(moduleName, "CHAT_MSG_SYSTEM", msg)
+    --@end-alpha@
+
+    if msg ~= ERR_EXHAUSTION_RESTED
+    and msg ~= ERR_EXHAUSTION_WELLRESTED
+    and msg ~= ERR_EXHAUSTION_NORMAL
+    and msg ~= ERR_EXHAUSTION_TIRED then return end
+
+    self:Update()
 end
 
 function module:PLAYER_ENTERING_WORLD()
@@ -89,12 +112,12 @@ end
 
 function module:GetData(mix)
     --@alpha@
-    D.Debug(moduleName, "GetData")
+    -- D.Debug(moduleName, "GetData")
     --@end-alpha@
 
     local d = mix or {}
 
-    d.dataType = "dataXp"
+    d.dataType = moduleName
     d.name = d.name or UnitName("PLAYER")
     d.realm = d.realm or GetRealmName()
     d.level = d.level or UnitLevel("PLAYER")
@@ -103,12 +126,12 @@ function module:GetData(mix)
 
     d.value = d.value or UnitXP("PLAYER")
     d.max = d.max or UnitXPMax("PLAYER")
-    d.gain = tonumber(d.value) - tonumber(prevData.value or 0) or 0
+    d.gain = d.gain or tonumber(d.value) - tonumber(prevData.value or 0) or 0
     d.rested = d.rested or (GetXPExhaustion() or 0)
 
-    d.cR = d.cR or d.rested and C.player.colorRested[1] or C.player.color[1]
-    d.cG = d.cG or d.rested and C.player.colorRested[2] or C.player.color[2]
-    d.cB = d.cB or d.rested and C.player.colorRested[3] or C.player.color[3]
+    d.cR = d.cR or d.rested > 0 and C.player.colorRested[1] or C.player.color[1]
+    d.cG = d.cG or d.rested > 0 and C.player.colorRested[2] or C.player.color[2]
+    d.cB = d.cB or d.rested > 0 and C.player.colorRested[3] or C.player.color[3]
 
     return d
 end
@@ -124,7 +147,7 @@ function module:IsUpdated(data)
 end
 
 function module:Update()
-    local data = self:GetData()
+    data = self:GetData()
 
     if self:IsUpdated(data) then
         --@alpha@

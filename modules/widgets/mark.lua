@@ -51,23 +51,23 @@ function module:CreateMark(id, data)
     m:Show()
 
     m.data = data
+    m.player = id == D.nameRealm;
     m.anim = D.CreateUpdateAnimation(m, self.OnAnimation)
+    m.model = D:GetModule("markModel"):Create(m)
+    m.sparks = D:GetModule("markSpark"):Create(m)
+
+
+    marks[id] = m
 
     --@alpha@
     D.Debug(moduleName, "CreateMark - SendMessage", moduleName..":Create", id )
     --@end-alpha@
     D:SendMessage(moduleName..":Create", id)
 
-    marks[id] = m
-
-    if id ~= D.nameRealm then return m end
-
-    m.player = true;
+    if not m.player then return m end
 
     m.texture:SetVertexColor(data.cR, data.cG, data.cB)
     m:SetFrameLevel(5)
-    m.model = D:GetModule("markModel"):Create(m)
-    m.sparks = D:GetModule("markSpark"):Create(m)
 
     return m
 end
@@ -130,7 +130,7 @@ function module:OnEnable()
     self:RegisterMessage("ReceiveData", "OnUpdateMark")
     self:RegisterMessage("ReceiveRequest", "OnUpdateMark")
     self:RegisterMessage("ReceiveDelete", "OnDeleteMark")
-    self:RegisterMessage(C.db.profile.mark.dataSource..":Update", "OnUpdateMark")
+    self:RegisterMessage("dataXp:Update", "OnUpdateMark")
 end
 
 function module:OnDisable()
@@ -141,7 +141,7 @@ function module:OnDisable()
     self:UnregisterMessage("ReceiveData")
     self:UnregisterMessage("ReceiveRequest")
     self:UnregisterMessage("ReceiveDelete")
-    self:UnregisterMessage(C.db.profile.mark.dataSource..":Update")
+    self:UnregisterMessage("dataXp:Update")
 end
 
 function module:DeleteMark(id)
@@ -153,7 +153,12 @@ function module:DeleteMark(id)
     if not marks[id] then return end
     marks[id]:Hide()
     marks[id] = nil
-    D:SendMessage("DeleteMark", id)
+
+    --@alpha@
+    D.Debug(moduleName, "DeleteMark - SendMessage", moduleName..":Delete", id )
+    --@end-alpha@
+
+    D:SendMessage("mark:Delete", id)
 end
 
 function module:Update()
@@ -164,7 +169,7 @@ function module:Update()
     if not C.db.profile.mark.showPlayer then
         self:DeleteMark(D.nameRealm)
     else
-        self:UpdateMark(D.nameRealm, D:GetModule(C.db.profile.mark.dataSource):GetData())
+        self:UpdateMark(D.nameRealm, D:GetModule("dataXp"):GetData())
     end
 
     C.db.profile.mark.flip = match(C.db.profile.mark.position, "TOP") ~= nil

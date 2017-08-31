@@ -13,8 +13,8 @@ local module = D:NewModule(moduleName, "AceEvent-3.0")
 
 function module:PlaySpark(sparkList, parent)
     --@alpha@
-    D.Debug(moduleName, "PlaySpark")
-    assert(sparkList, 'markSpark:PlaySpark - sparkList is missing for ')
+    --D.Debug(moduleName, "PlaySpark")
+    assert(sparkList, 'markSpark:PlaySpark - sparkList is missing')
     --@end-alpha@
 
     for k, spark in pairs(sparkList) do
@@ -51,13 +51,13 @@ function module:OnSparkPlay(f)
     assert(f:GetParent().data, 'markSparks:OnSparkPlay - f:GetParent().data is missing')
     --@end-alpha@
 
-    local value = f:GetParent().data.value
-    if not value or value == "0" then
+    local gain = f:GetParent().data.gain
+    if not gain or gain == "0" then
         f.ag:Stop()
         return
     end
 
-    f.text:SetFormattedText(C.sparkXP.format, tostring(value))
+    f.text:SetFormattedText(C.sparkXP.format, tostring(gain))
 end
 
 function module:OnSparkFinished(f)
@@ -102,7 +102,7 @@ function module:AddSpark(parent)
 
     f.ag.a3 = f.ag:CreateAnimation("Scale")
     f.ag.a3:SetFromScale(1, 1)
-    f.ag.a3:SetToScale(0.85, 0.85)
+    f.ag.a3:SetToScale(1, 1)
     f.ag.a3:SetDuration(0)
     f.ag.a3:SetSmoothing("OUT")
 
@@ -115,11 +115,14 @@ end
 function module:PlayXpSpark(msg, name, f)
     --@alpha@
     D.Debug(moduleName, "PlayXpSpark", msg, name)
+    assert(name, 'markSpark:PlayXpSpark - name is missing')
+    assert(f, 'markSpark:PlayXpSpark - f is missing')
+    assert(f.data, 'markSpark:PlayXpSpark - f.data is missing')
     --@end-alpha@
 
     if not f.sparks then return end
-    if not f.gain or f.gain == 0 then return end
-    f.sparks.Play(f.gain)
+    if not f.data.gain or f.data.gain == 0 then return end
+    f.sparks.Play(f.data.gain)
 end
 
 function module:Create(parent)
@@ -130,12 +133,17 @@ function module:Create(parent)
 
     local f = {}
     f.sparkList = {}
-    f.Play = function() self:PlaySpark(f.sparkList, parent) end
+    f.Play = function(xp)
+        parent.data.gain = xp
+        self:PlaySpark(f.sparkList, parent)
+    end
 
     -- debug
-    _G[D.addonName.."PlaySpark"] = f.Play
+    if parent.player then
+        _G[D.addonName.."PlaySpark"] = f.Play
+    end
 
-    for i = 1, C.sparkXP.max, 1 do
+    for i = 1, parent.player and C.sparkXP.max or (C.sparkXP.max / 2), 1 do
         f.sparkList[i] = self:AddSpark(parent)
     end
     return f

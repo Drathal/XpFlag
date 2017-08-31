@@ -17,12 +17,11 @@ end
 
 function module:OnEnable()
     if not C.db.profile.bar.show then return end
-    if not C.db.profile.bar.dataSource then return end
     --@alpha@
     D.Debug(moduleName, "OnEnable")
     --@end-alpha@
 
-    self:RegisterMessage(C.db.profile.bar.dataSource..":Update", "UpdatePlayerBar")
+    self:RegisterMessage("dataXp:Update", "UpdateBar")
 end
 
 function module:OnDisable()
@@ -31,7 +30,7 @@ function module:OnDisable()
     --@end-alpha@
 
     self.DeleteBar(D.nameRealm)
-    self:UnregisterMessage(C.db.profile.bar.dataSource..":Update")
+    self:UnregisterMessage("dataXp:Update")
 end
 
 function module:CreateBar(id)
@@ -87,7 +86,7 @@ function module:DeleteBar(id)
     bars[id] = nil
 end
 
-function module:UpdateBar(id, data)
+function module:UpdateBar(msg, id, data)
     --@alpha@
     D.Debug(moduleName, "UpdateBar", id)
     assert(id, 'bar:UpdateBar - id is missing')
@@ -108,44 +107,24 @@ function module:UpdateBar(id, data)
     bar.to = bar:GetParent():GetWidth() * data.value / data.max or 0
     bar.anim.Start()
 
-    if not bar.isPlayer then return end
-    bar.texture:SetVertexColor(unpack(D.GetXpColor()))
+    if data.cR then
+        bar.texture:SetVertexColor(data.cR, data.cG, data.cB)
+    end
+
+    return bar
 end
 
-function module:UpdatePlayerBar(msg, id, data)
-    --@alpha@
-    assert(id, 'bar:UpdatePlayerBar - id is missing')
-    assert(data, 'bar:UpdatePlayerBar - data is missing')
-    --@end-alpha@
-
-    if id ~= D.nameRealm then return end
-    --@alpha@
-    D.Debug(moduleName, "UpdatePlayerBar")
-    --@end-alpha@
-
-    self:UpdateBar(id, data)
-end
-
+-- at the moment we only have one bar for the player
 function module:Update()
-    --@alpha@
-    D.Debug(moduleName, "Update")
-    --@end-alpha@
-
     if not C.db.profile.bar.show then
         self:DeleteBar(D.nameRealm)
-    else
-        self:UpdateBar(D.nameRealm, D:GetModule(C.db.profile.bar.dataSource):GetData())
+        return
     end
 
-    if bars[D.nameRealm] then
-        bars[D.nameRealm]:SetHeight(C.db.profile.bar.height)
-        bars[D.nameRealm]:ClearAllPoints()
-        bars[D.nameRealm]:SetPoint(unpack(C.positions[C.db.profile.bar.position]))
-    end
-
-    if bars[D.nameRealm] and bars[D.nameRealm].data then
-        self:UpdateBar(D.nameRealm, bars[D.nameRealm].data)
-    end
+    local bar = self:UpdateBar(nil, D.nameRealm, bars[D.nameRealm] and bars[D.nameRealm].data or D:GetModule("dataXp"):GetData())
+    bar:SetHeight(C.db.profile.bar.height)
+    bar:ClearAllPoints()
+    bar:SetPoint(unpack(C.positions[C.db.profile.bar.position]))
 end
 
 function module:GetBar(id)

@@ -13,7 +13,7 @@ local assert = _G.assert
 
 local moduleName = "markTooltip"
 local module = D:NewModule(moduleName)
-local delay = 1
+local delay = 2
 
 local function UpdateTooltip(parent)
     local data = parent.data

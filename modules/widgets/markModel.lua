@@ -18,11 +18,17 @@ function module:Create(parent)
 end
 
 function module:FadeInMarkModel(msg, name, f)
+    --@alpha@
+    D.Debug(moduleName, "FadeInMarkModel", name)
+    --@end-alpha@
     if not f or not f.model then return end
     UIFrameFadeIn(f.model, 0.1, f.model:GetAlpha(), 0.5)
 end
 
 function module:FadeOutMarkModel(msg, f)
+    --@alpha@
+    D.Debug(moduleName, "FadeOutMarkModel")
+    --@end-alpha@
     if not f or not f.model then return end
     UIFrameFadeOut(f.model, 1, f.model:GetAlpha(), 0)
 end

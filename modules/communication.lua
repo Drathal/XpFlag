@@ -19,16 +19,20 @@ local MSG_TYPE_PING = "PING"
 local MSG_TYPE_PONG = "PONG"
 
 local moduleName = "com"
-local module = D:NewModule(moduleName, "AceEvent-3.0", "AceSerializer-3.0")
+local module = D:NewModule(moduleName, "AceEvent-3.0", "AceSerializer-3.0", "AceComm-3.0")
 
 --@alpha@
 -- mock communication
+local After = _G.C_Timer.After
 local assert = _G.assert
 local select = _G.select
 local random = _G.math.random
+local vv = 0
+
 function module:FakeSendAddonMessage(prefix, msg, type, target)
 
     local _, data = self:Deserialize(msg)
+    local dataString = nil
 
     D.Debug(moduleName, "FakeSendAddonMessage", data.type, prefix, type, target)
 
@@ -36,33 +40,43 @@ function module:FakeSendAddonMessage(prefix, msg, type, target)
         dataType = "dataXp",
         name = select(1, split("-", D.fakeName)),
         realm = select(2, split("-", D.fakeName)),
-        level = random(1, 110),
+        level = random(UnitLevel("PLAYER") - 1, UnitLevel("PLAYER") + 1),
         class = "HUNTER",
         disable = false,
-        value = 233,
+        value = 1,
         max = 5000,
-        gain = 112,
-        rested = 0
+        gain = 1,
+        rested = random(100, 300)
     }
 
-    -- when we send a ping -- other player is sending pong back
-    if data.type == MSG_TYPE_PING then
-        fakeData.type = MSG_TYPE_PONG
-        local dataString = self:Serialize(D:GetModule(C.db.profile.mark.dataSource):GetData(fakeData))
-        self:CHAT_MSG_ADDON("CHAT_MSG_ADDON", MessagePrefix, dataString, "WHISPER", D.fakeName)
+    fakeData.gain = random(100, 300)
+    vv = vv + fakeData.gain
+    fakeData.value = vv
+
+    if fakeData.value > 4999 then
+        fakeData.value = 0
+        vv = 0
     end
 
-    if data.type == MSG_TYPE_REQUEST then
-        fakeData.type = MSG_TYPE_DATA
-        local dataString = self:Serialize(D:GetModule(C.db.profile.mark.dataSource):GetData(fakeData))
-        self:CHAT_MSG_ADDON("CHAT_MSG_ADDON", MessagePrefix, dataString, "WHISPER", D.fakeName)
+    if data.type == MSG_TYPE_PING then
+        fakeData.type = MSG_TYPE_PONG
     end
+
+    if data.type == MSG_TYPE_REQUEST or ( data.type == MSG_TYPE_DATA and D:GetModule("mark"):GetMark(D.fakeName) ) then
+        fakeData.type = MSG_TYPE_DATA
+        After(random(1, 5), function() self:SendUpdate(D.fakeName) end)
+    end
+
+    if fakeData.type then
+        dataString = self:Serialize(D:GetModule("dataXp"):GetData(fakeData))
+        self:OnCommReceived(MessagePrefix, dataString, "WHISPER", D.fakeName)
+    end
+
 end
 --@end-alpha@
 
 function module:Send(type, target)
     --@alpha@
-    D.Debug(moduleName, "Send", type, target)
     assert(type, 'com:Send - type is missing')
     assert(target, 'com:Send - target is missing')
     assert(match(target, "%-") == '-', 'com:Send - target has no relam ')
@@ -72,13 +86,14 @@ function module:Send(type, target)
 
     --@alpha@
     if target ~= D.fakeName then
+        D.Debug(moduleName, "Send", type, target)
         --@end-alpha@
-        SendAddonMessage(MessagePrefix, self:Serialize(D:GetModule(C.db.profile.mark.dataSource):GetData({type = type})), "WHISPER", target)
+        self:SendCommMessage(MessagePrefix, self:Serialize(D:GetModule("dataXp"):GetData({type = type})), "WHISPER", target)
         --@alpha@
     end
 
     if target == D.fakeName then
-        self:FakeSendAddonMessage(MessagePrefix, self:Serialize(D:GetModule(C.db.profile.mark.dataSource):GetData({type = type})), "WHISPER", target)
+        self:FakeSendAddonMessage(MessagePrefix, self:Serialize(D:GetModule("dataXp"):GetData({type = type})), "WHISPER", target)
     end
     --@end-alpha@
 end
@@ -113,16 +128,14 @@ end
 
 function module:OnEnable()
     RegisterAddonMessagePrefix(MessagePrefix)
-    self:RegisterEvent("CHAT_MSG_ADDON")
-    self:RegisterMessage(C.db.profile.mark.dataSource, "SendUpdates")
+    self:RegisterMessage("dataXp:Update", "SendUpdates")
 end
 
 function module:OnDisable()
-    self:UnregisterEvent("CHAT_MSG_ADDON")
-    self:UnregisterMessage(C.db.profile.mark.dataSource)
+    self:UnregisterMessage("dataXp:Update")
 end
 
-function module:CHAT_MSG_ADDON(event, pre, rawmsg, chan, sender)
+function module:OnCommReceived(pre, rawmsg, chan, sender)
     if pre ~= MessagePrefix then return end
     if sender == D.nameRealm then return end
     if not rawmsg or rawmsg == "" then return end

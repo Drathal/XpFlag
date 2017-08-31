@@ -6,6 +6,7 @@ local print = _G.print
 local type = _G.type
 local min = _G.math.min;
 local max = _G.math.max;
+local next = _G.next
 local floor = _G.math.floor
 local abs = _G.math.abs
 local GetXPExhaustion = _G.GetXPExhaustion
@@ -38,11 +39,10 @@ local function CopyTable(src, dest)
     return dest
 end
 
--- TODO: refactor
 local function Throttle(self, elapsed)
     self.delay = min((self.delay or 0.01) - elapsed, 0.15);
     if self.delay > 0 then return true end
-    self.delay = 12 / GetFramerate();
+    self.delay = (1 / GetFramerate() / 2);
 
     return nil
 end
@@ -94,7 +94,7 @@ local function AnimateWidth(f)
     local cur = f:GetWidth()
     local new = cur + min((f.to - cur) / C.bar.animationSpeed, f.to - cur)
 
-    if cur == f.to or abs(new - f.to) < 2 then
+    if cur == f.to or abs(new - f.to) < 1 then
         new = f.to
         f.to = nil
     end
@@ -111,7 +111,7 @@ local function AnimateX(f)
     local cur = f.cur or 0
     local new = cur + min((f.to - cur) / C.mark.animationSpeed, f.to - cur)
 
-    if cur == f.to or abs(new - f.to) < 2 then
+    if cur == f.to or abs(new - f.to) < 1 then
         new = f.to
         f.to = nil
         D:SendMessage("AnimateXEnd", f)
@@ -130,7 +130,9 @@ local function IsMaxLevel(level)
 end
 
 -- API
+--@alpha@
 D.Debug = Debug
+--@end-alpha@
 D.Throttle = Throttle
 D.GetXpColor = GetXpColor
 D.GetMarkTexture = GetMarkTexture
