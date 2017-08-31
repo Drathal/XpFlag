@@ -1,5 +1,10 @@
 ## CHANGELOG
 
+### 0.14.0 
+
+  * add option to attach marker to the blizzard exp bar
+  * change toc file for wow 7.3.0 release
+
 ### 0.12.3
 
   * feature: flip marker now also flips xp animation

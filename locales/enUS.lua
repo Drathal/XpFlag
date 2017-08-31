@@ -20,4 +20,4 @@ L["MARK_SIZE_DESC"] = "Size of all Markers"
 
 L["POS_SCREENTOP"] = "Screen Top"
 L["POS_SCREENBOTTOM"] = "Screen Bottom"
-L["POS_BLIZZ_EXPBAR"] = "Blizzard experience bar"
+L["POS_BLIZZ_EXPBAR"] = "Blizzard Experience Bar"
