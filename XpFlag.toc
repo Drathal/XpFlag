@@ -1,9 +1,13 @@
 ## Interface: 70300
 ## Title: XpFlag
+## Notes: Fancy XP display for you and your friends.
 ## Author: Drathal
 ## Version: @project-version@
 ## DefaultState: Enabled
-## LoadOnDemand: 0
+## X-Date: @project-date-iso@
+## X-License: MIT
+## X-eMail: xpflag@markus-dethlefsen.de
 ## SavedVariables: XpFlagDB
+## OptionalDeps: AdiDebug
 
 XpFlag.xml

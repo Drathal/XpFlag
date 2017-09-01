@@ -4,8 +4,9 @@ local _G = _G
 local tonumber = _G.tonumber
 local print = _G.print
 local type = _G.type
-local min = _G.math.min;
-local max = _G.math.max;
+local pairs = _G.pairs
+local min = _G.math.min
+local max = _G.math.max
 local next = _G.next
 local floor = _G.math.floor
 local abs = _G.math.abs
@@ -23,26 +24,23 @@ local function Debug(module, msg, a1, a2, a3, a4)
 end
 --@end-alpha@
 
-local function CopyTable(src, dest)
-    if type(dest) ~= "table" then
-        dest = {}
-    end
-
-    for k, v in next, src do
-        if type(v) == "table" then
-            dest[k] = CopyTable(v, dest[k])
+local function CopyTable(tbl)
+    if not tbl then return {} end
+    local copy = {};
+    for k, v in pairs(tbl) do
+        if ( type(v) == "table" ) then
+            copy[k] = CopyTable(v);
         else
-            dest[k] = v
+            copy[k] = v;
         end
     end
-
-    return dest
+    return copy;
 end
 
 local function Throttle(self, elapsed)
-    self.delay = min((self.delay or 0.01) - elapsed, 0.15);
+    self.delay = min((self.delay or 0.01) - elapsed, 0.15)
     if self.delay > 0 then return true end
-    self.delay = (1 / GetFramerate() / 2);
+    self.delay = (1 / GetFramerate() / 2)
 
     return nil
 end
@@ -119,14 +117,14 @@ local function AnimateX(f)
 
     local p1, p, p2, xOfs, yOfs = f:GetPoint()
     f:ClearAllPoints();
-    f:SetPoint(p1, p, p2, new - f:GetWidth() / 2, yOfs);
+    f:SetPoint(p1, p, p2, new - f:GetWidth() / 2, yOfs)
 
     f.cur = new
     return f.to
 end
 
 local function IsMaxLevel(level)
-    return MAX_PLAYER_LEVEL_TABLE[GetExpansionLevel()] == (level or UnitLevel("player"));
+    return MAX_PLAYER_LEVEL_TABLE[GetExpansionLevel()] == (level or UnitLevel("player"))
 end
 
 -- API

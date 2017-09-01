@@ -6,6 +6,7 @@ ignore:
     - media/logo.psd
     - media/logo.png
     - .editorconfig
+    - .luacheckrc
 
 manual-changelog:
     filename: CHANGELOG.md
