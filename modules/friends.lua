@@ -15,6 +15,7 @@ local pairs = _G.pairs
 local hooksecurefunc = _G.hooksecurefunc
 local FRIENDS_BUTTON_TYPE_BNET = _G.FRIENDS_BUTTON_TYPE_BNET
 local FRIENDS_BUTTON_TYPE_WOW = _G.FRIENDS_BUTTON_TYPE_WOW
+local GameTooltip = _G.GameTooltip
 --@alpha@
 local assert = _G.assert
 --@end-alpha@
@@ -130,6 +131,18 @@ function module:CreateMiniButton(parent)
     b:SetPoint("LEFT", parent, "LEFT", 3, - 8)
     b:SetScript("OnClick", function() self:OnStateButtonClick(parent) end )
     self:SetButtonTexture(b)
+    b:SetScript("OnEnter", function(self)
+        parent.tooltip:Show()
+        GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+        GameTooltip:ClearLines()
+        GameTooltip:AddLine(format("%s XP", D.addonName))
+        GameTooltip:Show()
+    end)
+    b:SetScript("OnLeave", function(self)
+        parent.tooltip:Hide()
+        GameTooltip:Hide()
+        parent.tooltip:SetScript("OnUpdate", nil)
+    end)
     b:Hide()
     return b
 end
