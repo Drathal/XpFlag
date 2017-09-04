@@ -21,3 +21,10 @@ L["MARK_SIZE_DESC"] = "Size of all Markers"
 L["POS_SCREENTOP"] = "Screen Top"
 L["POS_SCREENBOTTOM"] = "Screen Bottom"
 L["POS_BLIZZ_EXPBAR"] = "Blizzard Experience Bar"
+
+L["CONNECT_BUTTON_TT"] = "Connect with Friend"
+
+L["XP_MARK_TT_1"] = "%s XP"
+L["XP_MARK_TT_2"] = "Level: %s"
+L["XP_MARK_TT_3"] = "XP: %s/%s (%.2f %%)"
+L["XP_MARK_TT_4"] = "Rested: %s (%.2f %%)"

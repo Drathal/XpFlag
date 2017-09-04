@@ -31,7 +31,7 @@ AddOn.woWPatch, AddOn.woWBuild, AddOn.woWPatchReleaseDate, AddOn.tocVersion = Ge
 AddOn.woWBuild = tonumber(AddOn.woWBuild)
 
 --@alpha@
-AddOn.fakeCom = false
+AddOn.fakeCom = true
 AddOn.fakeName = "dummy-Madmortem"
 AddOn.debug = {
     --mark = true,
@@ -41,6 +41,6 @@ AddOn.debug = {
     --dataXp = true,
     --com = true,
     --bar = true,
-    --friends = true
+    friends = true
 }
 --@end-alpha@

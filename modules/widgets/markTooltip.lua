@@ -18,12 +18,12 @@ local delay = 2
 local function UpdateTooltip(parent)
     local data = parent.data
     GameTooltip:ClearLines()
-    GameTooltip:AddLine(format("%s XP", D.addonName))
+    GameTooltip:AddLine(format(L["XP_MARK_TT_1"], D.addonName))
     GameTooltip:AddLine(data.name, COLORS[data.class].r, COLORS[data.class].g, COLORS[data.class].b, 1)
-    GameTooltip:AddLine(format("Level: %s", data.level), 1, 1, 1, 1)
-    GameTooltip:AddLine(format("XP: %s/%s (%.2f %%)", data.value, data.max, data.value / data.max * 100 ), 1, 1, 1, 1)
+    GameTooltip:AddLine(format(L["XP_MARK_TT_2"], data.level), 1, 1, 1, 1)
+    GameTooltip:AddLine(format(L["XP_MARK_TT_3"], data.value, data.max, data.value / data.max * 100 ), 1, 1, 1, 1)
     if data.rested and data.rested > 0 then
-        GameTooltip:AddLine(format("Rested: %s (%.2f %%)", data.rested, data.rested / data.max * 100 ), 1, 1, 1, 1)
+        GameTooltip:AddLine(format(L["XP_MARK_TT_4"], data.rested, data.rested / data.max * 100 ), 1, 1, 1, 1)
     end
     GameTooltip:Show()
 end
