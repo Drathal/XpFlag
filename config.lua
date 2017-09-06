@@ -4,8 +4,6 @@ local _G = _G
 local GameFontNormal = _G.GameFontNormal
 local LibStub = _G.LibStub
 
-local options = nil
-
 local function Get(section)
     return function(info)
         local key = info[#info]
@@ -124,12 +122,14 @@ function D:OnInitialize()
 
     LibStub("AceConfigRegistry-3.0"):RegisterOptionsTable(self.addonName, self.options)
     LibStub("AceConfigDialog-3.0"):AddToBlizOptions(self.addonName)
+
 end
 
 C["positions"] = {
     ["SCREENTOP"] = { "TOPLEFT", _G['UIParent'], "TOPLEFT", 0, 0 },
     ["SCREENBOTTOM"] = { "BOTTOMLEFT", _G['UIParent'], "BOTTOMLEFT", 0, 0 },
-    ["BLIZZEXPBAR"] = { "BOTTOMLEFT", _G['MainMenuExpBar'], "BOTTOMLEFT", 0, 2 },
+    ["BLIZZEXPBAR"] = { "TOPLEFT", _G['MainMenuBarOverlayFrame'], "TOPLEFT", 0, 9 },
+    -- ["BLIZZEXPBAR"] = { "BOTTOMLEFT", _G['MainMenuExpBar'], "BOTTOMLEFT", 0, 2 },
 }
 
 -- MainMenuExpBar
@@ -147,7 +147,7 @@ C["sparkXP"] = {
     ["fontColor"] = { 1, .82, 0, 1 },
     ["xSpread"] = { - 15, 15 },
     ["ySpread"] = { - 120, - 80 },
-    ["durationSpread"] = { 1, 2 }
+    ["durationSpread"] = { 1.5, 2 }
 }
 
 C["sparkModel"] = {
@@ -160,23 +160,23 @@ C["sparkModel"] = {
 
 C["bar"] = {
     ["position"] = "SCREENTOP",
-    ["dataSource"] = "DataXpUpdate",
+    ["dataSource"] = "dataXp",
     ["show"] = true,
     ["texture"] = "Interface\\AddOns\\"..D.addonName.."\\media\\bar.blp",
     ["backdrop"] = [[Interface\BUTTONS\WHITE8X8]],
-	["edge"] = [[Interface\BUTTONS\WHITE8X8]],
-	["height"] = 1,
-	["animationSpeed"] = 6
+	    ["edge"] = [[Interface\BUTTONS\WHITE8X8]],
+	    ["height"] = 1,
+	    ["animationSpeed"] = 6
 }
 
 C["mark"] = {
     ["position"] = "SCREENTOP",
 	["size"] = 15,
-    ["dataSource"] = "DataXpUpdate",
+    ["dataSource"] = "dataXp",
 	["flip"] = true,
     ["showPlayer"] = true,
 	["animationSpeed"] = 6,
-	["texture"] = {
+    ["texture"] = {
 		["default"] = "Interface\\AddOns\\"..D.addonName.."\\media\\circle.tga",
 		["below"] = "Interface\\AddOns\\"..D.addonName.."\\media\\circle-minus.tga",
 		["over"] = "Interface\\AddOns\\"..D.addonName.."\\media\\circle-plus.tga",

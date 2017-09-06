@@ -1,114 +1,173 @@
 local D, C, L = unpack(select(2, ...))
 
 local _G = _G
+local match = _G.string.match
+local pairs = _G.pairs
+local split = _G.strsplit
 local UnitXP = _G.UnitXP
 local UnitXPMax = _G.UnitXPMax
 local UnitLevel = _G.UnitLevel
 local SendAddonMessage = _G.SendAddonMessage
 local RegisterAddonMessagePrefix = _G.RegisterAddonMessagePrefix
+local LibStub = _G.LibStub
 
-local MessagePrefix = "XPF1b"
+local MessagePrefix = "XPF1"
 local MSG_TYPE_DATA = "DATA"
 local MSG_TYPE_REQUEST = "RESQUEST"
 local MSG_TYPE_DELETE = "DELETE"
 local MSG_TYPE_PING = "PING"
 local MSG_TYPE_PONG = "PONG"
 
-local module = D:NewModule("Communication", "AceEvent-3.0")
+local moduleName = "com"
+local module = D:NewModule(moduleName, "AceEvent-3.0", "AceSerializer-3.0", "AceComm-3.0")
 
-local function CreateMessage(type, xp, max, level, class)
-    local data = D.DataXpGet({
-        xp = xp,
-        max = max,
-        level = level,
-        class = class
-    })
-    return (type or MSG_TYPE_DATA)..":"..data.xp..":"..data.max..":"..data.level..":"..data.class
-end
+--@alpha@
+-- mock communication
+local After = _G.C_Timer.After
+local assert = _G.assert
+local select = _G.select
+local random = _G.math.random
+local vv = 0
 
-local function DecodeMessage(msg)
-    local type, xp, max, level, class = msg:match("^(.-):(.-):(.-):(.-):(.-)$");
+function module:FakeSendAddonMessage(prefix, msg, type, target)
 
-    return {
-        type = type,
-        xp = xp,
-        max = max,
-        level = level,
-        class = class
+    local _, data = self:Deserialize(msg)
+    local dataString = nil
+
+    D.Debug(moduleName, "FakeSendAddonMessage", data.type, prefix, type, target)
+
+    local fakeData = {
+        dataType = "dataXp",
+        name = select(1, split("-", D.fakeName)),
+        realm = select(2, split("-", D.fakeName)),
+        level = random(UnitLevel("PLAYER") - 1, UnitLevel("PLAYER") + 1),
+        class = "HUNTER",
+        disable = false,
+        value = 1,
+        max = 5000,
+        gain = 1,
+        rested = random(100, 300)
     }
+
+    fakeData.gain = random(100, 300)
+    vv = vv + fakeData.gain
+    fakeData.value = vv
+
+    if fakeData.value > 4999 then
+        fakeData.value = 0
+        vv = 0
+    end
+
+    if data.type == MSG_TYPE_PING then
+        fakeData.type = MSG_TYPE_PONG
+    end
+
+    if data.type == MSG_TYPE_REQUEST or ( data.type == MSG_TYPE_DATA and D:GetModule("mark"):GetMark(D.fakeName) ) then
+        fakeData.type = MSG_TYPE_DATA
+        After(random(1, 5), function() self:SendUpdate(D.fakeName) end)
+    end
+
+    if fakeData.type then
+        dataString = self:Serialize(D:GetModule("dataXp"):GetData(fakeData))
+        self:OnCommReceived(MessagePrefix, dataString, "WHISPER", D.fakeName)
+    end
+
+end
+--@end-alpha@
+
+function module:Send(type, target)
+    --@alpha@
+    assert(type, 'com:Send - type is missing')
+    assert(target, 'com:Send - target is missing')
+    assert(match(target, "%-") == '-', 'com:Send - target has no relam ')
+    --@end-alpha@
+
+    if not match(target, "%-") then return end
+
+    --@alpha@
+    if target ~= D.fakeName then
+        D.Debug(moduleName, "Send", type, target)
+        --@end-alpha@
+        self:SendCommMessage(MessagePrefix, self:Serialize(D:GetModule("dataXp"):GetData({type = type})), "WHISPER", target)
+        --@alpha@
+    end
+
+    if target == D.fakeName then
+        self:FakeSendAddonMessage(MessagePrefix, self:Serialize(D:GetModule("dataXp"):GetData({type = type})), "WHISPER", target)
+    end
+    --@end-alpha@
 end
 
-local function Send(type, target)
-    -- print("COM: Send", type, target, CreateMessage(type))
-    if not string.match(target, "%-") then return end
-    SendAddonMessage(MessagePrefix, CreateMessage(type), "WHISPER", target)
+function module:SendRequest(target)
+    self:Send(MSG_TYPE_REQUEST, target)
 end
 
-local function SendRequest(target)
-    Send(MSG_TYPE_REQUEST, target)
+function module:SendDelete(target)
+    self:Send(MSG_TYPE_DELETE, target)
 end
 
-local function SendDelete(target)
-    Send(MSG_TYPE_DELETE, target)
+function module:SendPing(target)
+    self:Send(MSG_TYPE_PING, target)
 end
 
-local function SendPing(target)
-    Send(MSG_TYPE_PING, target)
+function module:SendPong(target)
+    self:Send(MSG_TYPE_PONG, target)
 end
 
-local function SendPong(target)
-    Send(MSG_TYPE_PONG, target)
+function module:SendUpdate(target)
+    self:Send(MSG_TYPE_DATA, target)
 end
 
-local function SendUpdate(target)
-    Send(MSG_TYPE_DATA, target)
-end
-
-local function SendUpdates()
-    for target, _ in pairs(D.GetMarks()) do
+function module:SendUpdates()
+    for target, _ in pairs(D:GetModule("mark"):GetMarks()) do
         if target and target ~= D.nameRealm then
-            SendUpdate(target)
+            self:SendUpdate(target)
         end
     end
 end
 
 function module:OnEnable()
     RegisterAddonMessagePrefix(MessagePrefix)
-    self:RegisterEvent("CHAT_MSG_ADDON")
-    self:RegisterMessage("DataXpUpdate", SendUpdates)
+    self:RegisterMessage("dataXp:Update", "SendUpdates")
 end
 
 function module:OnDisable()
-    self:UnregisterEvent("CHAT_MSG_ADDON")
-    self:UnregisterMessage("DataXpUpdate")
+    self:UnregisterMessage("dataXp:Update")
 end
 
-function module:CHAT_MSG_ADDON(event, pre, rawmsg, chan, sender)
+function module:OnCommReceived(pre, rawmsg, chan, sender)
     if pre ~= MessagePrefix then return end
     if sender == D.nameRealm then return end
     if not rawmsg or rawmsg == "" then return end
 
-    if not string.match(sender, "%-") then
+    if not match(sender, "%-") then
         sender = sender.."-"..D.realm
     end
 
-    local data = DecodeMessage(rawmsg)
+    local success, data = self:Deserialize(rawmsg)
+
+    --@alpha@
+    assert(success, "CHAT_MSG_ADDON:Deserialize failed")
+    D.Debug(moduleName, "CHAT_MSG_ADDON", data.type, pre, chan, sender)
+    --@end-alpha@
+
+    if not success then return end
 
     if data.type == MSG_TYPE_DATA then
         D:SendMessage("ReceiveData", sender, data)
     end
 
     if data.type == MSG_TYPE_PING then
-        SendPong(sender)
+        self:SendPong(sender)
         D:SendMessage("ReceivePing", sender, data)
     end
 
     if data.type == MSG_TYPE_PONG then
-        D:SendMessage("ReceivePong", sender, data)
+        self:SendMessage("ReceivePong", sender, data)
     end
 
     if data.type == MSG_TYPE_REQUEST then
-        SendUpdate(sender)
+        self:SendUpdate(sender)
         D:SendMessage("ReceiveRequest", sender, data)
     end
 
@@ -116,11 +175,3 @@ function module:CHAT_MSG_ADDON(event, pre, rawmsg, chan, sender)
         D:SendMessage("ReceiveDelete", sender, data)
     end
 end
-
--- API
-D.SendRequest = SendRequest
-D.SendDelete = SendDelete
-D.SendPing = SendPing
-D.SendPong = SendPong
-D.SendUpdate = SendUpdate
-D.SendUpdates = SendUpdates

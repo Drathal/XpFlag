@@ -1,5 +1,15 @@
 ## CHANGELOG
 
+### 1.0.0
+
+  * feature: spark animation for connected player marks
+  * feature: model animation for connected player marks
+  * feature: smoothing animation throttle
+  * chore: communication over AceComm-3
+  * chore: communication mocking for alpha builds
+  * chore: logging for alpha builds
+  * chore: debug code for alpha builds
+
 ### 0.14.0 
 
   * add option to attach marker to the blizzard exp bar
