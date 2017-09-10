@@ -86,11 +86,11 @@ end
 
 function module:OnStateButtonClick(f)
     --@alpha@
-    D.Debug(moduleName, "OnStateButtonClick", f)
+    D.Debug(moduleName, "OnStateButtonClick", f, f.friend)
     assert(f, 'friends:OnStateButtonClick - f is missing')
     --@end-alpha@
 
-    local friend = f:GetParent().friend
+    local friend = f.friend
     if not friend then return end
 
     --@alpha@
@@ -136,6 +136,11 @@ function module:CreateMiniButton(parent)
         GameTooltip:ClearLines()
         GameTooltip:AddLine(D.addonName)
         GameTooltip:AddLine(L["CONNECT_BUTTON_TT"], 1, 1, 1, 1)
+
+        --@alpha@
+        GameTooltip:AddLine("debug: " .. parent.friend, 1, 1, 1, 1)
+        --@end-alpha@
+
         GameTooltip:Show()
     end)
     b:SetScript("OnLeave", function(self)
@@ -174,13 +179,17 @@ end
 
 function module:UpdateFriendButton(button)
     local friend = module:GetFriendNameByButton(button)
-    button.friend = friend
+
+    --@alpha@
+    D.Debug(moduleName, "UpdateFriendButton", button, friend)
+    --@end-alpha@
 
     if button.statusButton then
         button.statusButton:Hide()
     end
 
     if friend then
+        button.friend = friend
         online[friend] = true
         self:Ping(friend)
         if button:IsShown() and hasAddon[friend] then
@@ -257,9 +266,9 @@ function module:OnEnable()
     D.Debug(moduleName, "OnEnable")
     --@end-alpha@
 
-    local this = self
-    hooksecurefunc(_G['FriendsFrameFriendsScrollFrame'], 'update', function() module.OnFriendsFrameUpdate(self, this) end)
-    hooksecurefunc('FriendsFrame_UpdateFriends', function() module.OnFriendsFrameUpdate(self, this) end)
+    hooksecurefunc(_G['FriendsFrameFriendsScrollFrame'], 'update', function() self:OnFriendsFrameUpdate(self) end)
+    hooksecurefunc('FriendsFrame_UpdateFriends', function() self:OnFriendsFrameUpdate(self) end)
+
     self:RegisterMessage("ReceivePong", "OnPong")
     self:RegisterMessage("mark:Create", "OnNewMark")
     self:RegisterMessage("mark:Delete", "OnDeleteMark")

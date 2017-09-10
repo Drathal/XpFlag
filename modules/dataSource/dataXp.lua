@@ -27,7 +27,6 @@ local nameRealm = UnitName("player").."-"..GetRealmName()
 local data = nil
 local prevData = {}
 
-
 function module:OnEnable()
     --@alpha@
     D.Debug(moduleName, "OnEnable")

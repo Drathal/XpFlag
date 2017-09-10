@@ -142,7 +142,7 @@ C["player"] = {
 
 C["sparkXP"] = {
     ["max"] = 10,
-    ["format"] = "%s XP",
+    ["format"] = L["XP_MARK_TT_1"],
     ["font"] = { GameFontNormal:GetFont(), 12, "OUTLINE", 0 },
     ["fontColor"] = { 1, .82, 0, 1 },
     ["xSpread"] = { - 15, 15 },

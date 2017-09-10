@@ -38,8 +38,8 @@ AddOn.debug = {
     --markSpark = true,
     --markModel = true,
     --markTooltip = true,
-    --dataXp = true,
-    --com = true,
+    dataXp = true,
+    com = true,
     --bar = true,
     friends = true
 }
