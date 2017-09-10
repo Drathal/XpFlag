@@ -1,5 +1,9 @@
 ## CHANGELOG
 
+### 1.0.1
+
+  * fix: connect to friend fix
+
 ### 1.0.0
 
   * feature: spark animation for connected player marks

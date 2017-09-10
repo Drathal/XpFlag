@@ -127,7 +127,7 @@ function module:SendUpdates()
 end
 
 function module:OnEnable()
-    RegisterAddonMessagePrefix(MessagePrefix)
+    self:RegisterComm(MessagePrefix)
     self:RegisterMessage("dataXp:Update", "SendUpdates")
 end
 
@@ -147,8 +147,8 @@ function module:OnCommReceived(pre, rawmsg, chan, sender)
     local success, data = self:Deserialize(rawmsg)
 
     --@alpha@
-    assert(success, "CHAT_MSG_ADDON:Deserialize failed")
-    D.Debug(moduleName, "CHAT_MSG_ADDON", data.type, pre, chan, sender)
+    assert(success, "OnCommReceived:Deserialize failed")
+    D.Debug(moduleName, "OnCommReceived", data.type, pre, chan, sender)
     --@end-alpha@
 
     if not success then return end
