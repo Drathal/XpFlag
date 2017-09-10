@@ -1,12 +1,12 @@
 local D, C, L = unpack(select(2, ...))
 
 local _G = _G
-local tonumber = _G.tonumber
 local print = _G.print
 local type = _G.type
 local pairs = _G.pairs
 local min = _G.math.min
 local max = _G.math.max
+local tonumber = _G.tonumber
 local next = _G.next
 local floor = _G.math.floor
 local abs = _G.math.abs
@@ -18,9 +18,23 @@ local UnitLevel = _G.UnitLevel
 local MAX_PLAYER_LEVEL_TABLE = _G.MAX_PLAYER_LEVEL_TABLE
 
 --@alpha@
-local function Debug(module, msg, a1, a2, a3, a4)
+local select = _G.select
+local gsub = _G.gsub
+local strtrim = _G.strtrim
+local tostring = _G.tostring
+local PARAMETER_COLORS = { "|cff88ff88" }
+local function Debug(module, ...)
     if D.debug and not D.debug[module] then return end
-    print("|cffffff78 " .. module .. "|r : ".. msg .. " |cff88ff88", a1 or "", a2 or "", a3 or "", a4 or "", "|r")
+
+    local msg = "|cffffff78 " .. tostring(module) .."|r : "
+    for n = 1, select('#', ...) do
+        msg = msg .. " " .. (PARAMETER_COLORS[n] or " |cffffffff") .. tostring(select(n, ...)) .. "|r"
+        if _G.ViragDevTool_AddData and type(select(n, ...)) == 'table' then
+            _G.ViragDevTool_AddData(select(n, ...), tostring(module) .. ":".. select(1, ...))
+        end
+    end
+
+    print(msg)
 end
 --@end-alpha@
 

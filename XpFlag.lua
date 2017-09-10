@@ -34,13 +34,13 @@ AddOn.woWBuild = tonumber(AddOn.woWBuild)
 AddOn.fakeCom = true
 AddOn.fakeName = "dummy-Madmortem"
 AddOn.debug = {
-    --mark = true,
+    mark = true,
     --markSpark = true,
     --markModel = true,
     --markTooltip = true,
-    --dataXp = true,
-    --com = true,
-    --bar = true,
+    dataXp = true,
+    com = true,
+    bar = true,
     friends = true
 }
 --@end-alpha@

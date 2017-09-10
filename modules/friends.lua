@@ -257,9 +257,9 @@ function module:OnEnable()
     D.Debug(moduleName, "OnEnable")
     --@end-alpha@
 
-    local this = self
-    hooksecurefunc(_G['FriendsFrameFriendsScrollFrame'], 'update', function() module.OnFriendsFrameUpdate(self, this) end)
-    hooksecurefunc('FriendsFrame_UpdateFriends', function() module.OnFriendsFrameUpdate(self, this) end)
+    hooksecurefunc(_G['FriendsFrameFriendsScrollFrame'], 'update', function() self:OnFriendsFrameUpdate(self) end)
+    hooksecurefunc('FriendsFrame_UpdateFriends', function() self:OnFriendsFrameUpdate(self) end)
+
     self:RegisterMessage("ReceivePong", "OnPong")
     self:RegisterMessage("mark:Create", "OnNewMark")
     self:RegisterMessage("mark:Delete", "OnDeleteMark")
