@@ -38,33 +38,24 @@ D.options = {
             get = Get('bar'),
             set = Set('bar'),
             args = {
+                header = {
+                    order = 1,
+                    type = 'header',
+                    name = 'Bar Setup',
+                    width = 'full'
+                },
+                description = {
+                    order = 2,
+                    type = 'description',
+                    name = 'You can setup your bar independently from your markers. But you can only have one bar right now.',
+                    width = 'full',
+                },
                 show = {
                     type = 'toggle',
-                    order = 1,
+                    order = 3,
                     width = 'full',
                     name = L["SHOW_PLAYER_BAR_LABEL"],
                     desc = L["SHOW_PLAYER_BAR_DESC"]
-                },
-                position = {
-                    type = 'select',
-                    order = 2,
-                    width = 'full',
-                    values = {
-                        ["SCREENTOP"] = L["POS_SCREENTOP"],
-                        ["SCREENBOTTOM"] = L["POS_SCREENBOTTOM"],
-                    },
-                    name = L["PLAYER_BAR_POS_LABEL"],
-                    desc = L["PLAYER_BAR_POS_DESC"]
-                },
-                height = {
-                    type = 'range',
-                    order = 3,
-                    width = 'full',
-                    min = 1,
-                    max = 15,
-                    step = 1,
-                    name = L["PLAYER_BAR_HEIGHT_LABEL"],
-                    desc = L["PLAYER_BAR_HEIGHT_DESC"]
                 },
                 dataSource = {
                     type = 'select',
@@ -76,6 +67,27 @@ D.options = {
                     },
                     name = L["PLAYER_BAR_DATASOURCE_LABEL"],
                     desc = L["PLAYER_BAR_DATASOURCE_DESC"]
+                },
+                position = {
+                    type = 'select',
+                    order = 5,
+                    width = 'full',
+                    values = {
+                        ["SCREENTOP"] = L["POS_SCREENTOP"],
+                        ["SCREENBOTTOM"] = L["POS_SCREENBOTTOM"],
+                    },
+                    name = L["PLAYER_BAR_POS_LABEL"],
+                    desc = L["PLAYER_BAR_POS_DESC"]
+                },
+                height = {
+                    type = 'range',
+                    order = 6,
+                    width = 'full',
+                    min = 1,
+                    max = 15,
+                    step = 1,
+                    name = L["PLAYER_BAR_HEIGHT_LABEL"],
+                    desc = L["PLAYER_BAR_HEIGHT_DESC"]
                 },
             }
         },

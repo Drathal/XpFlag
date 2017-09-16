@@ -33,7 +33,7 @@ function module:OnEnable()
     D.Debug(moduleName, "OnEnable")
     --@end-alpha@
 
-    hooksecurefunc(_G['SetWatchedFactionIndex'], function() self:Update() end)
+    hooksecurefunc('SetWatchedFactionIndex', function() self:Update() end)
     self:RegisterEvent("PLAYER_ENTERING_WORLD")
     self:RegisterEvent("UPDATE_FACTION")
 end
