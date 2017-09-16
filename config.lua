@@ -42,8 +42,8 @@ D.options = {
                     type = 'toggle',
                     order = 1,
                     width = 'full',
-                    name = L["SHOW_PLAYER_XP_BAR_LABEL"],
-                    desc = L["SHOW_PLAYER_XP_BAR_DESC"]
+                    name = L["SHOW_PLAYER_BAR_LABEL"],
+                    desc = L["SHOW_PLAYER_BAR_DESC"]
                 },
                 position = {
                     type = 'select',
@@ -53,8 +53,8 @@ D.options = {
                         ["SCREENTOP"] = L["POS_SCREENTOP"],
                         ["SCREENBOTTOM"] = L["POS_SCREENBOTTOM"],
                     },
-                    name = L["PLAYER_XP_BAR_POS_LABEL"],
-                    desc = L["PLAYER_XP_BAR_POS_DESC"]
+                    name = L["PLAYER_BAR_POS_LABEL"],
+                    desc = L["PLAYER_BAR_POS_DESC"]
                 },
                 height = {
                     type = 'range',
@@ -63,8 +63,19 @@ D.options = {
                     min = 1,
                     max = 15,
                     step = 1,
-                    name = L["PLAYER_XP_BAR_HEIGHT_LABEL"],
-                    desc = L["PLAYER_XP_BAR_HEIGHT_DESC"]
+                    name = L["PLAYER_BAR_HEIGHT_LABEL"],
+                    desc = L["PLAYER_BAR_HEIGHT_DESC"]
+                },
+                dataSource = {
+                    type = 'select',
+                    order = 4,
+                    width = 'full',
+                    values = {
+                        ["dataXp"] = L["PLAYER_BAR_DATASOURCE_OPTION_XP"],
+                        ["dataRep"] = L["PLAYER_BAR_DATASOURCE_OPTION_REP"],
+                    },
+                    name = L["PLAYER_BAR_DATASOURCE_LABEL"],
+                    desc = L["PLAYER_BAR_DATASOURCE_DESC"]
                 },
             }
         },
@@ -132,7 +143,10 @@ C["positions"] = {
     -- ["BLIZZEXPBAR"] = { "BOTTOMLEFT", _G['MainMenuExpBar'], "BOTTOMLEFT", 0, 2 },
 }
 
--- MainMenuExpBar
+C["datasource"] = {
+    ["SOURCE_XP"] = "dataXp",
+    ["SOURCE_REP"] = "dataRep",
+}
 
 C["player"] = {
     ["show"] = true,

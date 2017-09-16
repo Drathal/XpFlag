@@ -6,7 +6,6 @@ local UnitLevel = _G.UnitLevel
 local UnitXP = _G.UnitXP
 local UnitXPMax = _G.UnitXPMax
 local UnitName = _G.UnitName
-local GameTooltip = _G.GameTooltip
 local UnitClass = _G.UnitClass
 local GetRealmName = _G.GetRealmName
 local MAX_PLAYER_LEVEL_TABLE = _G.MAX_PLAYER_LEVEL_TABLE
@@ -38,8 +37,6 @@ function module:OnEnable()
     self:RegisterEvent("PLAYER_XP_UPDATE")
     self:RegisterEvent("PLAYER_LEVEL_UP")
     self:RegisterEvent("CHAT_MSG_SYSTEM")
-
-    self:Update()
 end
 
 function module:OnDisable()
@@ -55,14 +52,14 @@ function module:OnDisable()
 end
 
 function module:CHAT_MSG_SYSTEM(event, msg)
-    --@alpha@
-    D.Debug(moduleName, "CHAT_MSG_SYSTEM", msg)
-    --@end-alpha@
-
     if msg ~= ERR_EXHAUSTION_RESTED
     and msg ~= ERR_EXHAUSTION_WELLRESTED
     and msg ~= ERR_EXHAUSTION_NORMAL
     and msg ~= ERR_EXHAUSTION_TIRED then return end
+
+    --@alpha@
+    D.Debug(moduleName, "CHAT_MSG_SYSTEM", msg)
+    --@end-alpha@
 
     self:Update()
 end
@@ -110,10 +107,6 @@ function module:PLAYER_XP_UPDATE(event, unit)
 end
 
 function module:GetData(mix)
-    --@alpha@
-    -- D.Debug(moduleName, "GetData")
-    --@end-alpha@
-
     local d = mix or {}
 
     d.dataType = moduleName
@@ -136,7 +129,11 @@ function module:GetData(mix)
 end
 
 function module:IsUpdated(data)
-    if (prevData.dataType) then
+    if not prevData.dataType then
+        return true
+    end
+
+    if prevData.dataType then
         for k1, v1 in pairs(data) do
             if v1 ~= prevData[k1] then
                 return true

@@ -7,12 +7,12 @@ if _G.GetLocale() ~= "deDE" then return end
 L["DESCRIPTION"] = "Erfahrungs Anzeige für dich und deine Freunde."
 
 L["SECTION_BAR"] = "Balken"
-L["SHOW_PLAYER_XP_BAR_LABEL"] = "Zeige"
-L["SHOW_PLAYER_XP_BAR_DESC"] = "Zeige / Verberge Balken"
-L["PLAYER_XP_BAR_POS_LABEL"] = "Position"
-L["PLAYER_XP_BAR_POS_DESC"] = "Position des Balken"
-L["PLAYER_XP_BAR_HEIGHT_LABEL"] = "Höhe"
-L["PLAYER_XP_BAR_HEIGHT_DESC"] = "Höhe des Balken"
+L["SHOW_PLAYER_BAR_LABEL"] = "Zeige"
+L["SHOW_PLAYER_BAR_DESC"] = "Zeige / Verberge Balken"
+L["PLAYER_BAR_POS_LABEL"] = "Position"
+L["PLAYER_BAR_POS_DESC"] = "Position des Balken"
+L["PLAYER_BAR_HEIGHT_LABEL"] = "Höhe"
+L["PLAYER_BAR_HEIGHT_DESC"] = "Höhe des Balken"
 
 L["SECTION_MARK"] = "Markierung"
 L["SHOW_PLAYER_MARK_LABEL"] = "Zeige"

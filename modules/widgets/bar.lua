@@ -21,7 +21,7 @@ function module:OnEnable()
     D.Debug(moduleName, "OnEnable")
     --@end-alpha@
 
-    self:RegisterMessage("dataXp:Update", "UpdateBar")
+    self:RegisterMessage("dataSource:Update", "Update")
 end
 
 function module:OnDisable()
@@ -30,7 +30,7 @@ function module:OnDisable()
     --@end-alpha@
 
     self.DeleteBar(D.nameRealm)
-    self:UnregisterMessage("dataXp:Update")
+    self:UnregisterMessage("dataSource:Update")
 end
 
 function module:CreateBar(id)
@@ -86,13 +86,7 @@ function module:DeleteBar(id)
     bars[id] = nil
 end
 
-function module:UpdateBar(msg, id, data)
-    --@alpha@
-    D.Debug(moduleName, "UpdateBar", id)
-    assert(id, 'bar:UpdateBar - id is missing')
-    assert(data, 'bar:UpdateBar - data is missing')
-    --@end-alpha@
-
+function module:UpdateBar(id, data)
     local bar = bars[id] or self:CreateBar(id)
 
     bar.data = data
@@ -115,13 +109,26 @@ function module:UpdateBar(msg, id, data)
 end
 
 -- at the moment we only have one bar for the player
-function module:Update()
+function module:Update(msg, id, data, source)
+    if source and source ~= C.db.profile.bar.dataSource..":Update" then
+        D.Debug(moduleName, "source", source, C.db.profile.bar.dataSource)
+        return
+    end
+
     if not C.db.profile.bar.show then
         self:DeleteBar(D.nameRealm)
         return
     end
 
-    local bar = self:UpdateBar(nil, D.nameRealm, bars[D.nameRealm] and bars[D.nameRealm].data or D:GetModule("dataXp"):GetData())
+    -- when we have no id or data then the update comes from the options menu
+    id = id or D.nameRealm
+    data = data or D:GetModule(C.db.profile.bar.dataSource):GetData()
+
+    --@alpha@
+    D.Debug(moduleName, "Update", id, data, source)
+    --@end-alpha@
+
+    local bar = self:UpdateBar(id, data)
     bar:SetHeight(C.db.profile.bar.height)
     bar:ClearAllPoints()
     bar:SetPoint(unpack(C.positions[C.db.profile.bar.position]))
