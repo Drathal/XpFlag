@@ -39,10 +39,10 @@ AddOn.debug = {
     --markModel = true,
     --markTooltip = true,
     dataSource = true,
-    --dataXp = true,
+    dataXp = true,
     dataRep = true,
     --com = true,
-    bar = true,
+    --bar = true,
     --friends = true
 }
 --@end-alpha@

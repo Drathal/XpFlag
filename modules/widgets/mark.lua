@@ -83,7 +83,7 @@ function module:UpdateMark(id, data)
     local m = marks[id] or self:CreateMark(id, data);
     m.data = data
 
-    if data.disabled then
+    if data.disable then
         m:Hide()
         return
     end
@@ -130,7 +130,7 @@ function module:OnEnable()
     self:RegisterMessage("ReceiveData", "OnUpdateMark")
     self:RegisterMessage("ReceiveRequest", "OnUpdateMark")
     self:RegisterMessage("ReceiveDelete", "OnDeleteMark")
-    self:RegisterMessage("dataXp:Update", "OnUpdateMark")
+    self:RegisterMessage("dataSource:Update", "OnUpdateMark")
 end
 
 function module:OnDisable()
@@ -141,7 +141,7 @@ function module:OnDisable()
     self:UnregisterMessage("ReceiveData")
     self:UnregisterMessage("ReceiveRequest")
     self:UnregisterMessage("ReceiveDelete")
-    self:UnregisterMessage("dataXp:Update")
+    self:UnregisterMessage("dataSource:Update")
 end
 
 function module:DeleteMark(id)
@@ -169,7 +169,7 @@ function module:Update()
     if not C.db.profile.mark.showPlayer then
         self:DeleteMark(D.nameRealm)
     else
-        self:UpdateMark(D.nameRealm, D:GetModule("dataXp"):GetData())
+        self:UpdateMark(D.nameRealm, D:GetModule(C.db.profile.mark.dataSource):GetData())
     end
 
     C.db.profile.mark.flip = match(C.db.profile.mark.position, "TOP") ~= nil
