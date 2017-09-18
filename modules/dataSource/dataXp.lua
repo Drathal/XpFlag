@@ -143,6 +143,7 @@ function module:IsUpdated(data)
 end
 
 function module:Update()
+    D.Debug(moduleName, "Update - ##############################")
     data = self:GetData()
 
     if self:IsUpdated(data) then
@@ -155,6 +156,9 @@ function module:Update()
     prevData = data
 
     if data.disable then
+        --@alpha@
+        D.Debug(moduleName, "Update - Disable")
+        --@end-alpha@
         self:Disable()
     end
 end

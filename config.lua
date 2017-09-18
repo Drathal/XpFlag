@@ -41,7 +41,7 @@ D.options = {
                 header = {
                     order = 1,
                     type = 'header',
-                    name = L["SECTION_BAR_HEADER"] ,
+                    name = L["SECTION_BAR_HEADER"],
                     width = 'full'
                 },
                 description = {
@@ -98,22 +98,45 @@ D.options = {
             get = Get('mark'),
             set = Set('mark'),
             args = {
+                header = {
+                    order = 1,
+                    type = 'header',
+                    name = L["SECTION_MARK_HEADER"],
+                    width = 'full'
+                },
+                description = {
+                    order = 2,
+                    type = 'description',
+                    name = L["SECTION_MARK_DESCRIPTION"],
+                    width = 'full',
+                },
                 showPlayer = {
                     type = 'toggle',
-                    order = 1,
+                    order = 3,
                     width = 'full',
                     name = L["SHOW_PLAYER_MARK_LABEL"],
                     desc = L["SHOW_PLAYER_MARK_DESC"]
                 },
+                dataSource = {
+                    type = 'select',
+                    order = 4,
+                    width = 'full',
+                    values = {
+                        ["dataXp"] = L["PLAYER_BAR_DATASOURCE_OPTION_XP"],
+                        ["dataRep"] = L["PLAYER_BAR_DATASOURCE_OPTION_REP"],
+                    },
+                    name = L["PLAYER_BAR_DATASOURCE_LABEL"],
+                    desc = L["PLAYER_BAR_DATASOURCE_DESC"]
+                },
                 position = {
                     type = 'select',
-                    order = 2,
+                    order = 5,
                     width = 'full',
                     values = function()
                         local items = {}
                         items["SCREENTOP"] = L["POS_SCREENTOP"]
                         items["SCREENBOTTOM"] = L["POS_SCREENBOTTOM"]
-                        if _G['MainMenuExpBar']:IsVisible() then
+                        if _G['MainMenuBarOverlayFrame']:IsVisible() then
                             items["BLIZZEXPBAR"] = L["POS_BLIZZ_EXPBAR"]
                         end
                         return items
@@ -123,7 +146,7 @@ D.options = {
                 },
                 size = {
                     type = 'range',
-                    order = 3,
+                    order = 6,
                     width = 'full',
                     min = 6,
                     max = 30,
@@ -160,6 +183,11 @@ C["datasource"] = {
     ["SOURCE_REP"] = "dataRep",
 }
 
+C["datasourceshort"] = {
+    ["dataXp"] = "XP",
+    ["dataRep"] = "REP",
+}
+
 C["player"] = {
     ["show"] = true,
     ["color"] = { 0.25, 0.5, 1, 1 },
@@ -193,6 +221,19 @@ C["bar"] = {
 	    ["edge"] = [[Interface\BUTTONS\WHITE8X8]],
 	    ["height"] = 1,
 	    ["animationSpeed"] = 6
+}
+
+C["tooltip"] = {
+    ["XP"] = {
+        [2] = function(data) return data.name, data.level end,                 
+        [3] = function(data) return data.value, data.max, data.value / data.max * 100 end,         
+        [4] = function(data) return data.rested, data.rested / data.max * 100 end,                 
+    },
+    ["REP"] = {
+        [2] = function(data) return data.name, data.level end,                     
+        [3] = function(data) return data.faction, data.standingID end,                     
+        [4] = function(data) return data.value, data.max, data.value / data.max * 100 end,         
+    }
 }
 
 C["mark"] = {
