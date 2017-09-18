@@ -111,7 +111,6 @@ end
 -- at the moment we only have one bar for the player
 function module:Update(msg, id, data, source)
     if source and source ~= C.db.profile.bar.dataSource..":Update" then
-        D.Debug(moduleName, "source", source, C.db.profile.bar.dataSource)
         return
     end
 

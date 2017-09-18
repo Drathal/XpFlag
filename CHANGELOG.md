@@ -1,5 +1,9 @@
 ## CHANGELOG
 
+### 1.1.0
+
+  * feature: new data source: reputation
+
 ### 1.0.1
 
   * fix: connect to friend fix

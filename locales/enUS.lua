@@ -3,6 +3,8 @@ local D, C, L = unpack(select(2, ...))
 L["DESCRIPTION"] = "Its shows player experience at the top of the Screen. It can also Sync your Battle.net Friends Experience."
 
 L["SECTION_BAR"] = "Bar"
+L["SECTION_BAR_HEADER"] = "Bar Setup"
+L["SECTION_BAR_DESCRIPTION"] = "You can setup your bar independently from your markers. But you can only have one bar right now."
 L["SHOW_PLAYER_BAR_LABEL"] = "Show"
 L["SHOW_PLAYER_BAR_DESC"] = "Show / Hide bar"
 L["PLAYER_BAR_POS_LABEL"] = "Position"

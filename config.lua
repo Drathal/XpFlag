@@ -41,13 +41,13 @@ D.options = {
                 header = {
                     order = 1,
                     type = 'header',
-                    name = 'Bar Setup',
+                    name = L["SECTION_BAR_HEADER"] ,
                     width = 'full'
                 },
                 description = {
                     order = 2,
                     type = 'description',
-                    name = 'You can setup your bar independently from your markers. But you can only have one bar right now.',
+                    name = L["SECTION_BAR_DESCRIPTION"],
                     width = 'full',
                 },
                 show = {

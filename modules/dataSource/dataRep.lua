@@ -33,7 +33,12 @@ function module:OnEnable()
     D.Debug(moduleName, "OnEnable")
     --@end-alpha@
 
-    hooksecurefunc('SetWatchedFactionIndex', function() self:Update() end)
+    hooksecurefunc('SetWatchedFactionIndex', function(factionIndex) 
+        --@alpha@
+        D.Debug(moduleName, "SetWatchedFactionIndex", factionIndex)
+        --@end-alpha@
+        self:Update() 
+    end)
     self:RegisterEvent("PLAYER_ENTERING_WORLD")
     self:RegisterEvent("UPDATE_FACTION")
 end
@@ -52,11 +57,11 @@ function module:PLAYER_ENTERING_WORLD()
     --@end-alpha@
 
     self:Update()
-    self:UnregisterEvent("PLAYER_ENTERING_WORLD");
+    self:UnregisterEvent("PLAYER_ENTERING_WORLD")
 end
 
 function module:UPDATE_FACTION(event, unit)
-    -- if unit ~= 'player' then return end
+    if unit ~= 'player' then return end
     --@alpha@
     D.Debug(moduleName, "UPDATE_FACTION", event, unit)
     --@end-alpha@
