@@ -143,10 +143,9 @@ function module:IsUpdated(data)
 end
 
 function module:Update()
-    D.Debug(moduleName, "Update - ##############################")
     data = self:GetData()
 
-    if self:IsUpdated(data) then
+    if self:IsUpdated(data) and C.db.profile.mark.dataSource == moduleName then
         --@alpha@
         D.Debug(moduleName, "Update - SendMessage", moduleName..":Update", nameRealm )
         --@end-alpha@
@@ -156,9 +155,6 @@ function module:Update()
     prevData = data
 
     if data.disable then
-        --@alpha@
-        D.Debug(moduleName, "Update - Disable")
-        --@end-alpha@
         self:Disable()
     end
 end

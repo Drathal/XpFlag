@@ -174,7 +174,7 @@ end
 C["positions"] = {
     ["SCREENTOP"] = { "TOPLEFT", _G['UIParent'], "TOPLEFT", 0, 0 },
     ["SCREENBOTTOM"] = { "BOTTOMLEFT", _G['UIParent'], "BOTTOMLEFT", 0, 0 },
-    ["BLIZZEXPBAR"] = { "TOPLEFT", _G['MainMenuBarOverlayFrame'], "TOPLEFT", 0, 9 },
+    ["BLIZZEXPBAR"] = { "TOPLEFT", _G['MainMenuBarOverlayFrame'], "TOPLEFT", 0, - 8 },
     -- ["BLIZZEXPBAR"] = { "BOTTOMLEFT", _G['MainMenuExpBar'], "BOTTOMLEFT", 0, 2 },
 }
 
@@ -247,7 +247,6 @@ C["mark"] = {
     ["position"] = "SCREENTOP",
 	["size"] = 15,
     ["dataSource"] = "dataXp",
-	["flip"] = true,
     ["showPlayer"] = true,
 	["animationSpeed"] = 6,
     ["texture"] = {

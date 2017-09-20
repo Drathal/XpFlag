@@ -33,11 +33,11 @@ function module:OnEnable()
     D.Debug(moduleName, "OnEnable")
     --@end-alpha@
 
-    hooksecurefunc('SetWatchedFactionIndex', function(factionIndex) 
+    hooksecurefunc('SetWatchedFactionIndex', function(factionIndex)
         --@alpha@
         D.Debug(moduleName, "SetWatchedFactionIndex", factionIndex)
         --@end-alpha@
-        self:Update() 
+        self:Update()
     end)
     self:RegisterEvent("PLAYER_ENTERING_WORLD")
     self:RegisterEvent("UPDATE_FACTION")
@@ -129,7 +129,7 @@ end
 function module:Update()
     data = self:GetData()
 
-    if self:IsUpdated(data) then
+    if self:IsUpdated(data) and C.db.profile.mark.dataSource == moduleName then
         --@alpha@
         D.Debug(moduleName, "Update - SendMessage", moduleName..":Update", nameRealm )
         --@end-alpha@

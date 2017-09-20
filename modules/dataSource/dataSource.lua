@@ -10,7 +10,6 @@ function module:OnEnable()
 
     self:RegisterMessage("dataXp:Update", "Update")
     self:RegisterMessage("dataRep:Update", "Update")
-    -- self:Update()
 end
 
 function module:OnDisable()

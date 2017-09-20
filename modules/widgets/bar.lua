@@ -91,11 +91,6 @@ function module:UpdateBar(id, data)
 
     bar.data = data
 
-    if data.isMaxLevel then
-        self:DeleteBar(id)
-        return
-    end
-
     bar:Show()
 
     bar.to = bar:GetParent():GetWidth() * data.value / data.max or 0
@@ -110,18 +105,13 @@ end
 
 -- at the moment we only have one bar for the player
 function module:Update(msg, id, data, source)
-    if source and source ~= C.db.profile.bar.dataSource..":Update" then
-        return
-    end
+    id = id or D.nameRealm
+    data = data or D:GetModule(C.db.profile.bar.dataSource):GetData()
 
-    if not C.db.profile.bar.show then
+    if not C.db.profile.bar.show or data.disable then
         self:DeleteBar(D.nameRealm)
         return
     end
-
-    -- when we have no id or data then the update comes from the options menu
-    id = id or D.nameRealm
-    data = data or D:GetModule(C.db.profile.bar.dataSource):GetData()
 
     --@alpha@
     D.Debug(moduleName, "Update", id, data, source)

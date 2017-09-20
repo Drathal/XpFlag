@@ -19,7 +19,6 @@ local MAX_PLAYER_LEVEL_TABLE = _G.MAX_PLAYER_LEVEL_TABLE
 
 --@alpha@
 local select = _G.select
-local gsub = _G.gsub
 local strtrim = _G.strtrim
 local tostring = _G.tostring
 local PARAMETER_COLORS = { "|cff88ff88" }

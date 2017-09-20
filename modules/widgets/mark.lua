@@ -5,6 +5,7 @@ local pairs = _G.pairs
 local select = _G.select
 local unpack = _G.unpack
 local match = _G.string.match
+local gsub = _G.gsub
 local assert = _G.assert
 local CreateFrame = _G.CreateFrame
 local UnitXP = _G.UnitXP
@@ -56,7 +57,6 @@ function module:CreateMark(id, data)
     m.model = D:GetModule("markModel"):Create(m)
     m.sparks = D:GetModule("markSpark"):Create(m)
 
-
     marks[id] = m
 
     --@alpha@
@@ -74,7 +74,7 @@ end
 
 function module:UpdateMark(id, data)
     --@alpha@
-    D.Debug(moduleName, "UpdateMark", id)
+    D.Debug(moduleName, "UpdateMark", id, data)
     assert(id, 'mark:UpdateMark - id is missing')
     assert(data, 'mark:UpdateMark - data is missing')
     --@end-alpha@
@@ -83,11 +83,6 @@ function module:UpdateMark(id, data)
     local m = marks[id] or self:CreateMark(id, data);
     m.data = data
 
-    if data.disable then
-        m:Hide()
-        return
-    end
-
     m.to = m:GetParent():GetWidth() * data.value / data.max
     m.texture:SetTexture(D.GetMarkTexture(data.level, UnitLevel("player")))
     m.texture:SetVertexColor(rcolor.r, rcolor.g, rcolor.b)
@@ -95,31 +90,12 @@ function module:UpdateMark(id, data)
 
     m.anim.Start()
 
-    --@alpha@
-    D.Debug(moduleName, "UpdateMark - SendMessage", moduleName..":Update", id )
-    --@end-alpha@
     D:SendMessage(moduleName..":Update", id, m)
 
-    if not m.player then return end
+    if not m.player then return m end
     m.texture:SetVertexColor(data.cR, data.cG, data.cB)
-end
 
-function module:OnUpdateMark(event, id, data)
-    --@alpha@
-    D.Debug(moduleName, "OnUpdateMark", id)
-    assert(id, 'mark:OnUpdateMark - id is missing')
-    assert(data, 'mark:OnUpdateMark - data is missing')
-    --@end-alpha@
-
-    self:UpdateMark(id, data)
-end
-
-function module:OnDeleteMark(event, id)
-    --@alpha@
-    D.Debug(moduleName, "OnDeleteMark", id)
-    --@end-alpha@
-
-    self:DeleteMark(id)
+    return m
 end
 
 function module:OnEnable()
@@ -127,10 +103,10 @@ function module:OnEnable()
     D.Debug(moduleName, "OnEnable")
     --@end-alpha@
 
-    self:RegisterMessage("ReceiveData", "OnUpdateMark")
-    self:RegisterMessage("ReceiveRequest", "OnUpdateMark")
-    self:RegisterMessage("ReceiveDelete", "OnDeleteMark")
-    self:RegisterMessage("dataSource:Update", "OnUpdateMark")
+    self:RegisterMessage("ReceiveData", "Update")
+    self:RegisterMessage("ReceiveRequest", "Update")
+    self:RegisterMessage("ReceiveDelete", "DeleteMark")
+    self:RegisterMessage("dataSource:Update", "Update")
 end
 
 function module:OnDisable()
@@ -161,39 +137,49 @@ function module:DeleteMark(id)
     D:SendMessage("mark:Delete", id)
 end
 
-function module:Update()
+function module:Update(msg, id, data, source)
     --@alpha@
-    D.Debug(moduleName, "Update")
+    D.Debug(moduleName, "Update", msg, id, data, source)
     --@end-alpha@
 
-    if not C.db.profile.mark.showPlayer then
-        self:DeleteMark(D.nameRealm)
-    else
-        self:UpdateMark(D.nameRealm, D:GetModule(C.db.profile.mark.dataSource):GetData())
+    id = id or D.nameRealm
+
+    -- create player mark if we have to
+    if not marks[id] and C.db.profile.mark.showPlayer then
+        self:UpdateMark(id, data or D:GetModule(C.db.profile.mark.dataSource):GetData())
     end
 
-    C.db.profile.mark.flip = match(C.db.profile.mark.position, "TOP") ~= nil
-
+    local flip = match(C.db.profile.mark.position, "TOP") == nil
     local newPos = C.positions[C.db.profile.mark.position]
 
-    for id, mark in pairs(marks) do
-        if not mark then return end
+    for mid, mark in pairs(marks) do
+        if mid == id then
+            if C.db.profile.mark.dataSource ~= mark.data.dataType then
+                mark.data = D:GetModule(C.db.profile.mark.dataSource):GetData()
+            end
+            if not C.db.profile.mark.showPlayer then
+                mark.data.disable = true
+            end
+        end
 
-        local _, p, _, xOfs, _ = mark:GetPoint()
-        newPos[4] = xOfs
+        newPos[4] = mark:GetParent():GetWidth() * mark.data.value / mark.data.max
+
+        if flip then
+            newPos[1] = gsub(newPos[1], "TOP", "BOTTOM")
+        end
 
         mark:ClearAllPoints()
-        mark:SetParent(p)
         mark:SetPoint(unpack(newPos))
+        mark:SetParent(newPos[2])
         mark:SetHeight(C.db.profile.mark.size)
         mark:SetWidth(C.db.profile.mark.size)
-        mark.texture:SetTexCoord(unpack(C.db.profile.mark.flip and {0, 1, 1, 0} or {0, 1, 0, 1}))
+        mark.texture:SetTexCoord(unpack(flip and {0, 1, 0, 1} or {0, 1, 1, 0}))
 
-        --@alpha@
-        assert(mark.data, 'mark:Update - mark.data is missing for '..id)
-        --@end-alpha@
-
-        self:UpdateMark(id, mark.data)
+        if mark.data.disable then
+            self:DeleteMark(mid)
+        else
+            self:UpdateMark(mid, mark.data)
+        end
     end
 end
 
