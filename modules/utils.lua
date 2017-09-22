@@ -99,30 +99,24 @@ local function GetMarkTexture(friend, player)
 end
 
 local function AnimateWidth(f)
-    if not f then return end
-    if not f.to then return end
-
     local cur = f:GetWidth()
-    local new = cur + min((f.to - cur) / C.bar.animationSpeed, f.to - cur)
+    local new = cur + (f.to - cur) / C.bar.animationSpeed
 
-    if cur == f.to or abs(new - f.to) < 1 then
+    if abs(new - f.to) < 1 then
         new = f.to
         f.to = nil
     end
 
-    f:SetWidth(new + 0.001)
+    f:SetWidth(new)
 
     return f.to
 end
 
 local function AnimateX(f)
-    if not f then return end
-    if not f.to then return end
-
     local cur = f.cur or 0
-    local new = cur + min((f.to - cur) / C.mark.animationSpeed, f.to - cur)
+    local new = cur + (f.to - cur) / C.mark.animationSpeed
 
-    if cur == f.to or abs(new - f.to) < 1 then
+    if abs(new - f.to) < 1 then
         new = f.to
         f.to = nil
         D:SendMessage("AnimateXEnd", f)
@@ -130,7 +124,7 @@ local function AnimateX(f)
 
     local p1, p, p2, xOfs, yOfs = f:GetPoint()
     f:ClearAllPoints();
-    f:SetPoint(p1, p, p2, new - f:GetWidth() / 2, yOfs)
+    f:SetPoint(p1, p, p2, new, yOfs)
 
     f.cur = new
     return f.to

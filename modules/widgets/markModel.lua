@@ -11,7 +11,7 @@ local module = D:NewModule(moduleName, "AceEvent-3.0")
 function module:Create(parent)
     local m = CreateFrame('PlayerModel', D.addonName..'-SparkModel', parent)
     m:SetPoint('CENTER')
-    m:SetSize(C.sparkModel.size, C.sparkModel.size)
+    m:SetSize(parent:GetWidth() * C.sparkModel.size, parent:GetWidth() * C.sparkModel.size)
     m:SetModel(C.sparkModel.model)
     m:SetAlpha(1)
     return m

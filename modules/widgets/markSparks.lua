@@ -7,26 +7,29 @@ local assert = _G.assert
 local unpack = _G.unpack
 local pairs = _G.pairs
 local tostring = _G.tostring
+local match = _G.string.match
 
 local moduleName = "markSpark"
 local module = D:NewModule(moduleName, "AceEvent-3.0")
 
 function module:PlaySpark(sparkList, parent)
     --@alpha@
-    --D.Debug(moduleName, "PlaySpark")
+    D.Debug(moduleName, "PlaySpark", sparkList, parent)
     assert(sparkList, 'markSpark:PlaySpark - sparkList is missing')
+    assert(parent, 'markSpark:PlaySpark - parent is missing')
     --@end-alpha@
 
     for k, spark in pairs(sparkList) do
         if not spark.ag:IsPlaying() then
             local f1, p, f2, xOfs, yOfs = parent:GetPoint()
-            local x = (xOfs + (C.db.profile.mark.size / 2)) --* UIParent:GetEffectiveScale()
 
             spark:ClearAllPoints()
-            spark:SetPoint(f1, p, f2, x, yOfs);
+            spark:SetPoint(f1, p, f2, xOfs, yOfs);
+
+            D.Debug(moduleName, "PlaySpark - POS", parent:GetPoint())
 
             local ySpread1, ySpread2 = unpack(C.sparkXP.ySpread)
-            if not C.db.profile.mark.flip then
+            if match(C.db.profile.mark.position, "TOP") == nil then
                 ySpread1 = C.sparkXP.ySpread[2] * - 1
                 ySpread2 = C.sparkXP.ySpread[1] * - 1
             end
@@ -45,7 +48,7 @@ end
 
 function module:OnSparkPlay(f)
     --@alpha@
-    D.Debug(moduleName, "OnSparkPlay", f)
+    D.Debug(moduleName, "OnSparkPlay", f, f:GetParent().data.gain)
     assert(f, 'markSparks:OnSparkPlay - f is missing')
     assert(f.text, 'markSparks:OnSparkPlay - f.text is missing')
     assert(f:GetParent().data, 'markSparks:OnSparkPlay - f:GetParent().data is missing')
@@ -53,11 +56,12 @@ function module:OnSparkPlay(f)
 
     local gain = f:GetParent().data.gain
     if not gain or gain == "0" then
+        D.Debug(moduleName, "OnSparkPlay STOPPED", gain)
         f.ag:Stop()
         return
     end
 
-    f.text:SetFormattedText(C.sparkXP.format, tostring(gain))
+    f.text:SetFormattedText(C.sparkXP.formats[C.db.profile.mark.dataSource], tostring(gain))
 end
 
 function module:OnSparkFinished(f)
@@ -68,13 +72,14 @@ function module:OnSparkFinished(f)
     f.text:SetText("")
 end
 
-function module:AddSpark(parent)
+function module:AddSpark(parent, i)
     --@alpha@
-    -- D.Debug(moduleName, "AddSpark")
+    D.Debug(moduleName, "AddSpark", parent, i)
     --@end-alpha@
 
-    local f = CreateFrame("Frame", nil, parent)
-    f:SetHeight(1)
+    local f = CreateFrame("Frame", parent:GetName()..'_spark_'..i, parent)
+    f:SetPoint("CENTER", _G[parent:GetName()], "CENTER", 0, 0)
+    f:SetHeight(C.db.profile.mark.size)
     f:SetWidth(1)
     f:Show()
 
@@ -127,12 +132,13 @@ end
 
 function module:Create(parent)
     --@alpha@
-    D.Debug(moduleName, "Create")
+    D.Debug(moduleName, "Create", parent)
     assert(parent, 'markSparks:Create - parent is missing')
     --@end-alpha@
 
     local f = {}
     f.sparkList = {}
+
     f.Play = function(xp)
         parent.data.gain = xp
         self:PlaySpark(f.sparkList, parent)
@@ -144,8 +150,9 @@ function module:Create(parent)
     end
 
     for i = 1, parent.player and C.sparkXP.max or (C.sparkXP.max / 2), 1 do
-        f.sparkList[i] = self:AddSpark(parent)
+        f.sparkList[i] = self:AddSpark(parent, i)
     end
+
     return f
 end
 

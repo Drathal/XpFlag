@@ -37,7 +37,7 @@ function module:FakeSendAddonMessage(prefix, msg, type, target)
     D.Debug(moduleName, "FakeSendAddonMessage", data.type, prefix, type, target)
 
     local fakeData = {
-        dataType = "dataXp",
+        dataType = C.db.profile.mark.dataSource,
         name = select(1, split("-", D.fakeName)),
         realm = select(2, split("-", D.fakeName)),
         level = random(UnitLevel("PLAYER") - 1, UnitLevel("PLAYER") + 1),
@@ -68,7 +68,7 @@ function module:FakeSendAddonMessage(prefix, msg, type, target)
     end
 
     if fakeData.type then
-        dataString = self:Serialize(D:GetModule("dataXp"):GetData(fakeData))
+        dataString = self:Serialize(D:GetModule(C.db.profile.mark.dataSource):GetData(fakeData))
         self:OnCommReceived(MessagePrefix, dataString, "WHISPER", D.fakeName)
     end
 
@@ -88,12 +88,12 @@ function module:Send(type, target)
     if target ~= D.fakeName then
         D.Debug(moduleName, "Send", type, target)
         --@end-alpha@
-        self:SendCommMessage(MessagePrefix, self:Serialize(D:GetModule("dataXp"):GetData({type = type})), "WHISPER", target)
+        self:SendCommMessage(MessagePrefix, self:Serialize(D:GetModule(C.db.profile.mark.dataSource):GetData({type = type})), "WHISPER", target)
         --@alpha@
     end
 
     if target == D.fakeName then
-        self:FakeSendAddonMessage(MessagePrefix, self:Serialize(D:GetModule("dataXp"):GetData({type = type})), "WHISPER", target)
+        self:FakeSendAddonMessage(MessagePrefix, self:Serialize(D:GetModule(C.db.profile.mark.dataSource):GetData({type = type})), "WHISPER", target)
     end
     --@end-alpha@
 end
@@ -128,11 +128,11 @@ end
 
 function module:OnEnable()
     self:RegisterComm(MessagePrefix)
-    self:RegisterMessage("dataXp:Update", "SendUpdates")
+    self:RegisterMessage("dataSource:Update", "SendUpdates")
 end
 
 function module:OnDisable()
-    self:UnregisterMessage("dataXp:Update")
+    self:UnregisterMessage("dataSource:Update")
 end
 
 function module:OnCommReceived(pre, rawmsg, chan, sender)

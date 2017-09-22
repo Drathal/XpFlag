@@ -39,8 +39,7 @@ function module:CreateBar(id)
     assert(id, 'bar:CreateBar - id is missing')
     --@end-alpha@
 
-    local parent = select(2, unpack(C.positions[C.db.profile.bar.position]))
-    local bar = CreateFrame("Frame", nil, parent)
+    local bar = CreateFrame("Frame", nil, _G[select(2, unpack(C.positions[C.db.profile.bar.position]))])
     bar.name = id
     bar:SetHeight(C.db.profile.bar.height)
     bar:SetWidth(0)
@@ -89,6 +88,10 @@ end
 function module:UpdateBar(id, data)
     local bar = bars[id] or self:CreateBar(id)
 
+    if data.disable then
+        return self:DeleteBar(id)
+    end
+
     bar.data = data
 
     bar:Show()
@@ -100,6 +103,10 @@ function module:UpdateBar(id, data)
         bar.texture:SetVertexColor(data.cR, data.cG, data.cB)
     end
 
+    bar:SetHeight(C.db.profile.bar.height)
+    bar:ClearAllPoints()
+    bar:SetPoint(unpack(C.positions[C.db.profile.bar.position]))
+
     return bar
 end
 
@@ -109,18 +116,14 @@ function module:Update(msg, id, data, source)
     data = data or D:GetModule(C.db.profile.bar.dataSource):GetData()
 
     if not C.db.profile.bar.show or data.disable then
-        self:DeleteBar(D.nameRealm)
-        return
+        data.disable = true
     end
 
     --@alpha@
     D.Debug(moduleName, "Update", id, data, source)
     --@end-alpha@
 
-    local bar = self:UpdateBar(id, data)
-    bar:SetHeight(C.db.profile.bar.height)
-    bar:ClearAllPoints()
-    bar:SetPoint(unpack(C.positions[C.db.profile.bar.position]))
+    self:UpdateBar(id, data)
 end
 
 function module:GetBar(id)

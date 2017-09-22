@@ -31,15 +31,13 @@ function module:CreateMark(id, data)
     --@end-alpha@
 
     local rcolor = RAID_CLASS_COLORS[data.class]
-    local parent = select(2, unpack(C.positions[C.db.profile.mark.position]))
-    C.db.profile.mark.flip = match(C.db.profile.mark.position, "TOP") ~= nil
 
-    local m = CreateFrame("Frame", nil, parent)
+    local m = CreateFrame("Frame", 'XpFlagMark_'..id:gsub('%W', ''), _G[select(2, unpack(C.markerpositions[C.db.profile.mark.position]))])
     m:SetHeight(C.db.profile.mark.size)
     m:SetWidth(C.db.profile.mark.size)
-    m:SetPoint(unpack(C.positions[C.db.profile.mark.position]))
+    m:SetPoint(unpack(C.markerpositions[C.db.profile.mark.position]))
     m:SetFrameStrata("DIALOG")
-    m:SetFrameLevel(2)
+    m:SetFrameLevel(1)
     m:SetAlpha(1)
     m:EnableMouse()
     D:GetModule("markTooltip"):SetTooltip(m)
@@ -47,7 +45,7 @@ function module:CreateMark(id, data)
     m.texture = m:CreateTexture(nil, "OVERLAY")
     m.texture:SetAllPoints(m)
     m.texture:SetTexture(C.mark.texture.default)
-    m.texture:SetTexCoord(unpack(C.db.profile.mark.flip and {0, 1, 1, 0} or {0, 1, 0, 1}))
+    m.texture:SetTexCoord(unpack(match(C.db.profile.mark.position, "TOP") ~= nil and {0, 1, 1, 0} or {0, 1, 0, 1}))
     m.texture:SetVertexColor(rcolor.r, rcolor.g, rcolor.b, 1)
     m:Show()
 
@@ -79,18 +77,36 @@ function module:UpdateMark(id, data)
     assert(data, 'mark:UpdateMark - data is missing')
     --@end-alpha@
 
+    if data.disable then
+        return self:DeleteMark(id)
+    end
+
+    local flip = match(C.db.profile.mark.position, "TOP") == nil
     local rcolor = RAID_CLASS_COLORS[data.class]
     local m = marks[id] or self:CreateMark(id, data);
+
     m.data = data
 
-    m.to = m:GetParent():GetWidth() * data.value / data.max
+    local newPos = C.markerpositions[C.db.profile.mark.position]
+    newPos[1] = gsub(newPos[1], "TOP", flip and "BOTTOM" or "TOP")
+
+    --@alpha@
+    D.Debug(moduleName, "UpdateMark - SendMessage", moduleName..":Update", id, m )
+    --@end-alpha@
+    D:SendMessage(moduleName..":Update", id, m)
+
+    m:ClearAllPoints()
+    m:SetPoint(unpack(newPos))
+
+    m.to = _G[newPos[2]]:GetWidth() * data.value / data.max
+    m:SetHeight(C.db.profile.mark.size)
+    m:SetWidth(C.db.profile.mark.size)
     m.texture:SetTexture(D.GetMarkTexture(data.level, UnitLevel("player")))
     m.texture:SetVertexColor(rcolor.r, rcolor.g, rcolor.b)
+    m.texture:SetTexCoord(unpack(flip and {0, 1, 0, 1} or {0, 1, 1, 0}))
     m:Show()
 
     m.anim.Start()
-
-    D:SendMessage(moduleName..":Update", id, m)
 
     if not m.player then return m end
     m.texture:SetVertexColor(data.cR, data.cG, data.cB)
@@ -137,64 +153,37 @@ function module:DeleteMark(id)
     D:SendMessage("mark:Delete", id)
 end
 
-function module:Update(msg, id, data, source)
-    --@alpha@
-    D.Debug(moduleName, "Update", msg, id, data, source)
-    --@end-alpha@
-
+function module:Update(msg, id, data)
     id = id or D.nameRealm
+    data = data or D:GetModule(C.db.profile.mark.dataSource):GetData()
 
-    -- create player mark if we have to
-    if not marks[id] and C.db.profile.mark.showPlayer then
-        self:UpdateMark(id, data or D:GetModule(C.db.profile.mark.dataSource):GetData())
+    if marks[id] then
+        marks[id].data = data
     end
 
-    local flip = match(C.db.profile.mark.position, "TOP") == nil
-    local newPos = C.positions[C.db.profile.mark.position]
+    if id == D.nameRealm and not C.db.profile.mark.showPlayer then
+        marks[id].data.disable = true
+    end
+
+    --@alpha@
+    D.Debug(moduleName, "Update", msg, id, data, data.dataSource)
+    --@end-alpha@
+
+    self:UpdateMark(id, data)
+
+    if msg then return end
 
     for mid, mark in pairs(marks) do
-        if mid == id then
-            if C.db.profile.mark.dataSource ~= mark.data.dataType then
-                mark.data = D:GetModule(C.db.profile.mark.dataSource):GetData()
-            end
-            if not C.db.profile.mark.showPlayer then
-                mark.data.disable = true
-            end
-        end
-
-        newPos[4] = mark:GetParent():GetWidth() * mark.data.value / mark.data.max
-
-        if flip then
-            newPos[1] = gsub(newPos[1], "TOP", "BOTTOM")
-        end
-
-        mark:ClearAllPoints()
-        mark:SetPoint(unpack(newPos))
-        mark:SetParent(newPos[2])
-        mark:SetHeight(C.db.profile.mark.size)
-        mark:SetWidth(C.db.profile.mark.size)
-        mark.texture:SetTexCoord(unpack(flip and {0, 1, 0, 1} or {0, 1, 1, 0}))
-
-        if mark.data.disable then
-            self:DeleteMark(mid)
-        else
+        if mid ~= id then
             self:UpdateMark(mid, mark.data)
         end
     end
 end
 
 function module:GetMark(id)
-    --@alpha@
-    D.Debug(moduleName, "GetMark")
-    --@end-alpha@
-
     return marks[id]
 end
 
 function module:GetMarks()
-    --@alpha@
-    D.Debug(moduleName, "GetMarks")
-    --@end-alpha@
-
     return marks
 end

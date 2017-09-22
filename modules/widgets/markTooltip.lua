@@ -17,7 +17,7 @@ local delay = 2
 
 local function UpdateTooltip(parent)
     local data = parent.data
-    local TYPE = C["datasourceshort"][data.dataType]
+    local TYPE = C["datasourceshort"][data.dataSource]
 
     GameTooltip:ClearLines()
     GameTooltip:AddLine(format(L[TYPE.."_MARK_TT_1"], D.addonName))

@@ -19,8 +19,7 @@ local function Set(moduleName)
         local key = info[#info]
         if moduleName then
             C.db.profile[moduleName][key] = value
-            local module = D:GetModule(moduleName)
-            module:Update()
+            D:GetModule(moduleName):Update()
         else
             C.db.profile[key] = value
         end
@@ -148,8 +147,8 @@ D.options = {
                     type = 'range',
                     order = 6,
                     width = 'full',
-                    min = 6,
-                    max = 30,
+                    min = 5,
+                    max = 50,
                     step = 1,
                     name = L["MARK_SIZE_LABEL"],
                     desc = L["MARK_SIZE_DESC"]
@@ -172,9 +171,16 @@ function D:OnInitialize()
 end
 
 C["positions"] = {
-    ["SCREENTOP"] = { "TOPLEFT", _G['UIParent'], "TOPLEFT", 0, 0 },
-    ["SCREENBOTTOM"] = { "BOTTOMLEFT", _G['UIParent'], "BOTTOMLEFT", 0, 0 },
-    ["BLIZZEXPBAR"] = { "TOPLEFT", _G['MainMenuBarOverlayFrame'], "TOPLEFT", 0, - 8 },
+    ["SCREENTOP"] = { "TOPLEFT", 'UIParent', "TOPLEFT", 0, 0 },
+    ["SCREENBOTTOM"] = { "BOTTOMLEFT", 'UIParent', "BOTTOMLEFT", 0, 0 },
+    ["BLIZZEXPBAR"] = { "TOPLEFT", 'MainMenuBarOverlayFrame', "TOPLEFT", 0, - 8 },
+    -- ["BLIZZEXPBAR"] = { "BOTTOMLEFT", _G['MainMenuExpBar'], "BOTTOMLEFT", 0, 2 },
+}
+
+C["markerpositions"] = {
+    ["SCREENTOP"] = { "TOP", 'UIParent', "TOPLEFT", 0, 0 },
+    ["SCREENBOTTOM"] = { "BOTTOM", 'UIParent', "BOTTOMLEFT", 0, 0 },
+    ["BLIZZEXPBAR"] = { "TOP", 'MainMenuBarOverlayFrame', "TOPLEFT", 0, - 8 },
     -- ["BLIZZEXPBAR"] = { "BOTTOMLEFT", _G['MainMenuExpBar'], "BOTTOMLEFT", 0, 2 },
 }
 
@@ -202,8 +208,12 @@ C["player"] = {
 }
 
 C["sparkXP"] = {
-    ["max"] = 10,
+    ["max"] = 6,
     ["format"] = L["XP_MARK_TT_1"],
+    ["formats"] = {
+        ["dataXp"] = L["XP_MARK_TT_1"],
+        ["dataRep"] = L["REP_MARK_TT_1"],
+    },
     ["font"] = { GameFontNormal:GetFont(), 12, "OUTLINE", 0 },
     ["fontColor"] = { 1, .82, 0, 1 },
     ["xSpread"] = { - 15, 15 },
@@ -212,7 +222,7 @@ C["sparkXP"] = {
 }
 
 C["sparkModel"] = {
-    ["size"] = 64,
+    ["size"] = 2,
     ["model"] = "spells/7fx_mage_aegwynnsascendance_statehand.m2"
     -- spells/7fx_mage_aegwynnsascendance_statehand.m2
     -- spells/voljin_serpentward_missile.m2

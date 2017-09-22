@@ -109,7 +109,7 @@ end
 function module:GetData(mix)
     local d = mix or {}
 
-    d.dataType = moduleName
+    d.dataSource = moduleName
     d.name = d.name or UnitName("PLAYER")
     d.realm = d.realm or GetRealmName()
     d.level = d.level or UnitLevel("PLAYER")
@@ -129,11 +129,11 @@ function module:GetData(mix)
 end
 
 function module:IsUpdated(data)
-    if not prevData.dataType then
+    if not prevData.dataSource then
         return true
     end
 
-    if prevData.dataType then
+    if prevData.dataSource then
         for k1, v1 in pairs(data) do
             if v1 ~= prevData[k1] then
                 return true
