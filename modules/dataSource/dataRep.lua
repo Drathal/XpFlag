@@ -129,7 +129,7 @@ end
 function module:Update()
     data = self:GetData()
 
-    if self:IsUpdated(data) and C.db.profile.mark.dataSource == moduleName then
+    if self:IsUpdated(data) then
         --@alpha@
         D.Debug(moduleName, "Update - SendMessage", moduleName..":Update", nameRealm )
         --@end-alpha@

@@ -222,7 +222,7 @@ C["sparkXP"] = {
 }
 
 C["sparkModel"] = {
-    ["size"] = 2,
+    ["size"] = 3,
     ["model"] = "spells/7fx_mage_aegwynnsascendance_statehand.m2"
     -- spells/7fx_mage_aegwynnsascendance_statehand.m2
     -- spells/voljin_serpentward_missile.m2

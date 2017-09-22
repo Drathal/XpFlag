@@ -153,7 +153,9 @@ function module:DeleteMark(id)
     D:SendMessage("mark:Delete", id)
 end
 
-function module:Update(msg, id, data)
+function module:Update(msg, id, data, source)
+    if source and C.db.profile.mark.dataSource..":Update" ~= source then return end
+
     id = id or D.nameRealm
     data = data or D:GetModule(C.db.profile.mark.dataSource):GetData()
 

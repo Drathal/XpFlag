@@ -17,6 +17,12 @@ function module:Create(parent)
     return m
 end
 
+function module:Update(m)
+    m:SetSize(m:GetParent():GetWidth() * C.sparkModel.size, m:GetParent():GetWidth() * C.sparkModel.size)
+    m:SetModel(C.sparkModel.model)
+    return m
+end
+
 function module:FadeInMarkModel(msg, name, f)
     --@alpha@
     D.Debug(moduleName, "FadeInMarkModel", name)

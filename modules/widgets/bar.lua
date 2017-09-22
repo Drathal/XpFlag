@@ -112,6 +112,9 @@ end
 
 -- at the moment we only have one bar for the player
 function module:Update(msg, id, data, source)
+    D.Debug(moduleName, "Update", C.db.profile.bar.dataSource, source)
+    if C.db.profile.bar.dataSource..":Update" ~= source then return end
+
     id = id or D.nameRealm
     data = data or D:GetModule(C.db.profile.bar.dataSource):GetData()
 
