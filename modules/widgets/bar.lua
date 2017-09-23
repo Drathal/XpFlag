@@ -5,6 +5,7 @@ local CreateFrame = _G.CreateFrame
 local select = _G.select
 local unpack = _G.unpack
 local assert = _G.assert
+local pairs = _G.pairs
 
 local bars = {}
 
@@ -110,20 +111,41 @@ function module:UpdateBar(id, data)
     return bar
 end
 
--- at the moment we only have one bar for the player
-function module:Update(msg, id, data, source)
-    D.Debug(moduleName, "Update", C.db.profile.bar.dataSource, source)
-    if C.db.profile.bar.dataSource..":Update" ~= source then return end
+function module:Config(key, value)
+    --@alpha@
+    D.Debug(moduleName, "Config", key, value)
+    --@end-alpha@
 
-    id = id or D.nameRealm
-    data = data or D:GetModule(C.db.profile.bar.dataSource):GetData()
-
-    if not C.db.profile.bar.show or data.disable then
-        data.disable = true
+    if key == 'show' and value then
+        self:UpdateBar(D.nameRealm, D:GetModule(C.db.profile.bar.dataSource):GetData())
     end
 
+    for bid, bar in pairs(bars) do
+        if bid == D.nameRealm and not C.db.profile.bar.show then
+            bar.data.disable = true
+        end
+
+        if key == 'dataSource' then
+            bar.data = D:GetModule(C.db.profile.bar.dataSource):GetData()
+        end
+
+        self:UpdateBar(bid, bar.data)
+    end
+end
+
+function module:Update(msg, id, data, source)
     --@alpha@
-    D.Debug(moduleName, "Update", id, data, source)
+    assert(msg, 'bar:Update - msg is missing')
+    assert(id, 'bar:Update - id is missing')
+    assert(data, 'bar:Update - data is missing')
+    assert(source, 'bar:Update - source is missing')
+    --@end-alpha@
+
+    if C.db.profile.bar.dataSource..":Update" ~= source then return end
+    if not C.db.profile.bar.show then return end
+
+    --@alpha@
+    D.Debug(moduleName, "Update", msg, id, data, source)
     --@end-alpha@
 
     self:UpdateBar(id, data)

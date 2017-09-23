@@ -17,9 +17,8 @@ function module:Create(parent)
     return m
 end
 
-function module:Update(m)
+function module:Config(m)
     m:SetSize(m:GetParent():GetWidth() * C.sparkModel.size, m:GetParent():GetWidth() * C.sparkModel.size)
-    m:SetModel(C.sparkModel.model)
     return m
 end
 

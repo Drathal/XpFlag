@@ -153,33 +153,47 @@ function module:DeleteMark(id)
     D:SendMessage("mark:Delete", id)
 end
 
+function module:Config(key, value)
+    --@alpha@
+    D.Debug(moduleName, "Config", key, value)
+    --@end-alpha@
+
+    if key == 'showPlayer' and value then
+        self:UpdateMark(D.nameRealm, D:GetModule(C.db.profile.bar.dataSource):GetData())
+    end
+
+    for mid, mark in pairs(marks) do
+        if mid == D.nameRealm and not C.db.profile.mark.showPlayer then
+            mark.data.disable = true
+        end
+
+        if mid == D.nameRealm and key == 'dataSource' then
+            mark.data = D:GetModule(C.db.profile.mark.dataSource):GetData()
+        end
+
+        if key == 'size' then
+            D:GetModule('markModel'):Config(mark.model)
+        end
+
+        self:UpdateMark(mid, mark.data)
+    end
+end
+
 function module:Update(msg, id, data, source)
-    if source and C.db.profile.mark.dataSource..":Update" ~= source then return end
+    --@alpha@
+    assert(msg, 'mark:Update - msg is missing')
+    assert(id, 'mark:Update - id is missing')
+    assert(data, 'mark:Update - data is missing')
+    --@end-alpha@
 
-    id = id or D.nameRealm
-    data = data or D:GetModule(C.db.profile.mark.dataSource):GetData()
-
-    if marks[id] then
-        marks[id].data = data
-    end
-
-    if id == D.nameRealm and not C.db.profile.mark.showPlayer then
-        marks[id].data.disable = true
-    end
+    if C.db.profile.mark.dataSource..":Update" ~= source and id == D.nameRealm then return end
+    if not C.db.profile.mark.showPlayer and id == D.nameRealm then return end
 
     --@alpha@
     D.Debug(moduleName, "Update", msg, id, data, data.dataSource)
     --@end-alpha@
 
     self:UpdateMark(id, data)
-
-    if msg then return end
-
-    for mid, mark in pairs(marks) do
-        if mid ~= id then
-            self:UpdateMark(mid, mark.data)
-        end
-    end
 end
 
 function module:GetMark(id)

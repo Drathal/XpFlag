@@ -19,7 +19,7 @@ local function Set(moduleName)
         local key = info[#info]
         if moduleName then
             C.db.profile[moduleName][key] = value
-            D:GetModule(moduleName):Update()
+            D:GetModule(moduleName):Config(key, value)
         else
             C.db.profile[key] = value
         end
