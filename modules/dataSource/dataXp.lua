@@ -24,7 +24,8 @@ local module = D:NewModule(moduleName, "AceEvent-3.0")
 
 local nameRealm = UnitName("player").."-"..GetRealmName()
 local data = nil
-local prevData = {}
+local prevHash = ''
+local prevValue = 0
 
 function module:OnEnable()
     --@alpha@
@@ -109,50 +110,38 @@ end
 function module:GetData(mix)
     local d = mix or {}
 
-    d.dataSource = moduleName
+    d.dataSource = d.dataSource or moduleName
     d.name = d.name or UnitName("PLAYER")
     d.realm = d.realm or GetRealmName()
-    d.level = d.level or UnitLevel("PLAYER")
     d.class = d.class or select(2, UnitClass("PLAYER"))
-    d.disable = d.disable or MAX_PLAYER_LEVEL_TABLE[GetExpansionLevel()] == UnitLevel("PLAYER")
 
-    d.value = d.value or UnitXP("PLAYER")
-    d.max = d.max or UnitXPMax("PLAYER")
-    d.gain = d.gain or tonumber(d.value) - tonumber(prevData.value or 0) or 0
-    d.rested = d.rested or (GetXPExhaustion() or 0)
+    d.level = UnitLevel("PLAYER")
+    d.disable = MAX_PLAYER_LEVEL_TABLE[GetExpansionLevel()] == UnitLevel("PLAYER")
+    d.value = UnitXP("PLAYER")
+    d.max = UnitXPMax("PLAYER")
+    d.gain = tonumber(d.value) - tonumber(prevValue or 0) or 0
+    d.rested = (GetXPExhaustion() or 0)
 
-    d.cR = d.cR or d.rested > 0 and C.player.colorRested[1] or C.player.color[1]
-    d.cG = d.cG or d.rested > 0 and C.player.colorRested[2] or C.player.color[2]
-    d.cB = d.cB or d.rested > 0 and C.player.colorRested[3] or C.player.color[3]
+    d.cR = d.rested > 0 and C.player.colorRested[1] or C.player.color[1]
+    d.cG = d.rested > 0 and C.player.colorRested[2] or C.player.color[2]
+    d.cB = d.rested > 0 and C.player.colorRested[3] or C.player.color[3]
+
+    prevValue = d.value
 
     return d
 end
 
-function module:IsUpdated(data)
-    if not prevData.dataSource then
-        return true
-    end
-
-    if prevData.dataSource then
-        for k1, v1 in pairs(data) do
-            if v1 ~= prevData[k1] then
-                return true
-            end
-        end
-    end
-end
-
 function module:Update()
-    data = self:GetData()
+    data = self:GetData(data)
 
-    if self:IsUpdated(data) then
+    if prevHash ~= data.level .. data.value .. data.rested then
         --@alpha@
-        D.Debug(moduleName, "Update - SendMessage", moduleName..":Update", nameRealm )
+        D.Debug(moduleName, "Update - SendMessage", moduleName..":Update", nameRealm, data )
         --@end-alpha@
         D:SendMessage(moduleName..":Update", nameRealm, data)
     end
 
-    prevData = data
+    prevHash = data.level .. data.value .. data.rested
 
     if data.disable then
         self:Disable()

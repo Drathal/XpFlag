@@ -197,9 +197,18 @@ function module:Update(msg, id, data, source)
 end
 
 function module:GetMark(id)
+    --@alpha@
+    D.Debug(moduleName, "GetMark", id)
+    assert(id, 'bar:GetMark - id is missing')
+    --@end-alpha@
+
     return marks[id]
 end
 
 function module:GetMarks()
+    --@alpha@
+    D.Debug(moduleName, "GetMarks")
+    --@end-alpha@
+
     return marks
 end

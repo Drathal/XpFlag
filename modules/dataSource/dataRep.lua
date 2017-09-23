@@ -25,7 +25,8 @@ local module = D:NewModule(moduleName, "AceEvent-3.0")
 
 local nameRealm = UnitName("player").."-"..GetRealmName()
 local data = nil
-local prevData = {}
+local prevHash = ''
+local prevValue = 0
 local lastFactionID = nil
 
 function module:OnEnable()
@@ -89,54 +90,42 @@ function module:GetData(mix)
         name, _, standingID, min, max, cur, _, _, _, _, _, _, _, factionID = GetFactionInfoByID(self:getSomeFactionID())
     end
 
-    d.dataSource = moduleName
+    d.dataSource = d.dataSource or moduleName
     d.name = d.name or UnitName("PLAYER")
     d.realm = d.realm or GetRealmName()
-    d.level = d.level or UnitLevel("PLAYER")
     d.class = d.class or select(2, UnitClass("PLAYER"))
     d.disable = d.disable or false
 
-    d.min = d.min or min
-    d.value = d.value or cur - min
-    d.max = d.max or max - min
-    d.gain = d.gain or tonumber(d.value) - tonumber(prevData.value or 0) or 0
+    d.level = UnitLevel("PLAYER")
+    d.min = min
+    d.value = cur - min
+    d.max = max - min
+    d.gain = tonumber(d.value) - tonumber(prevValue or 0) or 0
 
-    d.cR = d.cR or FACTION_BAR_COLORS[5].r
-    d.cG = d.cG or FACTION_BAR_COLORS[5].g
-    d.cB = d.cB or FACTION_BAR_COLORS[5].b
+    d.cR = FACTION_BAR_COLORS[5].r
+    d.cG = FACTION_BAR_COLORS[5].g
+    d.cB = FACTION_BAR_COLORS[5].b
 
-    d.factionID = d.factionID or factionID
-    d.faction = d.faction or name
-    d.standingID = d.standingID or standingID
+    d.factionID = factionID
+    d.faction = name
+    d.standingID = standingID
+
+    prevValue = d.value
 
     return d
 end
 
-function module:IsUpdated(data)
-    if not prevData.dataSource then
-        return true
-    end
-
-    if prevData.dataSource then
-        for k1, v1 in pairs(data) do
-            if v1 ~= prevData[k1] then
-                return true
-            end
-        end
-    end
-end
-
 function module:Update()
-    data = self:GetData()
+    data = self:GetData(data)
 
-    if self:IsUpdated(data) then
+    if prevHash ~= data.factionID .. data.value then
         --@alpha@
         D.Debug(moduleName, "Update - SendMessage", moduleName..":Update", nameRealm )
         --@end-alpha@
         D:SendMessage(moduleName..":Update", nameRealm, data)
     end
 
-    prevData = data
+    prevHash = data.factionID .. data.value
 
     if data.disable then
         self:Disable()

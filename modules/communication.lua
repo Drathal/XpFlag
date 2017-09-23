@@ -28,6 +28,14 @@ local assert = _G.assert
 local select = _G.select
 local random = _G.math.random
 local vv = 0
+local fakeData = {
+    dataSource = "dataXp",
+    name = select(1, split("-", D.fakeName)),
+    realm = select(2, split("-", D.fakeName)),
+    class = "MONK",
+    disable = false,
+    max = 5000
+}
 
 function module:FakeSendAddonMessage(prefix, msg, type, target)
 
@@ -36,20 +44,10 @@ function module:FakeSendAddonMessage(prefix, msg, type, target)
 
     D.Debug(moduleName, "FakeSendAddonMessage", data.type, prefix, type, target)
 
-    local fakeData = {
-        dataType = C.db.profile.mark.dataSource,
-        name = select(1, split("-", D.fakeName)),
-        realm = select(2, split("-", D.fakeName)),
-        level = random(UnitLevel("PLAYER") - 1, UnitLevel("PLAYER") + 1),
-        class = "HUNTER",
-        disable = false,
-        value = 1,
-        max = 5000,
-        gain = 1,
-        rested = random(100, 300)
-    }
-
+    fakeData.level = random(UnitLevel("PLAYER") - 1, UnitLevel("PLAYER") + 1)
+    fakeData.rested = random(100, 300)
     fakeData.gain = random(100, 300)
+
     vv = vv + fakeData.gain
     fakeData.value = vv
 
@@ -64,18 +62,18 @@ function module:FakeSendAddonMessage(prefix, msg, type, target)
 
     if data.type == MSG_TYPE_REQUEST or ( data.type == MSG_TYPE_DATA and D:GetModule("mark"):GetMark(D.fakeName) ) then
         fakeData.type = MSG_TYPE_DATA
-        After(random(1, 5), function() self:SendUpdate(D.fakeName) end)
+        After(random(1, 5), function() self:SendUpdate(D.fakeName, fakeData) end)
     end
 
     if fakeData.type then
-        dataString = self:Serialize(D:GetModule(C.db.profile.mark.dataSource):GetData(fakeData))
+        dataString = self:Serialize(fakeData)
         self:OnCommReceived(MessagePrefix, dataString, "WHISPER", D.fakeName)
     end
 
 end
 --@end-alpha@
 
-function module:Send(type, target)
+function module:Send(type, target, data)
     --@alpha@
     assert(type, 'com:Send - type is missing')
     assert(target, 'com:Send - target is missing')
@@ -84,44 +82,57 @@ function module:Send(type, target)
 
     if not match(target, "%-") then return end
 
+    data = data or {}
+    data.type = type
+
     --@alpha@
     if target ~= D.fakeName then
         D.Debug(moduleName, "Send", type, target)
         --@end-alpha@
-        self:SendCommMessage(MessagePrefix, self:Serialize(D:GetModule(C.db.profile.mark.dataSource):GetData({type = type})), "WHISPER", target)
+        self:SendCommMessage(MessagePrefix, self:Serialize(data), "WHISPER", target)
         --@alpha@
     end
 
     if target == D.fakeName then
-        self:FakeSendAddonMessage(MessagePrefix, self:Serialize(D:GetModule(C.db.profile.mark.dataSource):GetData({type = type})), "WHISPER", target)
+        self:FakeSendAddonMessage(MessagePrefix, self:Serialize(data), "WHISPER", target)
     end
     --@end-alpha@
 end
 
-function module:SendRequest(target)
-    self:Send(MSG_TYPE_REQUEST, target)
+function module:SendRequest(target, data)
+    self:Send(MSG_TYPE_REQUEST, target, data)
 end
 
-function module:SendDelete(target)
-    self:Send(MSG_TYPE_DELETE, target)
+function module:SendDelete(target, data)
+    self:Send(MSG_TYPE_DELETE, target, data)
 end
 
-function module:SendPing(target)
-    self:Send(MSG_TYPE_PING, target)
+function module:SendPing(target, data)
+    self:Send(MSG_TYPE_PING, target, data)
 end
 
-function module:SendPong(target)
-    self:Send(MSG_TYPE_PONG, target)
+function module:SendPong(target, data)
+    self:Send(MSG_TYPE_PONG, target, data)
 end
 
-function module:SendUpdate(target)
-    self:Send(MSG_TYPE_DATA, target)
+function module:SendUpdate(target, data)
+    self:Send(MSG_TYPE_DATA, target, data)
 end
 
-function module:SendUpdates()
+function module:SendUpdates(msg, id, data, source)
+    if C.db.profile.mark.dataSource..":Update" ~= source then return end
+
+    --@alpha@
+    D.Debug(moduleName, "SendUpdates - incomming ", msg, id, data, source)
+    --@end-alpha@
+
     for target, _ in pairs(D:GetModule("mark"):GetMarks()) do
         if target and target ~= D.nameRealm then
-            self:SendUpdate(target)
+            --@alpha@
+            D.Debug(moduleName, "SendUpdates", id, data)
+            --@end-alpha@
+
+            self:SendUpdate(id, data)
         end
     end
 end
@@ -148,7 +159,7 @@ function module:OnCommReceived(pre, rawmsg, chan, sender)
 
     --@alpha@
     assert(success, "OnCommReceived:Deserialize failed")
-    D.Debug(moduleName, "OnCommReceived", data.type, pre, chan, sender)
+    D.Debug(moduleName, "OnCommReceived", data.type, pre, chan, sender, data)
     --@end-alpha@
 
     if not success then return end
