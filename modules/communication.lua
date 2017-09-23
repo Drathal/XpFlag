@@ -60,14 +60,13 @@ function module:FakeSendAddonMessage(prefix, msg, type, target)
         fakeData.type = MSG_TYPE_PONG
     end
 
-    if data.type == MSG_TYPE_REQUEST or ( data.type == MSG_TYPE_DATA and D:GetModule("mark"):GetMark(D.fakeName) ) then
+    if data.type == MSG_TYPE_REQUEST or data.type == MSG_TYPE_DATA then
         fakeData.type = MSG_TYPE_DATA
         After(random(1, 5), function() self:SendUpdate(D.fakeName, fakeData) end)
     end
 
     if fakeData.type then
-        dataString = self:Serialize(fakeData)
-        self:OnCommReceived(MessagePrefix, dataString, "WHISPER", D.fakeName)
+        self:OnCommReceived(MessagePrefix, self:Serialize(fakeData), "WHISPER", D.fakeName)
     end
 
 end
