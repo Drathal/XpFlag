@@ -1,15 +1,10 @@
-local D, C, L = unpack(select(2, ...))
+local D, C, L = _G.unpack(_G.select(2, ...))
 
 local _G = _G
 local match = _G.string.match
 local pairs = _G.pairs
 local split = _G.strsplit
-local UnitXP = _G.UnitXP
-local UnitXPMax = _G.UnitXPMax
 local UnitLevel = _G.UnitLevel
-local SendAddonMessage = _G.SendAddonMessage
-local RegisterAddonMessagePrefix = _G.RegisterAddonMessagePrefix
-local LibStub = _G.LibStub
 
 local MessagePrefix = "XPF1"
 local MSG_TYPE_DATA = "DATA"
@@ -40,7 +35,6 @@ local fakeData = {
 function module:FakeSendAddonMessage(prefix, msg, type, target)
 
     local _, data = self:Deserialize(msg)
-    local dataString = nil
 
     D.Debug(moduleName, "FakeSendAddonMessage", data.type, prefix, type, target)
 
@@ -134,6 +128,7 @@ function module:SendUpdates(msg, id, data, source)
             self:SendUpdate(id, data)
         end
     end
+
 end
 
 function module:OnEnable()

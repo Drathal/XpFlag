@@ -1,4 +1,4 @@
-local D, C, L = unpack(select(2, ...))
+local D, C, L = _G.unpack(_G.select(2, ...))
 
 local _G = _G
 local GetTime = _G.GetTime
@@ -8,6 +8,7 @@ local BNGetFriendInfo = _G.BNGetFriendInfo
 local GetFriendInfo = _G.GetFriendInfo
 local CreateFrame = _G.CreateFrame
 local FriendsFrame = _G.FriendsFrame
+local FriendsFrameBattlenetFrame = _G.FriendsFrameBattlenetFrame
 local FriendsFrameFriendsScrollFrame = _G.FriendsFrameFriendsScrollFrame
 local wipe = _G.wipe
 local match = _G.string.match
@@ -36,11 +37,15 @@ function module:GetBNFriendName(id)
     assert(id, 'friends:GetBNFriendName - id is missing')
     --@end-alpha@
 
-    local bnetIDAccount, _, _, isBattleTagPresence, characterName, bnetIDGameAccount, client, isOnline, _, isAFK, isDND, _, _, isRIDFriend, _, _ = BNGetFriendInfo(id)
+    local bnetIDAccount, isBattleTagPresence, characterName, bnetIDGameAccount, client, isOnline, isAFK, isDND, isRIDFriend, realmName, realmID, faction, race, class, zoneName
+
+    bnetIDAccount, _, _, isBattleTagPresence, characterName, bnetIDGameAccount, client, isOnline, _, isAFK, isDND, _, _, isRIDFriend, _, _ = BNGetFriendInfo(id)
     if not bnetIDGameAccount then return end
     if not CanCooperateWithGameAccount(bnetIDGameAccount) then return end
-    local _, characterName, client, realmName, realmID, faction, race, class, _, zoneName, _, _, _, _, _, _ = BNGetGameAccountInfo(bnetIDGameAccount)
+
+    _, characterName, client, realmName, realmID, faction, race, class, _, zoneName, _, _, _, _, _, _ = BNGetGameAccountInfo(bnetIDGameAccount)
     if not isOnline or not characterName or client ~= 'WoW' then return nil end
+
     return characterName..'-'..realmName
 end
 
@@ -50,17 +55,17 @@ function module:GetFriendName(id)
     assert(id, 'friends:GetFriendName - id is missing')
     --@end-alpha@
 
-    local name, level, class, area, connected, status, note, raf, id = GetFriendInfo(id)
+    local name, level, class, area, connected, status, note, raf, fid = GetFriendInfo(id)
     if not name or not connected then return nil end
     if not match(name, "-") then
         name = name.."-"..D.realm
     end
+
     return name
 end
 
 function module:GetFriendNameByButton(button)
     --@alpha@
-    -- D.Debug(moduleName, "GetFriendNameByButton", button)
     assert(button, 'friends:GetFriendNameByButton - button is missing')
     --@end-alpha@
 
@@ -74,7 +79,7 @@ function module:GetFriendNameByButton(button)
     end
 
     --@alpha@
-    if button == _G.FriendsFrameBattlenetFrame then
+    if button == FriendsFrameBattlenetFrame then
         data = D.fakeName
         button:GetParent().friend = data
         D.Debug(moduleName, "GetFriendNameByButton:fake", data)
@@ -125,14 +130,16 @@ function module:CreateMiniButton(parent)
     --@end-alpha@
 
     local b = CreateFrame("Button", parent:GetName().."FriendButton", parent)
+    self:SetButtonTexture(b)
     b:SetFrameLevel(8)
     b:SetFrameStrata("DIALOG")
     b:SetSize(16, 16)
     b:SetPoint("LEFT", parent, "LEFT", 3, - 8)
-    b:SetScript("OnClick", function() self:OnStateButtonClick(parent) end )
-    self:SetButtonTexture(b)
-    b:SetScript("OnEnter", function(self)
-        GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+    b:SetScript("OnClick", function()
+        self:OnStateButtonClick(parent)
+    end)
+    b:SetScript("OnEnter", function()
+        GameTooltip:SetOwner(b, "ANCHOR_RIGHT")
         GameTooltip:ClearLines()
         GameTooltip:AddLine(D.addonName)
         GameTooltip:AddLine(L["CONNECT_BUTTON_TT"], 1, 1, 1, 1)
@@ -143,7 +150,7 @@ function module:CreateMiniButton(parent)
 
         GameTooltip:Show()
     end)
-    b:SetScript("OnLeave", function(self)
+    b:SetScript("OnLeave", function()
         GameTooltip:Hide()
     end)
     b:Hide()
@@ -202,12 +209,12 @@ function module:UpdateFriendButton(button)
     end
 end
 
-function module:OnFriendsFrameUpdate(self)
+function module:OnFriendsFrameUpdate()
     if not FriendsFrame:IsShown() then return end
 
     --@alpha@
-    D.Debug(moduleName, "OnFriendsFrameUpdate", self)
-    assert(self, 'friends:OnFriendsFrameUpdate - self is missing')
+    D.Debug(moduleName, "OnFriendsFrameUpdate")
+    --assert(self, 'friends:OnFriendsFrameUpdate - self is missing')
     --@end-alpha@
 
     wipe(online)

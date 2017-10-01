@@ -1,24 +1,18 @@
-local D, C, L = unpack(select(2, ...))
+local D, C, L = _G.unpack(_G.select(2, ...))
 
 local _G = _G
-local GetXPExhaustion = _G.GetXPExhaustion
 local UnitLevel = _G.UnitLevel
-local UnitXP = _G.UnitXP
-local UnitXPMax = _G.UnitXPMax
 local UnitName = _G.UnitName
 local UnitClass = _G.UnitClass
 local GetRealmName = _G.GetRealmName
 local GetNumFactions = _G.GetNumFactions
 local GetWatchedFactionInfo = _G.GetWatchedFactionInfo
-local GetFriendshipReputation = _G.GetFriendshipReputation
 local GetFactionInfo = _G.GetFactionInfo
 local GetFactionInfoByID = _G.GetFactionInfoByID
 local FACTION_BAR_COLORS = _G.FACTION_BAR_COLORS
 local hooksecurefunc = _G.hooksecurefunc
-local format = _G.format
 local tonumber = _G.tonumber
 local select = _G.select
-local pairs = _G.pairs
 
 local moduleName = "dataRep"
 local module = D:NewModule(moduleName, "AceEvent-3.0")
@@ -27,7 +21,6 @@ local nameRealm = UnitName("player").."-"..GetRealmName()
 local data = nil
 local prevHash = ''
 local prevValue = 0
-local lastFactionID = nil
 
 function module:OnEnable()
     --@alpha@

@@ -1,15 +1,24 @@
+std = "none"
+
 globals = {
-	-- Addons and Libraries
-	"AdiDebug", "LibStub",
+	"_G",
+	"_"
+}
 
-	-- WoW API
-	"GetNumGroupMembers", "GetPetTimeRemaining", "GetRuneCooldown", "GetShapeshiftFormID",
-	"GetSpellBonusHealing", "GetSpellCharges", "GetSpellCount", "GetSpellInfo", "GetTime",
-	"GetTotemInfo", "HasPetSpells", "IsPlayerSpell", "UnitCanAttack", "UnitCastingInfo",
-	"UnitChannelInfo", "UnitClass","UnitHealth", "UnitHealthMax", "UnitIsDeadOrGhost",
-	"UnitIsPlayer", "UnitName", "UnitPower", "UnitPowerMax", "UnitStagger",
+variable = value
 
-	-- Lua API
-	"bit", "ceil", "floor", "format", "ipairs", "math", "min", "pairs", "print", "select", "string", "table",
-	"tinsert", "type",
+unused_args = false
+
+unused = false
+
+self = false
+
+max_line_length = false
+
+ignore = {
+	
+}
+
+exclude_files = {
+	'.luacheckrc'      
 }

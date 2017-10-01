@@ -14,10 +14,8 @@ local ERR_EXHAUSTION_WELLRESTED = _G.ERR_EXHAUSTION_WELLRESTED
 local ERR_EXHAUSTION_NORMAL = _G.ERR_EXHAUSTION_NORMAL
 local ERR_EXHAUSTION_TIRED = _G.ERR_EXHAUSTION_TIRED
 local GetExpansionLevel = _G.GetExpansionLevel
-local format = _G.format
 local tonumber = _G.tonumber
 local select = _G.select
-local pairs = _G.pairs
 
 local moduleName = "dataXp"
 local module = D:NewModule(moduleName, "AceEvent-3.0")

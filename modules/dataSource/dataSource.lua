@@ -1,4 +1,4 @@
-local D, C, L = unpack(select(2, ...))
+local D, C, L = _G.unpack(_G.select(2, ...))
 
 local moduleName = "dataSource"
 local module = D:NewModule(moduleName, "AceEvent-3.0")

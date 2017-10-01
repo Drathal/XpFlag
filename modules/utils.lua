@@ -1,14 +1,11 @@
-local D, C, L = unpack(select(2, ...))
+local D, C, L = _G.unpack(_G.select(2, ...))
 
 local _G = _G
 local print = _G.print
 local type = _G.type
 local pairs = _G.pairs
 local min = _G.math.min
-local max = _G.math.max
 local tonumber = _G.tonumber
-local next = _G.next
-local floor = _G.math.floor
 local abs = _G.math.abs
 local GetXPExhaustion = _G.GetXPExhaustion
 local GetFramerate = _G.GetFramerate
@@ -19,7 +16,6 @@ local MAX_PLAYER_LEVEL_TABLE = _G.MAX_PLAYER_LEVEL_TABLE
 
 --@alpha@
 local select = _G.select
-local strtrim = _G.strtrim
 local tostring = _G.tostring
 local PARAMETER_COLORS = { "|cff88ff88" }
 local function Debug(module, ...)
@@ -36,19 +32,6 @@ local function Debug(module, ...)
     print(msg)
 end
 --@end-alpha@
-
-local function CopyTable(tbl)
-    if not tbl then return {} end
-    local copy = {};
-    for k, v in pairs(tbl) do
-        if ( type(v) == "table" ) then
-            copy[k] = CopyTable(v);
-        else
-            copy[k] = v;
-        end
-    end
-    return copy;
-end
 
 local function Throttle(self, elapsed)
     self.delay = min((self.delay or 0.01) - elapsed, 0.15)
@@ -122,7 +105,7 @@ local function AnimateX(f)
         D:SendMessage("AnimateXEnd", f)
     end
 
-    local p1, p, p2, xOfs, yOfs = f:GetPoint()
+    local p1, p, p2, _, yOfs = f:GetPoint()
     f:ClearAllPoints();
     f:SetPoint(p1, p, p2, new, yOfs)
 
@@ -144,5 +127,4 @@ D.GetMarkTexture = GetMarkTexture
 D.AnimateWidth = AnimateWidth
 D.AnimateX = AnimateX
 D.IsMaxLevel = IsMaxLevel
-D.CopyTable = CopyTable
 D.CreateUpdateAnimation = CreateUpdateAnimation
