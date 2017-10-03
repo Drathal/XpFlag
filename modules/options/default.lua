@@ -78,7 +78,7 @@ C["tooltip"] = {
     },
     ["REP"] = {
         [2] = function(data) return data.name, data.level end,
-        [3] = function(data) return data.faction, data.standingID end,
+        [3] = function(data) return data.faction, _G["FACTION_STANDING_LABEL" .. data.standingID] end,
         [4] = function(data) return data.value, data.max, data.value / data.max * 100 end,
     }
 }
