@@ -33,7 +33,6 @@ local fakeData = {
 }
 
 function module:FakeSendAddonMessage(prefix, msg, type, target)
-
     local _, data = self:Deserialize(msg)
 
     D.Debug(moduleName, "FakeSendAddonMessage", data.type, prefix, type, target)
@@ -56,24 +55,37 @@ function module:FakeSendAddonMessage(prefix, msg, type, target)
 
     if data.type == MSG_TYPE_REQUEST or data.type == MSG_TYPE_DATA then
         fakeData.type = MSG_TYPE_DATA
-        After(random(1, 5), function() self:SendUpdate(D.fakeName, fakeData) end)
+        After(
+            random(1, 5),
+            function()
+                if not fakeData.type then
+                    return
+                end
+                self:SendUpdate(D.fakeName, fakeData)
+            end
+        )
+    end
+
+    if data.type == MSG_TYPE_DELETE then
+        fakeData.type = nil
     end
 
     if fakeData.type then
         self:OnCommReceived(MessagePrefix, self:Serialize(fakeData), "WHISPER", D.fakeName)
     end
-
 end
 --@end-alpha@
 
 function module:Send(type, target, data)
     --@alpha@
-    assert(type, 'com:Send - type is missing')
-    assert(target, 'com:Send - target is missing')
-    assert(match(target, "%-") == '-', 'com:Send - target has no relam ')
+    assert(type, "com:Send - type is missing")
+    assert(target, "com:Send - target is missing")
+    assert(match(target, "%-") == "-", "com:Send - target has no relam ")
     --@end-alpha@
 
-    if not match(target, "%-") then return end
+    if not match(target, "%-") then
+        return
+    end
 
     data = data or {}
     data.type = type
@@ -83,7 +95,7 @@ function module:Send(type, target, data)
         D.Debug(moduleName, "Send", type, target)
         --@end-alpha@
         self:SendCommMessage(MessagePrefix, self:Serialize(data), "WHISPER", target)
-        --@alpha@
+    --@alpha@
     end
 
     if target == D.fakeName then
@@ -113,11 +125,9 @@ function module:SendUpdate(target, data)
 end
 
 function module:SendUpdates(msg, id, data, source)
-    if C.db.profile.mark.dataSource..":Update" ~= source then return end
-
-    --@alpha@
-    D.Debug(moduleName, "SendUpdates - incomming ", msg, id, data, source)
-    --@end-alpha@
+    if C.db.profile.mark.dataSource .. ":Update" ~= source then
+        return
+    end
 
     for target, _ in pairs(D:GetModule("mark"):GetMarks()) do
         if target and target ~= D.nameRealm then
@@ -128,7 +138,6 @@ function module:SendUpdates(msg, id, data, source)
             self:SendUpdate(id, data)
         end
     end
-
 end
 
 function module:OnEnable()
@@ -141,12 +150,18 @@ function module:OnDisable()
 end
 
 function module:OnCommReceived(pre, rawmsg, chan, sender)
-    if pre ~= MessagePrefix then return end
-    if sender == D.nameRealm then return end
-    if not rawmsg or rawmsg == "" then return end
+    if pre ~= MessagePrefix then
+        return
+    end
+    if sender == D.nameRealm then
+        return
+    end
+    if not rawmsg or rawmsg == "" then
+        return
+    end
 
     if not match(sender, "%-") then
-        sender = sender.."-"..D.realm
+        sender = sender .. "-" .. D.realm
     end
 
     local success, data = self:Deserialize(rawmsg)
@@ -156,27 +171,29 @@ function module:OnCommReceived(pre, rawmsg, chan, sender)
     D.Debug(moduleName, "OnCommReceived", data.type, pre, chan, sender, data)
     --@end-alpha@
 
-    if not success then return end
+    if not success then
+        return
+    end
 
     if data.type == MSG_TYPE_DATA then
-        D:SendMessage("ReceiveData", sender, data)
+        D:SendMessage("com:Data", sender, data)
     end
 
     if data.type == MSG_TYPE_PING then
         self:SendPong(sender)
-        D:SendMessage("ReceivePing", sender, data)
+        D:SendMessage("com:Ping", sender, data)
     end
 
     if data.type == MSG_TYPE_PONG then
-        self:SendMessage("ReceivePong", sender, data)
+        self:SendMessage("com:Pong", sender, data)
     end
 
     if data.type == MSG_TYPE_REQUEST then
         self:SendUpdate(sender)
-        D:SendMessage("ReceiveRequest", sender, data)
+        D:SendMessage("com:Request", sender, data)
     end
 
     if data.type == MSG_TYPE_DELETE then
-        D:SendMessage("ReceiveDelete", sender, data)
+        D:SendMessage("com:Delete", sender, data)
     end
 end

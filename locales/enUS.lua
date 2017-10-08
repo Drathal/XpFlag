@@ -1,4 +1,4 @@
-local D, C, L = unpack(select(2, ...))
+local D, C, L = _G.unpack(_G.select(2, ...))
 
 L["DESCRIPTION"] = "Its shows player experience at the top of the Screen. It can also Sync your Battle.net Friends Experience."
 
@@ -30,7 +30,8 @@ L["POS_SCREENTOP"] = "Screen Top"
 L["POS_SCREENBOTTOM"] = "Screen Bottom"
 L["POS_BLIZZ_EXPBAR"] = "Blizzard Experience Bar"
 
-L["CONNECT_BUTTON_TT"] = "Connect with your Friend"
+L["CONNECT_BUTTON_TT"] = "Connect with %s"
+L["CONNECT_BUTTON_DATA"] = "Friend will share: %s"
 
 L["XP_MARK_TT_1"] = "%s XP"
 L["XP_MARK_TT_2"] = "%s (%s)"
@@ -41,3 +42,7 @@ L["REP_MARK_TT_1"] = "%s Reputation"
 L["REP_MARK_TT_2"] = "%s (%s)"
 L["REP_MARK_TT_3"] = "%s (%s)"
 L["REP_MARK_TT_4"] = "Reputation: %s/%s (%.2f %%)"
+
+L["dataXP"] = "Experience"
+L["dataXp"] = "Experience"
+L["dataRep"] = "Reputation"

@@ -1,4 +1,4 @@
-local D, C, L = unpack(select(2, ...))
+local D, C, L = _G.unpack(_G.select(2, ...))
 
 local _G = _G
 local pairs = _G.pairs
@@ -26,13 +26,13 @@ end
 function module:CreateMark(id, data)
     --@alpha@
     D.Debug(moduleName, "CreateMark", id)
-    assert(id, 'mark:CreateMark - id is missing')
-    assert(data, 'mark:CreateMark - data is missing')
+    assert(id, "mark:CreateMark - id is missing")
+    assert(data, "mark:CreateMark - data is missing")
     --@end-alpha@
 
     local rcolor = RAID_CLASS_COLORS[data.class]
 
-    local m = CreateFrame("Frame", 'XpFlagMark_'..id:gsub('%W', ''), _G[select(2, unpack(C.markerpositions[C.db.profile.mark.position]))])
+    local m = CreateFrame("Frame", "XpFlagMark_" .. id:gsub("%W", ""), _G[select(2, unpack(C.markerpositions[C.db.profile.mark.position]))])
     m:SetHeight(C.db.profile.mark.size)
     m:SetWidth(C.db.profile.mark.size)
     m:SetPoint(unpack(C.markerpositions[C.db.profile.mark.position]))
@@ -50,7 +50,7 @@ function module:CreateMark(id, data)
     m:Show()
 
     m.data = data
-    m.player = id == D.nameRealm;
+    m.player = id == D.nameRealm
     m.anim = D.CreateUpdateAnimation(m, self.OnAnimation)
     m.model = D:GetModule("markModel"):Create(m)
     m.sparks = D:GetModule("markSpark"):Create(m)
@@ -58,11 +58,13 @@ function module:CreateMark(id, data)
     marks[id] = m
 
     --@alpha@
-    D.Debug(moduleName, "CreateMark - SendMessage", moduleName..":Create", id )
+    D.Debug(moduleName, "CreateMark - SendMessage", moduleName .. ":Create", id)
     --@end-alpha@
-    D:SendMessage(moduleName..":Create", id)
+    D:SendMessage(moduleName .. ":Create", id)
 
-    if not m.player then return m end
+    if not m.player then
+        return m
+    end
 
     m.texture:SetVertexColor(data.cR, data.cG, data.cB)
     m:SetFrameLevel(5)
@@ -73,8 +75,8 @@ end
 function module:UpdateMark(id, data)
     --@alpha@
     D.Debug(moduleName, "UpdateMark", id, data)
-    assert(id, 'mark:UpdateMark - id is missing')
-    assert(data, 'mark:UpdateMark - data is missing')
+    assert(id, "mark:UpdateMark - id is missing")
+    assert(data, "mark:UpdateMark - data is missing")
     --@end-alpha@
 
     if data.disable then
@@ -83,7 +85,7 @@ function module:UpdateMark(id, data)
 
     local flip = match(C.db.profile.mark.position, "TOP") == nil
     local rcolor = RAID_CLASS_COLORS[data.class]
-    local m = marks[id] or self:CreateMark(id, data);
+    local m = marks[id] or self:CreateMark(id, data)
 
     m.data = data
 
@@ -91,9 +93,9 @@ function module:UpdateMark(id, data)
     newPos[1] = gsub(newPos[1], "TOP", flip and "BOTTOM" or "TOP")
 
     --@alpha@
-    D.Debug(moduleName, "UpdateMark - SendMessage", moduleName..":Update", id, m )
+    D.Debug(moduleName, "UpdateMark - SendMessage", moduleName .. ":Update", id, m)
     --@end-alpha@
-    D:SendMessage(moduleName..":Update", id, m)
+    D:SendMessage(moduleName .. ":Update", id, m)
 
     m:ClearAllPoints()
     m:SetPoint(unpack(newPos))
@@ -108,7 +110,9 @@ function module:UpdateMark(id, data)
 
     m.anim.Start()
 
-    if not m.player then return m end
+    if not m.player then
+        return m
+    end
     m.texture:SetVertexColor(data.cR, data.cG, data.cB)
 
     return m
@@ -119,9 +123,9 @@ function module:OnEnable()
     D.Debug(moduleName, "OnEnable")
     --@end-alpha@
 
-    self:RegisterMessage("ReceiveData", "Update")
-    self:RegisterMessage("ReceiveRequest", "Update")
-    self:RegisterMessage("ReceiveDelete", "DeleteMark")
+    self:RegisterMessage("com:Data", "Update")
+    self:RegisterMessage("com:Request", "Update")
+    self:RegisterMessage("com:Delete", "DeleteMark")
     self:RegisterMessage("dataSource:Update", "Update")
 end
 
@@ -130,9 +134,9 @@ function module:OnDisable()
     D.Debug(moduleName, "OnDisable")
     --@end-alpha@
 
-    self:UnregisterMessage("ReceiveData")
-    self:UnregisterMessage("ReceiveRequest")
-    self:UnregisterMessage("ReceiveDelete")
+    self:UnregisterMessage("com:Data")
+    self:UnregisterMessage("com:Request")
+    self:UnregisterMessage("com:Delete")
     self:UnregisterMessage("dataSource:Update")
 end
 
@@ -141,13 +145,17 @@ function module:DeleteMark(id)
     D.Debug(moduleName, "DeleteMark", id)
     --@end-alpha@
 
-    if not id then return end
-    if not marks[id] then return end
+    if not id then
+        return
+    end
+    if not marks[id] then
+        return
+    end
     marks[id]:Hide()
     marks[id] = nil
 
     --@alpha@
-    D.Debug(moduleName, "DeleteMark - SendMessage", moduleName..":Delete", id )
+    D.Debug(moduleName, "DeleteMark - SendMessage", moduleName .. ":Delete", id)
     --@end-alpha@
 
     D:SendMessage("mark:Delete", id)
@@ -158,7 +166,7 @@ function module:Config(key, value)
     D.Debug(moduleName, "Config", key, value)
     --@end-alpha@
 
-    if key == 'showPlayer' and value then
+    if key == "showPlayer" and value then
         self:UpdateMark(D.nameRealm, D:GetModule(C.db.profile.bar.dataSource):GetData())
     end
 
@@ -167,12 +175,12 @@ function module:Config(key, value)
             mark.data.disable = true
         end
 
-        if mid == D.nameRealm and key == 'dataSource' then
+        if mid == D.nameRealm and key == "dataSource" then
             mark.data = D:GetModule(C.db.profile.mark.dataSource):GetData()
         end
 
-        if key == 'size' then
-            D:GetModule('markModel'):Config(mark.model)
+        if key == "size" then
+            D:GetModule("markModel"):Config(mark.model)
         end
 
         self:UpdateMark(mid, mark.data)
@@ -181,13 +189,17 @@ end
 
 function module:Update(msg, id, data, source)
     --@alpha@
-    assert(msg, 'mark:Update - msg is missing')
-    assert(id, 'mark:Update - id is missing')
-    assert(data, 'mark:Update - data is missing')
+    assert(msg, "mark:Update - msg is missing")
+    assert(id, "mark:Update - id is missing")
+    assert(data, "mark:Update - data is missing")
     --@end-alpha@
 
-    if C.db.profile.mark.dataSource..":Update" ~= source and id == D.nameRealm then return end
-    if not C.db.profile.mark.showPlayer and id == D.nameRealm then return end
+    if C.db.profile.mark.dataSource .. ":Update" ~= source and id == D.nameRealm then
+        return
+    end
+    if not C.db.profile.mark.showPlayer and id == D.nameRealm then
+        return
+    end
 
     --@alpha@
     D.Debug(moduleName, "Update", msg, id, data, data.dataSource)
@@ -196,10 +208,22 @@ function module:Update(msg, id, data, source)
     self:UpdateMark(id, data)
 end
 
+function module:HasMark(id)
+    --@alpha@
+    D.Debug(moduleName, "HasMark", id)
+    assert(id, "bar:HasMark - id is missing")
+    --@end-alpha@
+
+    if not marks[id] then
+        return
+    end
+    return true
+end
+
 function module:GetMark(id)
     --@alpha@
     D.Debug(moduleName, "GetMark", id)
-    assert(id, 'bar:GetMark - id is missing')
+    assert(id, "bar:GetMark - id is missing")
     --@end-alpha@
 
     return marks[id]

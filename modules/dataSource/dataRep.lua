@@ -17,9 +17,9 @@ local select = _G.select
 local moduleName = "dataRep"
 local module = D:NewModule(moduleName, "AceEvent-3.0")
 
-local nameRealm = UnitName("player").."-"..GetRealmName()
+local nameRealm = UnitName("player") .. "-" .. GetRealmName()
 local data = nil
-local prevHash = ''
+local prevHash = ""
 local prevValue = 0
 
 function module:OnEnable()
@@ -27,12 +27,15 @@ function module:OnEnable()
     D.Debug(moduleName, "OnEnable")
     --@end-alpha@
 
-    hooksecurefunc('SetWatchedFactionIndex', function(factionIndex)
-        --@alpha@
-        D.Debug(moduleName, "SetWatchedFactionIndex", factionIndex)
-        --@end-alpha@
-        self:Update()
-    end)
+    hooksecurefunc(
+        "SetWatchedFactionIndex",
+        function(factionIndex)
+            --@alpha@
+            D.Debug(moduleName, "SetWatchedFactionIndex", factionIndex)
+            --@end-alpha@
+            self:Update()
+        end
+    )
     self:RegisterEvent("PLAYER_ENTERING_WORLD")
     self:RegisterEvent("UPDATE_FACTION")
 end
@@ -55,7 +58,9 @@ function module:PLAYER_ENTERING_WORLD()
 end
 
 function module:UPDATE_FACTION(event, unit)
-    if unit ~= 'player' then return end
+    if unit ~= "player" then
+        return
+    end
     --@alpha@
     D.Debug(moduleName, "UPDATE_FACTION", event, unit)
     --@end-alpha@
@@ -83,7 +88,7 @@ function module:GetData(mix)
         name, _, standingID, min, max, cur, _, _, _, _, _, _, _, factionID = GetFactionInfoByID(self:getSomeFactionID())
     end
 
-    d.dataSource = d.dataSource or moduleName
+    d.dataSource = moduleName
     d.name = d.name or UnitName("PLAYER")
     d.realm = d.realm or GetRealmName()
     d.class = d.class or select(2, UnitClass("PLAYER"))
@@ -113,9 +118,9 @@ function module:Update()
 
     if prevHash ~= data.factionID .. data.value then
         --@alpha@
-        D.Debug(moduleName, "Update - SendMessage", moduleName..":Update", nameRealm )
+        D.Debug(moduleName, "Update - SendMessage", moduleName .. ":Update", nameRealm)
         --@end-alpha@
-        D:SendMessage(moduleName..":Update", nameRealm, data)
+        D:SendMessage(moduleName .. ":Update", nameRealm, data)
     end
 
     prevHash = data.factionID .. data.value

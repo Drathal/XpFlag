@@ -1,4 +1,4 @@
-local D, C, L = unpack(select(2, ...))
+local D, C, L = _G.unpack(_G.select(2, ...))
 
 local _G = _G
 local CreateFrame = _G.CreateFrame
@@ -17,7 +17,9 @@ function module:OnAnimation(bar, elapsed)
 end
 
 function module:OnEnable()
-    if not C.db.profile.bar.show then return end
+    if not C.db.profile.bar.show then
+        return
+    end
     --@alpha@
     D.Debug(moduleName, "OnEnable")
     --@end-alpha@
@@ -37,7 +39,7 @@ end
 function module:CreateBar(id)
     --@alpha@
     D.Debug(moduleName, "CreateBar", id)
-    assert(id, 'bar:CreateBar - id is missing')
+    assert(id, "bar:CreateBar - id is missing")
     --@end-alpha@
 
     local bar = CreateFrame("Frame", nil, _G[select(2, unpack(C.positions[C.db.profile.bar.position]))])
@@ -46,20 +48,22 @@ function module:CreateBar(id)
     bar:SetWidth(0)
     bar:SetPoint(unpack(C.positions[C.db.profile.bar.position]))
     bar:SetFrameLevel(1)
-    bar:SetFrameStrata("DIALOG");
+    bar:SetFrameStrata("DIALOG")
 
     bar.texture = bar:CreateTexture(nil, "OVERLAY")
     bar.texture:SetTexture(C.bar.texture)
     bar.texture:SetAllPoints(bar)
 
-    bar:SetBackdrop({
-        bgFile = C.bar.backdrop,
-        edgeFile = C.bar.edge,
-        edgeSize = 1,
-        tileSize = 8,
-        tile = true,
-        insets = { left = 0, right = 0, top = 0, bottom = -1 }
-    })
+    bar:SetBackdrop(
+        {
+            bgFile = C.bar.backdrop,
+            edgeFile = C.bar.edge,
+            edgeSize = 1,
+            tileSize = 8,
+            tile = true,
+            insets = {left = 0, right = 0, top = 0, bottom = -1}
+        }
+    )
     bar:SetBackdropColor(0, 0, 0, 0.5)
     bar:SetBackdropBorderColor(0, 0, 0, 0.5)
     bar:Show()
@@ -78,10 +82,12 @@ end
 function module:DeleteBar(id)
     --@alpha@
     D.Debug(moduleName, "DeleteBar", id)
-    assert(id, 'bar:DeleteBar - id is missing')
+    assert(id, "bar:DeleteBar - id is missing")
     --@end-alpha@
 
-    if not bars[id] then return end
+    if not bars[id] then
+        return
+    end
     bars[id]:Hide()
     bars[id] = nil
 end
@@ -116,7 +122,7 @@ function module:Config(key, value)
     D.Debug(moduleName, "Config", key, value)
     --@end-alpha@
 
-    if key == 'show' and value then
+    if key == "show" and value then
         self:UpdateBar(D.nameRealm, D:GetModule(C.db.profile.bar.dataSource):GetData())
     end
 
@@ -125,7 +131,7 @@ function module:Config(key, value)
             bar.data.disable = true
         end
 
-        if key == 'dataSource' then
+        if key == "dataSource" then
             bar.data = D:GetModule(C.db.profile.bar.dataSource):GetData()
         end
 
@@ -135,14 +141,18 @@ end
 
 function module:Update(msg, id, data, source)
     --@alpha@
-    assert(msg, 'bar:Update - msg is missing')
-    assert(id, 'bar:Update - id is missing')
-    assert(data, 'bar:Update - data is missing')
-    assert(source, 'bar:Update - source is missing')
+    assert(msg, "bar:Update - msg is missing")
+    assert(id, "bar:Update - id is missing")
+    assert(data, "bar:Update - data is missing")
+    assert(source, "bar:Update - source is missing")
     --@end-alpha@
 
-    if C.db.profile.bar.dataSource..":Update" ~= source then return end
-    if not C.db.profile.bar.show then return end
+    if C.db.profile.bar.dataSource .. ":Update" ~= source then
+        return
+    end
+    if not C.db.profile.bar.show then
+        return
+    end
 
     --@alpha@
     D.Debug(moduleName, "Update", msg, id, data, source)
@@ -154,7 +164,7 @@ end
 function module:GetBar(id)
     --@alpha@
     D.Debug(moduleName, "GetBar", id)
-    assert(id, 'bar:GetBar - id is missing')
+    assert(id, "bar:GetBar - id is missing")
     --@end-alpha@
 
     return bars[id]

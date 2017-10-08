@@ -18,11 +18,10 @@ function module:OnDisable()
     --@end-alpha@
 end
 
-
 function module:Update(event, id, data)
     --@alpha@
     D.Debug(moduleName, "Update", event, id, data)
     --@end-alpha@
 
-    D:SendMessage(moduleName..":Update", id, data, event)
+    D:SendMessage(moduleName .. ":Update", id, data, event)
 end

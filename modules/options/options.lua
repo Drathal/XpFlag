@@ -27,115 +27,115 @@ local function Set(moduleName)
 end
 
 D.options = {
-    name = D.addonName.." "..D.version,
-    type = 'group',
+    name = D.addonName .. " " .. D.version,
+    type = "group",
     args = {
         bar = {
-            type = 'group',
+            type = "group",
             order = 1,
             name = L["SECTION_BAR"],
-            get = Get('bar'),
-            set = Set('bar'),
+            get = Get("bar"),
+            set = Set("bar"),
             args = {
                 header = {
                     order = 1,
-                    type = 'header',
+                    type = "header",
                     name = L["SECTION_BAR_HEADER"],
-                    width = 'full'
+                    width = "full"
                 },
                 description = {
                     order = 2,
-                    type = 'description',
+                    type = "description",
                     name = L["SECTION_BAR_DESCRIPTION"],
-                    width = 'full',
+                    width = "full"
                 },
                 show = {
-                    type = 'toggle',
+                    type = "toggle",
                     order = 3,
-                    width = 'full',
+                    width = "full",
                     name = L["SHOW_PLAYER_BAR_LABEL"],
                     desc = L["SHOW_PLAYER_BAR_DESC"]
                 },
                 dataSource = {
-                    type = 'select',
+                    type = "select",
                     order = 4,
-                    width = 'full',
+                    width = "full",
                     values = {
                         ["dataXp"] = L["PLAYER_BAR_DATASOURCE_OPTION_XP"],
-                        ["dataRep"] = L["PLAYER_BAR_DATASOURCE_OPTION_REP"],
+                        ["dataRep"] = L["PLAYER_BAR_DATASOURCE_OPTION_REP"]
                     },
                     name = L["PLAYER_BAR_DATASOURCE_LABEL"],
                     desc = L["PLAYER_BAR_DATASOURCE_DESC"]
                 },
                 position = {
-                    type = 'select',
+                    type = "select",
                     order = 5,
-                    width = 'full',
+                    width = "full",
                     values = {
                         ["SCREENTOP"] = L["POS_SCREENTOP"],
-                        ["SCREENBOTTOM"] = L["POS_SCREENBOTTOM"],
+                        ["SCREENBOTTOM"] = L["POS_SCREENBOTTOM"]
                     },
                     name = L["PLAYER_BAR_POS_LABEL"],
                     desc = L["PLAYER_BAR_POS_DESC"]
                 },
                 height = {
-                    type = 'range',
+                    type = "range",
                     order = 6,
-                    width = 'full',
+                    width = "full",
                     min = 1,
                     max = 15,
                     step = 1,
                     name = L["PLAYER_BAR_HEIGHT_LABEL"],
                     desc = L["PLAYER_BAR_HEIGHT_DESC"]
-                },
+                }
             }
         },
         mark = {
-            type = 'group',
+            type = "group",
             order = 2,
             name = L["SECTION_MARK"],
-            get = Get('mark'),
-            set = Set('mark'),
+            get = Get("mark"),
+            set = Set("mark"),
             args = {
                 header = {
                     order = 1,
-                    type = 'header',
+                    type = "header",
                     name = L["SECTION_MARK_HEADER"],
-                    width = 'full'
+                    width = "full"
                 },
                 description = {
                     order = 2,
-                    type = 'description',
+                    type = "description",
                     name = L["SECTION_MARK_DESCRIPTION"],
-                    width = 'full',
+                    width = "full"
                 },
                 showPlayer = {
-                    type = 'toggle',
+                    type = "toggle",
                     order = 3,
-                    width = 'full',
+                    width = "full",
                     name = L["SHOW_PLAYER_MARK_LABEL"],
                     desc = L["SHOW_PLAYER_MARK_DESC"]
                 },
                 dataSource = {
-                    type = 'select',
+                    type = "select",
                     order = 4,
-                    width = 'full',
+                    width = "full",
                     values = {
                         ["dataXp"] = L["PLAYER_BAR_DATASOURCE_OPTION_XP"],
-                        ["dataRep"] = L["PLAYER_BAR_DATASOURCE_OPTION_REP"],
+                        ["dataRep"] = L["PLAYER_BAR_DATASOURCE_OPTION_REP"]
                     },
                     name = L["PLAYER_BAR_DATASOURCE_LABEL"],
                     desc = L["PLAYER_BAR_DATASOURCE_DESC"]
                 },
                 position = {
-                    type = 'select',
+                    type = "select",
                     order = 5,
-                    width = 'full',
+                    width = "full",
                     values = function()
                         local items = {}
                         items["SCREENTOP"] = L["POS_SCREENTOP"]
                         items["SCREENBOTTOM"] = L["POS_SCREENBOTTOM"]
-                        if _G['MainMenuBarOverlayFrame']:IsVisible() then
+                        if _G["MainMenuBarOverlayFrame"]:IsVisible() then
                             items["BLIZZEXPBAR"] = L["POS_BLIZZ_EXPBAR"]
                         end
                         return items
@@ -144,19 +144,18 @@ D.options = {
                     desc = L["Mark_POS_DESC"]
                 },
                 size = {
-                    type = 'range',
+                    type = "range",
                     order = 6,
-                    width = 'full',
+                    width = "full",
                     min = 5,
                     max = 50,
                     step = 1,
                     name = L["MARK_SIZE_LABEL"],
                     desc = L["MARK_SIZE_DESC"]
-                },
+                }
             }
-        },
-
-    },
+        }
+    }
 }
 
 function D:OnInitialize()

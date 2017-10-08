@@ -1,4 +1,4 @@
-local D, C, L = unpack(select(2, ...))
+local D, C, L = _G.unpack(_G.select(2, ...))
 
 local _G = _G
 local CreateFrame = _G.CreateFrame
@@ -15,8 +15,8 @@ local module = D:NewModule(moduleName, "AceEvent-3.0")
 function module:PlaySpark(sparkList, parent)
     --@alpha@
     D.Debug(moduleName, "PlaySpark", sparkList, parent)
-    assert(sparkList, 'markSpark:PlaySpark - sparkList is missing')
-    assert(parent, 'markSpark:PlaySpark - parent is missing')
+    assert(sparkList, "markSpark:PlaySpark - sparkList is missing")
+    assert(parent, "markSpark:PlaySpark - parent is missing")
     --@end-alpha@
 
     for k, spark in pairs(sparkList) do
@@ -24,14 +24,14 @@ function module:PlaySpark(sparkList, parent)
             local f1, p, f2, xOfs, yOfs = parent:GetPoint()
 
             spark:ClearAllPoints()
-            spark:SetPoint(f1, p, f2, xOfs, yOfs);
+            spark:SetPoint(f1, p, f2, xOfs, yOfs)
 
             D.Debug(moduleName, "PlaySpark - POS", parent:GetPoint())
 
             local ySpread1, ySpread2 = unpack(C.sparkXP.ySpread)
             if match(C.db.profile.mark.position, "TOP") == nil then
-                ySpread1 = C.sparkXP.ySpread[2] * - 1
-                ySpread2 = C.sparkXP.ySpread[1] * - 1
+                ySpread1 = C.sparkXP.ySpread[2] * -1
+                ySpread2 = C.sparkXP.ySpread[1] * -1
             end
 
             spark.ag.a1:SetOffset(random(unpack(C.sparkXP.xSpread)), random(ySpread1, ySpread2))
@@ -49,9 +49,9 @@ end
 function module:OnSparkPlay(f)
     --@alpha@
     D.Debug(moduleName, "OnSparkPlay", f, f:GetParent().data.gain)
-    assert(f, 'markSparks:OnSparkPlay - f is missing')
-    assert(f.text, 'markSparks:OnSparkPlay - f.text is missing')
-    assert(f:GetParent().data, 'markSparks:OnSparkPlay - f:GetParent().data is missing')
+    assert(f, "markSparks:OnSparkPlay - f is missing")
+    assert(f.text, "markSparks:OnSparkPlay - f.text is missing")
+    assert(f:GetParent().data, "markSparks:OnSparkPlay - f:GetParent().data is missing")
     --@end-alpha@
 
     local gain = f:GetParent().data.gain
@@ -77,7 +77,7 @@ function module:AddSpark(parent, i)
     D.Debug(moduleName, "AddSpark", parent, i)
     --@end-alpha@
 
-    local f = CreateFrame("Frame", parent:GetName()..'_spark_'..i, parent)
+    local f = CreateFrame("Frame", parent:GetName() .. "_spark_" .. i, parent)
     f:SetPoint("CENTER", _G[parent:GetName()], "CENTER", 0, 0)
     f:SetHeight(C.db.profile.mark.size)
     f:SetWidth(1)
@@ -111,8 +111,18 @@ function module:AddSpark(parent, i)
     f.ag.a3:SetDuration(0)
     f.ag.a3:SetSmoothing("OUT")
 
-    f.ag:HookScript("OnPlay", function() self:OnSparkPlay(f) end)
-    f.ag:HookScript("OnFinished", function() self:OnSparkFinished(f) end)
+    f.ag:HookScript(
+        "OnPlay",
+        function()
+            self:OnSparkPlay(f)
+        end
+    )
+    f.ag:HookScript(
+        "OnFinished",
+        function()
+            self:OnSparkFinished(f)
+        end
+    )
 
     return f
 end
@@ -120,20 +130,24 @@ end
 function module:PlayXpSpark(msg, name, f)
     --@alpha@
     D.Debug(moduleName, "PlayXpSpark", msg, name)
-    assert(name, 'markSpark:PlayXpSpark - name is missing')
-    assert(f, 'markSpark:PlayXpSpark - f is missing')
-    assert(f.data, 'markSpark:PlayXpSpark - f.data is missing')
+    assert(name, "markSpark:PlayXpSpark - name is missing")
+    assert(f, "markSpark:PlayXpSpark - f is missing")
+    assert(f.data, "markSpark:PlayXpSpark - f.data is missing")
     --@end-alpha@
 
-    if not f.sparks then return end
-    if not f.data.gain or f.data.gain == 0 then return end
+    if not f.sparks then
+        return
+    end
+    if not f.data.gain or f.data.gain == 0 then
+        return
+    end
     f.sparks.Play(f.data.gain)
 end
 
 function module:Create(parent)
     --@alpha@
     D.Debug(moduleName, "Create", parent)
-    assert(parent, 'markSparks:Create - parent is missing')
+    assert(parent, "markSparks:Create - parent is missing")
     --@end-alpha@
 
     local f = {}
@@ -146,7 +160,7 @@ function module:Create(parent)
 
     -- debug
     if parent.player then
-        _G[D.addonName.."PlaySpark"] = f.Play
+        _G[D.addonName .. "PlaySpark"] = f.Play
     end
 
     for i = 1, parent.player and C.sparkXP.max or (C.sparkXP.max / 2), 1 do

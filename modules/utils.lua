@@ -17,15 +17,17 @@ local MAX_PLAYER_LEVEL_TABLE = _G.MAX_PLAYER_LEVEL_TABLE
 --@alpha@
 local select = _G.select
 local tostring = _G.tostring
-local PARAMETER_COLORS = { "|cff88ff88" }
+local PARAMETER_COLORS = {"|cff88ff88"}
 local function Debug(module, ...)
-    if D.debug and not D.debug[module] then return end
+    if D.debug and not D.debug[module] then
+        return
+    end
 
-    local msg = "|cffffff78 " .. tostring(module) .."|r : "
-    for n = 1, select('#', ...) do
+    local msg = "|cffffff78 " .. tostring(module) .. "|r : "
+    for n = 1, select("#", ...) do
         msg = msg .. " " .. (PARAMETER_COLORS[n] or " |cffffffff") .. tostring(select(n, ...)) .. "|r"
-        if _G.ViragDevTool_AddData and type(select(n, ...)) == 'table' then
-            _G.ViragDevTool_AddData(select(n, ...), tostring(module) .. ":".. select(1, ...))
+        if _G.ViragDevTool_AddData and type(select(n, ...)) == "table" then
+            _G.ViragDevTool_AddData(select(n, ...), tostring(module) .. ":" .. select(1, ...))
         end
     end
 
@@ -35,17 +37,21 @@ end
 
 local function Throttle(self, elapsed)
     self.delay = min((self.delay or 0.01) - elapsed, 0.15)
-    if self.delay > 0 then return true end
+    if self.delay > 0 then
+        return true
+    end
     self.delay = (1 / GetFramerate() / 2)
 
     return nil
 end
 
 local function CreateUpdateAnimation(f, cb)
-    local anim = CreateFrame('Frame')
+    local anim = CreateFrame("Frame")
 
     anim.UpdateAnimation = function(self, elapsed)
-        if Throttle(self, elapsed) then return end
+        if Throttle(self, elapsed) then
+            return
+        end
         if not f.to then
             self:Stop()
             return
@@ -54,7 +60,9 @@ local function CreateUpdateAnimation(f, cb)
     end
 
     anim.Start = function()
-        if not f.to then return end
+        if not f.to then
+            return
+        end
         anim:SetScript("OnUpdate", anim.UpdateAnimation)
     end
 
@@ -106,7 +114,7 @@ local function AnimateX(f)
     end
 
     local p1, p, p2, _, yOfs = f:GetPoint()
-    f:ClearAllPoints();
+    f:ClearAllPoints()
     f:SetPoint(p1, p, p2, new, yOfs)
 
     f.cur = new
