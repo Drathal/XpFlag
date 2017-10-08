@@ -44,7 +44,8 @@ AddOn.debug = {
     --dataRep = true,
     --com = true,
     --bar = true,
-    friends = true
+    --friends = true
     --utils = true
+    debug = true
 }
 --@end-alpha@
