@@ -20,9 +20,9 @@ local select = _G.select
 local moduleName = "dataXp"
 local module = D:NewModule(moduleName, "AceEvent-3.0")
 
-local nameRealm = UnitName("player") .. "-" .. GetRealmName()
+local nameRealm = UnitName("player").."-"..GetRealmName()
 local data = nil
-local prevHash = ""
+local prevHash = ''
 local prevValue = 0
 
 function module:OnEnable()
@@ -51,9 +51,10 @@ function module:OnDisable()
 end
 
 function module:CHAT_MSG_SYSTEM(event, msg)
-    if msg ~= ERR_EXHAUSTION_RESTED and msg ~= ERR_EXHAUSTION_WELLRESTED and msg ~= ERR_EXHAUSTION_NORMAL and msg ~= ERR_EXHAUSTION_TIRED then
-        return
-    end
+    if msg ~= ERR_EXHAUSTION_RESTED
+    and msg ~= ERR_EXHAUSTION_WELLRESTED
+    and msg ~= ERR_EXHAUSTION_NORMAL
+    and msg ~= ERR_EXHAUSTION_TIRED then return end
 
     --@alpha@
     D.Debug(moduleName, "CHAT_MSG_SYSTEM", msg)
@@ -68,7 +69,7 @@ function module:PLAYER_ENTERING_WORLD()
     --@end-alpha@
 
     self:Update()
-    self:UnregisterEvent("PLAYER_ENTERING_WORLD")
+    self:UnregisterEvent("PLAYER_ENTERING_WORLD");
 end
 
 function module:ZONE_CHANGED_NEW_AREA()
@@ -96,9 +97,7 @@ function module:PLAYER_LEVEL_UP()
 end
 
 function module:PLAYER_XP_UPDATE(event, unit)
-    if unit ~= "player" then
-        return
-    end
+    if unit ~= 'player' then return end
     --@alpha@
     D.Debug(moduleName, "PLAYER_XP_UPDATE")
     --@end-alpha@
@@ -109,7 +108,7 @@ end
 function module:GetData(mix)
     local d = mix or {}
 
-    d.dataSource = moduleName
+    d.dataSource = d.dataSource or moduleName
     d.name = d.name or UnitName("PLAYER")
     d.realm = d.realm or GetRealmName()
     d.class = d.class or select(2, UnitClass("PLAYER"))
@@ -135,9 +134,9 @@ function module:Update()
 
     if prevHash ~= data.level .. data.value .. data.rested then
         --@alpha@
-        D.Debug(moduleName, "Update - SendMessage", moduleName .. ":Update", nameRealm, data)
+        D.Debug(moduleName, "Update - SendMessage", moduleName..":Update", nameRealm, data )
         --@end-alpha@
-        D:SendMessage(moduleName .. ":Update", nameRealm, data)
+        D:SendMessage(moduleName..":Update", nameRealm, data)
     end
 
     prevHash = data.level .. data.value .. data.rested
