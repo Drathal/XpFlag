@@ -119,6 +119,8 @@ function module:OnButtonClick(f)
     else
         D:GetModule("com"):SendRequest(f.friend)
     end
+
+    self:OnFriendsFrameUpdate()
 end
 
 function module:SetButtonTexture(button, friendHasMark, friendhasAddon)
