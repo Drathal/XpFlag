@@ -79,9 +79,9 @@ function module:UpdateMark(id, data)
     assert(data, "mark:UpdateMark - data is missing")
     --@end-alpha@
 
-    if data.isMax then
+    -- if data.isMax then
     -- return self:DeleteMark(id)
-    end
+    -- end
 
     local flip = match(C.db.profile.mark.position, "TOP") == nil
     local rcolor = RAID_CLASS_COLORS[data.class]
@@ -171,10 +171,6 @@ function module:Config(key, value)
     end
 
     for mid, mark in pairs(marks) do
-        if mid == D.nameRealm and not C.db.profile.mark.showPlayer then
-            mark.data.isMax = true
-        end
-
         if mid == D.nameRealm and key == "dataSource" then
             mark.data = D:GetModule(C.db.profile.mark.dataSource):GetData()
         end
@@ -183,7 +179,12 @@ function module:Config(key, value)
             D:GetModule("markModel"):Config(mark.model)
         end
 
-        self:UpdateMark(mid, mark.data)
+        if mid == D.nameRealm and not C.db.profile.mark.showPlayer then
+            -- mark.data.isMax = true
+            self:DeleteMark(mid)
+        else
+            self:UpdateMark(mid, mark.data)
+        end
     end
 end
 

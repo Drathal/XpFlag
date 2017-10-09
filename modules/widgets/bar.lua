@@ -95,9 +95,9 @@ end
 function module:UpdateBar(id, data)
     local bar = bars[id] or self:CreateBar(id)
 
-    if data.isMax then
+    -- if data.isMax then
     -- return self:DeleteBar(id)
-    end
+    -- end
 
     bar.data = data
 
@@ -127,15 +127,16 @@ function module:Config(key, value)
     end
 
     for bid, bar in pairs(bars) do
-        if bid == D.nameRealm and not C.db.profile.bar.show then
-            bar.data.isMax = true
-        end
-
         if key == "dataSource" then
             bar.data = D:GetModule(C.db.profile.bar.dataSource):GetData()
         end
 
-        self:UpdateBar(bid, bar.data)
+        if bid == D.nameRealm and not C.db.profile.bar.show then
+            -- bar.data.isMax = true
+            self:DeleteBar(bid)
+        else
+            self:UpdateBar(bid, bar.data)
+        end
     end
 end
 
