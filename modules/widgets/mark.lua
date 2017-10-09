@@ -79,8 +79,8 @@ function module:UpdateMark(id, data)
     assert(data, "mark:UpdateMark - data is missing")
     --@end-alpha@
 
-    if data.disable then
-        return self:DeleteMark(id)
+    if data.isMax then
+    -- return self:DeleteMark(id)
     end
 
     local flip = match(C.db.profile.mark.position, "TOP") == nil
@@ -172,7 +172,7 @@ function module:Config(key, value)
 
     for mid, mark in pairs(marks) do
         if mid == D.nameRealm and not C.db.profile.mark.showPlayer then
-            mark.data.disable = true
+            mark.data.isMax = true
         end
 
         if mid == D.nameRealm and key == "dataSource" then

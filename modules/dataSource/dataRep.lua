@@ -92,7 +92,7 @@ function module:GetData(mix)
     d.name = d.name or UnitName("PLAYER")
     d.realm = d.realm or GetRealmName()
     d.class = d.class or select(2, UnitClass("PLAYER"))
-    d.disable = d.disable or false
+    d.isMax = d.isMax or false
 
     d.level = UnitLevel("PLAYER")
     d.min = min
@@ -125,7 +125,7 @@ function module:Update()
 
     prevHash = data.factionID .. data.value
 
-    if data.disable then
+    if data.isMax then
         self:Disable()
     end
 end

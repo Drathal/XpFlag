@@ -28,7 +28,7 @@ local fakeData = {
     name = select(1, split("-", D.fakeName)),
     realm = select(2, split("-", D.fakeName)),
     class = "MONK",
-    disable = false,
+    isMax = false,
     max = 5000
 }
 
