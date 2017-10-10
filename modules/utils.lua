@@ -125,6 +125,23 @@ local function IsMaxLevel(level)
     return MAX_PLAYER_LEVEL_TABLE[GetExpansionLevel()] == (level or UnitLevel("player"))
 end
 
+local function FormatNumber(num, places)
+    local placeValue = ("%%.%df"):format(places or 2)
+    if not num then
+        return 0
+    elseif num >= 1e12 then
+        return placeValue:format(num / 1e12) .. " T"
+    elseif num >= 1e9 then
+        return placeValue:format(num / 1e9) .. " B"
+    elseif num >= 1e6 then
+        return placeValue:format(num / 1e6) .. " M"
+    elseif num >= 1e3 then
+        return placeValue:format(num / 1e3) .. "K"
+    else
+        return num
+    end
+end
+
 -- API
 --@alpha@
 D.Debug = Debug
@@ -136,3 +153,4 @@ D.AnimateWidth = AnimateWidth
 D.AnimateX = AnimateX
 D.IsMaxLevel = IsMaxLevel
 D.CreateUpdateAnimation = CreateUpdateAnimation
+D.FormatNumber = FormatNumber

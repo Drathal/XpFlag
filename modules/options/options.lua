@@ -60,10 +60,7 @@ D.options = {
                     type = "select",
                     order = 4,
                     width = "full",
-                    values = {
-                        ["dataXp"] = L["PLAYER_BAR_DATASOURCE_OPTION_XP"],
-                        ["dataRep"] = L["PLAYER_BAR_DATASOURCE_OPTION_REP"]
-                    },
+                    values = C["datasourceoptions"],
                     name = L["PLAYER_BAR_DATASOURCE_LABEL"],
                     desc = L["PLAYER_BAR_DATASOURCE_DESC"]
                 },
@@ -120,10 +117,7 @@ D.options = {
                     type = "select",
                     order = 4,
                     width = "full",
-                    values = {
-                        ["dataXp"] = L["PLAYER_BAR_DATASOURCE_OPTION_XP"],
-                        ["dataRep"] = L["PLAYER_BAR_DATASOURCE_OPTION_REP"]
-                    },
+                    values = C["datasourceoptions"],
                     name = L["PLAYER_BAR_DATASOURCE_LABEL"],
                     desc = L["PLAYER_BAR_DATASOURCE_DESC"]
                 },

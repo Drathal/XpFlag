@@ -13,9 +13,11 @@ local ERR_EXHAUSTION_RESTED = _G.ERR_EXHAUSTION_RESTED
 local ERR_EXHAUSTION_WELLRESTED = _G.ERR_EXHAUSTION_WELLRESTED
 local ERR_EXHAUSTION_NORMAL = _G.ERR_EXHAUSTION_NORMAL
 local ERR_EXHAUSTION_TIRED = _G.ERR_EXHAUSTION_TIRED
+local COLORS = _G.RAID_CLASS_COLORS
 local GetExpansionLevel = _G.GetExpansionLevel
 local tonumber = _G.tonumber
 local select = _G.select
+local format = _G.string.format
 
 local moduleName = "dataXp"
 local module = D:NewModule(moduleName, "AceEvent-3.0")
@@ -128,6 +130,13 @@ function module:GetData(mix)
     prevValue = d.value
 
     return d
+end
+
+function module:AddTooltip(tooltip, d)
+    tooltip:AddLine(format(L["XP_MARK_TT_1"], D.addonName))
+    tooltip:AddLine(format(L["XP_MARK_TT_2"], d.name, d.level), COLORS[d.class].r, COLORS[d.class].g, COLORS[d.class].b, 1)
+    tooltip:AddLine(format(L["XP_MARK_TT_3"], D.FormatNumber(d.value), D.FormatNumber(d.max), d.value / d.max * 100), 1, 1, 1, 1)
+    tooltip:AddLine(format(L["XP_MARK_TT_4"], D.FormatNumber(d.rested), d.rested / d.max * 100), 1, 1, 1, 1)
 end
 
 function module:Update()

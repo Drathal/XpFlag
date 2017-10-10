@@ -119,7 +119,7 @@ function module:OnButtonClick(f)
     else
         D:GetModule("com"):SendRequest(f.friend)
     end
-
+    tooltip:AddLine(format(L["XP_MARK_TT_1"], D.addonName))
     self:OnFriendsFrameUpdate()
 end
 

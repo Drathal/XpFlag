@@ -16,15 +16,8 @@ local module = D:NewModule(moduleName)
 local delay = 2
 
 local function UpdateTooltip(parent)
-    local data = parent.data
-    local TYPE = C["datasourceshort"][data.dataSource]
-
     GameTooltip:ClearLines()
-    GameTooltip:AddLine(format(L[TYPE .. "_MARK_TT_1"], D.addonName))
-    GameTooltip:AddLine(format(L[TYPE .. "_MARK_TT_2"], C["tooltip"][TYPE][2](data)), COLORS[data.class].r, COLORS[data.class].g, COLORS[data.class].b, 1)
-    GameTooltip:AddLine(format(L[TYPE .. "_MARK_TT_3"], C["tooltip"][TYPE][3](data)), 1, 1, 1, 1)
-    GameTooltip:AddLine(format(L[TYPE .. "_MARK_TT_4"], C["tooltip"][TYPE][4](data)), 1, 1, 1, 1)
-
+    D:GetModule(parent.data.dataSource):AddTooltip(GameTooltip, parent.data)
     GameTooltip:Show()
 end
 

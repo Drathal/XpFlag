@@ -1,5 +1,10 @@
 local D, C, L = _G.unpack(_G.select(2, ...))
 
+C["datasourceoptions"] = {}
+C["datasourceoptions"]["dataXp"] = L["dataXp"]
+C["datasourceoptions"]["dataRep"] = L["dataRep"]
+C["datasourceoptions"]["dataAp"] = L["dataAp"]
+
 C["positions"] = {
     ["SCREENTOP"] = {"TOPLEFT", "UIParent", "TOPLEFT", 0, 0},
     ["SCREENBOTTOM"] = {"BOTTOMLEFT", "UIParent", "BOTTOMLEFT", 0, 0},
@@ -14,12 +19,6 @@ C["markerpositions"] = {
     -- ["BLIZZEXPBAR"] = { "BOTTOMLEFT", _G['MainMenuExpBar'], "BOTTOMLEFT", 0, 2 },
 }
 
-C["datasourceshort"] = {
-    ["dataXp"] = "XP",
-    ["dataRep"] = "REP",
-    ["dataAp"] = "AP"
-}
-
 C["player"] = {
     ["show"] = true,
     ["color"] = {0.25, 0.5, 1, 1},
@@ -28,10 +27,10 @@ C["player"] = {
 
 C["sparkXP"] = {
     ["max"] = 6,
-    ["format"] = L["XP_MARK_TT_1"],
     ["formats"] = {
         ["dataXp"] = L["XP_MARK_TT_1"],
-        ["dataRep"] = L["REP_MARK_TT_1"]
+        ["dataRep"] = L["REP_MARK_TT_1"],
+        ["dataAp"] = L["AP_MARK_TT_1"]
     },
     ["font"] = {_G.GameFontNormal:GetFont(), 12, "OUTLINE", 0},
     ["fontColor"] = {1, .82, 0, 1},
@@ -57,43 +56,6 @@ C["bar"] = {
     ["edge"] = [[Interface\BUTTONS\WHITE8X8]],
     ["height"] = 1,
     ["animationSpeed"] = 6
-}
-
--- todo: move funtions to dataSource
-C["tooltip"] = {
-    ["XP"] = {
-        [2] = function(data)
-            return data.name, data.level
-        end,
-        [3] = function(data)
-            return data.value, data.max, data.value / data.max * 100
-        end,
-        [4] = function(data)
-            return data.rested, data.rested / data.max * 100
-        end
-    },
-    ["REP"] = {
-        [2] = function(data)
-            return data.name, data.level
-        end,
-        [3] = function(data)
-            return data.faction, _G["FACTION_STANDING_LABEL" .. data.standingID]
-        end,
-        [4] = function(data)
-            return data.value, data.max, data.value / data.max * 100
-        end
-    },
-    ["AP"] = {
-        [2] = function(data)
-            return data.name, data.level
-        end,
-        [3] = function(data)
-            return data.faction, _G["FACTION_STANDING_LABEL" .. data.standingID]
-        end,
-        [4] = function(data)
-            return data.value, data.max, data.value / data.max * 100
-        end
-    }
 }
 
 C["mark"] = {
