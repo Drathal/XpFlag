@@ -19,6 +19,7 @@
 	<Script file="modules\options\default.lua"/>    
 	<Script file="modules\options\options.lua"/>
     <Script file="modules\dataSource\dataSource.lua"/>
+    <Script file="modules\dataSource\dataAp.lua"/>
 	<Script file="modules\dataSource\dataXp.lua"/>
     <Script file="modules\dataSource\dataRep.lua"/>
 	<Script file="modules\utils.lua"/>

@@ -16,12 +16,8 @@ C["markerpositions"] = {
 
 C["datasourceshort"] = {
     ["dataXp"] = "XP",
-    ["dataRep"] = "REP"
-}
-
-C["datasourceshort"] = {
-    ["dataXp"] = "XP",
-    ["dataRep"] = "REP"
+    ["dataRep"] = "REP",
+    ["dataAp"] = "AP"
 }
 
 C["player"] = {
@@ -77,6 +73,17 @@ C["tooltip"] = {
         end
     },
     ["REP"] = {
+        [2] = function(data)
+            return data.name, data.level
+        end,
+        [3] = function(data)
+            return data.faction, _G["FACTION_STANDING_LABEL" .. data.standingID]
+        end,
+        [4] = function(data)
+            return data.value, data.max, data.value / data.max * 100
+        end
+    },
+    ["AP"] = {
         [2] = function(data)
             return data.name, data.level
         end,

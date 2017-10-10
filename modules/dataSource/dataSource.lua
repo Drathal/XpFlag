@@ -8,6 +8,7 @@ function module:OnEnable()
     D.Debug(moduleName, "OnEnable")
     --@end-alpha@
 
+    self:RegisterMessage("dataAp:Update", "Update")
     self:RegisterMessage("dataXp:Update", "Update")
     self:RegisterMessage("dataRep:Update", "Update")
 end

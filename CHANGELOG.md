@@ -1,5 +1,9 @@
 ## CHANGELOG
 
+### 1.2.0
+
+  * feature: new data source: aritfact power
+  
 ### 1.1.0
 
   * feature: new data source: reputation

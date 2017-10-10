@@ -43,6 +43,7 @@ L["REP_MARK_TT_2"] = "%s (%s)"
 L["REP_MARK_TT_3"] = "%s (%s)"
 L["REP_MARK_TT_4"] = "Reputation: %s/%s (%.2f %%)"
 
+L["dataAp"] = "Artifact Power"
 L["dataXP"] = "Experience"
 L["dataXp"] = "Experience"
 L["dataRep"] = "Reputation"
