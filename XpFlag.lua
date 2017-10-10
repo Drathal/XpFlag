@@ -6,6 +6,7 @@ local UnitName = _G.UnitName
 local UnitGUID = _G.UnitGUID
 local GetRealmName = _G.GetRealmName
 local GetBuildInfo = _G.GetBuildInfo
+local LibStub = _G.LibStub
 
 -- init addon
 local AddOn = LibStub("AceAddon-3.0"):NewAddon(AddOnName, "AceEvent-3.0")
@@ -18,17 +19,17 @@ _G[AddOnName] = Engine
 
 -- Addon API
 AddOn.addonName = AddOnName
-AddOn.title = GetAddOnMetadata(AddOnName, "Title")
-AddOn.version = GetAddOnMetadata(AddOnName, "Version")
+AddOn.title = _G.GetAddOnMetadata(AddOnName, "Title")
+AddOn.version = _G.GetAddOnMetadata(AddOnName, "Version")
 AddOn.name = UnitName("player")
 AddOn.GUID = UnitGUID("player")
-AddOn.class = select(2, UnitClass("player"))
+AddOn.class = _G.select(2, _G.UnitClass("player"))
 AddOn.realm = GetRealmName()
-AddOn.nameRealm = AddOn.name.."-"..AddOn.realm
-AddOn.screenWidth = GetScreenWidth()
-AddOn.screenHeight = GetScreenHeight()
+AddOn.nameRealm = AddOn.name .. "-" .. AddOn.realm
+AddOn.screenWidth = _G.GetScreenWidth()
+AddOn.screenHeight = _G.GetScreenHeight()
 AddOn.woWPatch, AddOn.woWBuild, AddOn.woWPatchReleaseDate, AddOn.tocVersion = GetBuildInfo()
-AddOn.woWBuild = tonumber(AddOn.woWBuild)
+AddOn.woWBuild = _G.tonumber(AddOn.woWBuild)
 
 --@alpha@
 AddOn.fakeCom = true
@@ -38,9 +39,13 @@ AddOn.debug = {
     --markSpark = true,
     --markModel = true,
     --markTooltip = true,
-    dataXp = true,
-    com = true,
+    --dataSource = true,
+    --dataXp = true,
+    --dataRep = true,
+    --com = true,
     --bar = true,
-    friends = true
+    --friends = true
+    --utils = true
+    debug = true
 }
 --@end-alpha@

@@ -16,8 +16,11 @@
 	<!-- app -->
 	<Script file="XpFlag.lua"/>
 	<Include file="locales\locales.xml"/>
-	<Script file="config.lua"/>
+	<Script file="modules\options\default.lua"/>    
+	<Script file="modules\options\options.lua"/>
+    <Script file="modules\dataSource\dataSource.lua"/>
 	<Script file="modules\dataSource\dataXp.lua"/>
+    <Script file="modules\dataSource\dataRep.lua"/>
 	<Script file="modules\utils.lua"/>
 	<Script file="modules\friends.lua"/>
 	<Script file="modules\communication.lua"/>

@@ -1,5 +1,11 @@
 ## CHANGELOG
 
+### 1.1.0
+
+  * feature: new data source: reputation
+  * feature: add tooltip to connect to friend button
+  * chore: refactor code
+
 ### 1.0.1
 
   * fix: connect to friend fix
