@@ -13,14 +13,8 @@ C["markerpositions"] = {
     ["BLIZZEXPBAR"] = {"TOP", "MainMenuBarOverlayFrame", "TOPLEFT", 0, -8}
     -- ["BLIZZEXPBAR"] = { "BOTTOMLEFT", _G['MainMenuExpBar'], "BOTTOMLEFT", 0, 2 },
 }
- --
 
---[[
-C["datasource"] = {
-    ["SOURCE_XP"] = "dataXp",
-    ["SOURCE_REP"] = "dataRep",
-}
-]] C["datasourceshort"] = {
+C["datasourceshort"] = {
     ["dataXp"] = "XP",
     ["dataRep"] = "REP"
 }
@@ -69,6 +63,7 @@ C["bar"] = {
     ["animationSpeed"] = 6
 }
 
+-- todo: move funtions to dataSource
 C["tooltip"] = {
     ["XP"] = {
         [2] = function(data)
