@@ -26,7 +26,7 @@ L["MARK_SIZE_DESC"] = "Size of all Markers"
 
 L["POS_SCREENTOP"] = "Screen Top"
 L["POS_SCREENBOTTOM"] = "Screen Bottom"
-L["POS_BLIZZ_EXPBAR"] = "Blizzard Experience Bar"
+L["POS_BLIZZ_EXPBAR"] = "Blizzard Bar"
 
 L["CONNECT_BUTTON_TT"] = "Connect with %s"
 L["CONNECT_BUTTON_DATA"] = "Friend will share: %s"

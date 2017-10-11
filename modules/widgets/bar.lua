@@ -42,11 +42,11 @@ function module:CreateBar(id)
     assert(id, "bar:CreateBar - id is missing")
     --@end-alpha@
 
-    local bar = CreateFrame("Frame", nil, _G[select(2, unpack(C.positions[C.db.profile.bar.position]))])
+    local bar = CreateFrame("Frame", nil, _G[select(2, unpack(C.barpositions[C.db.profile.bar.position]))])
     bar.name = id
     bar:SetHeight(C.db.profile.bar.height)
     bar:SetWidth(0)
-    bar:SetPoint(unpack(C.positions[C.db.profile.bar.position]))
+    bar:SetPoint(unpack(C.barpositions[C.db.profile.bar.position]))
     bar:SetFrameLevel(1)
     bar:SetFrameStrata("DIALOG")
 
@@ -112,7 +112,7 @@ function module:UpdateBar(id, data)
 
     bar:SetHeight(C.db.profile.bar.height)
     bar:ClearAllPoints()
-    bar:SetPoint(unpack(C.positions[C.db.profile.bar.position]))
+    bar:SetPoint(unpack(C.barpositions[C.db.profile.bar.position]))
 
     return bar
 end

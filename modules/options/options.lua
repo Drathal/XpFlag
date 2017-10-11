@@ -60,7 +60,7 @@ D.options = {
                     type = "select",
                     order = 4,
                     width = "full",
-                    values = C["datasourceoptions"],
+                    values = D.GetDataSourceOptions,
                     name = L["PLAYER_BAR_DATASOURCE_LABEL"],
                     desc = L["PLAYER_BAR_DATASOURCE_DESC"]
                 },
@@ -117,7 +117,7 @@ D.options = {
                     type = "select",
                     order = 4,
                     width = "full",
-                    values = C["datasourceoptions"],
+                    values = D.GetDataSourceOptions,
                     name = L["PLAYER_BAR_DATASOURCE_LABEL"],
                     desc = L["PLAYER_BAR_DATASOURCE_DESC"]
                 },
@@ -125,15 +125,7 @@ D.options = {
                     type = "select",
                     order = 5,
                     width = "full",
-                    values = function()
-                        local items = {}
-                        items["SCREENTOP"] = L["POS_SCREENTOP"]
-                        items["SCREENBOTTOM"] = L["POS_SCREENBOTTOM"]
-                        if _G["MainMenuBarOverlayFrame"]:IsVisible() then
-                            items["BLIZZEXPBAR"] = L["POS_BLIZZ_EXPBAR"]
-                        end
-                        return items
-                    end,
+                    values = D.GetMarkMenuPosition,
                     name = L["MARK_POS_LABEL"],
                     desc = L["Mark_POS_DESC"]
                 },

@@ -32,10 +32,12 @@ function module:CreateMark(id, data)
 
     local rcolor = RAID_CLASS_COLORS[data.class]
 
-    local m = CreateFrame("Frame", "XpFlagMark_" .. id:gsub("%W", ""), _G[select(2, unpack(C.markerpositions[C.db.profile.mark.position]))])
+    local position = D.GetMarkPosition(C.db.profile.mark.position, data.dataSource)
+
+    local m = CreateFrame("Frame", "XpFlagMark_" .. id:gsub("%W", ""), _G[select(2, unpack(position))])
     m:SetHeight(C.db.profile.mark.size)
     m:SetWidth(C.db.profile.mark.size)
-    m:SetPoint(unpack(C.markerpositions[C.db.profile.mark.position]))
+    m:SetPoint(unpack(position))
     m:SetFrameStrata("DIALOG")
     m:SetFrameLevel(1)
     m:SetAlpha(1)
@@ -89,7 +91,7 @@ function module:UpdateMark(id, data)
 
     m.data = data
 
-    local newPos = C.markerpositions[C.db.profile.mark.position]
+    local newPos = D.GetMarkPosition(C.db.profile.mark.position, data.dataSource)
     newPos[1] = gsub(newPos[1], "TOP", flip and "BOTTOM" or "TOP")
 
     --@alpha@

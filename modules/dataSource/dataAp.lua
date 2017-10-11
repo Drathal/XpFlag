@@ -61,16 +61,15 @@ function module:ARTIFACT_XP_UPDATE(event, unit)
 end
 
 function module:GetData(mix)
-    local canGetData = HasArtifactEquipped() and not UnitHasVehicleUI("player")
-
-    if not canGetData then
-        return mix
-    end
-
     local d = mix or {}
+    local canGetData = HasArtifactEquipped() and not UnitHasVehicleUI("player")
+    local actifactName, totalPower, traitsLearned, tier
+    local numTraitsLearnable, power, powerForNextTrait
 
-    local _, _, name, _, totalPower, traitsLearned, _, _, _, _, _, _, tier = GetEquippedArtifactInfo()
-    local numTraitsLearnable, power, powerForNextTrait = GetNumArtifactTraitsPurchasableFromXP(traitsLearned, totalPower, tier)
+    if canGetData then
+        _, _, actifactName, _, totalPower, traitsLearned, _, _, _, _, _, _, tier = GetEquippedArtifactInfo()
+        numTraitsLearnable, power, powerForNextTrait = GetNumArtifactTraitsPurchasableFromXP(traitsLearned, totalPower, tier)
+    end
 
     d.dataSource = moduleName
     d.name = d.name or UnitName("PLAYER")
@@ -79,17 +78,17 @@ function module:GetData(mix)
     d.isMax = d.isMax or false
 
     d.level = UnitLevel("PLAYER")
-    d.value = power
-    d.max = powerForNextTrait
+    d.value = power or 0
+    d.max = powerForNextTrait or 0
     d.gain = tonumber(d.value) - tonumber(prevValue or 0) or 0
 
     d.cR = .901
     d.cG = .8
     d.cB = .601
 
-    d.traitsLearned = traitsLearned
-    d.totalPower = totalPower
-    d.actifactName = name
+    d.traitsLearned = traitsLearned or 0
+    d.totalPower = totalPower or 0
+    d.actifactName = actifactName or "none"
 
     prevValue = d.value
 

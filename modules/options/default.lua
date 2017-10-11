@@ -1,22 +1,11 @@
 local D, C, L = _G.unpack(_G.select(2, ...))
 
-C["datasourceoptions"] = {}
-C["datasourceoptions"]["dataXp"] = L["dataXp"]
-C["datasourceoptions"]["dataRep"] = L["dataRep"]
-C["datasourceoptions"]["dataAp"] = L["dataAp"]
+local HasArtifactEquipped = _G.HasArtifactEquipped
+local UnitHasVehicleUI = _G.UnitHasVehicleUI
 
-C["positions"] = {
+C["barpositions"] = {
     ["SCREENTOP"] = {"TOPLEFT", "UIParent", "TOPLEFT", 0, 0},
-    ["SCREENBOTTOM"] = {"BOTTOMLEFT", "UIParent", "BOTTOMLEFT", 0, 0},
-    ["BLIZZEXPBAR"] = {"TOPLEFT", "MainMenuBarOverlayFrame", "TOPLEFT", 0, -8}
-    -- ["BLIZZEXPBAR"] = { "BOTTOMLEFT", _G['MainMenuExpBar'], "BOTTOMLEFT", 0, 2 },
-}
-
-C["markerpositions"] = {
-    ["SCREENTOP"] = {"TOP", "UIParent", "TOPLEFT", 0, 0},
-    ["SCREENBOTTOM"] = {"BOTTOM", "UIParent", "BOTTOMLEFT", 0, 0},
-    ["BLIZZEXPBAR"] = {"TOP", "MainMenuBarOverlayFrame", "TOPLEFT", 0, -8}
-    -- ["BLIZZEXPBAR"] = { "BOTTOMLEFT", _G['MainMenuExpBar'], "BOTTOMLEFT", 0, 2 },
+    ["SCREENBOTTOM"] = {"BOTTOMLEFT", "UIParent", "BOTTOMLEFT", 0, 0}
 }
 
 C["player"] = {
@@ -50,7 +39,7 @@ C["sparkModel"] = {
 C["bar"] = {
     ["position"] = "SCREENTOP",
     ["dataSource"] = "dataXp",
-    ["show"] = true,
+    ["show"] = false,
     ["texture"] = "Interface\\AddOns\\" .. D.addonName .. "\\media\\bar.blp",
     ["backdrop"] = [[Interface\BUTTONS\WHITE8X8]],
     ["edge"] = [[Interface\BUTTONS\WHITE8X8]],
@@ -70,3 +59,59 @@ C["mark"] = {
         ["over"] = "Interface\\AddOns\\" .. D.addonName .. "\\media\\circle-plus.tga"
     }
 }
+
+local function GetMarkMenuPosition()
+    local p = {}
+    p["SCREENTOP"] = L["POS_SCREENTOP"]
+    p["SCREENBOTTOM"] = L["POS_SCREENBOTTOM"]
+
+    if _G["ArtifactWatchBar"]:IsVisible() then
+        p["BLIZZEXPBAR"] = L["POS_BLIZZ_EXPBAR"]
+    end
+
+    if _G["MainMenuExpBar"]:IsVisible() then
+        p["BLIZZEXPBAR"] = L["POS_BLIZZ_EXPBAR"]
+    end
+
+    if _G["ReputationWatchBar"]:IsVisible() then
+        p["BLIZZEXPBAR"] = L["POS_BLIZZ_EXPBAR"]
+    end
+
+    return p
+end
+
+local function GetMarkPosition(pos, dataSource)
+    local p = {}
+    p["SCREENTOP"] = {"TOP", "UIParent", "TOPLEFT", 0, 0}
+    p["SCREENBOTTOM"] = {"BOTTOM", "UIParent", "BOTTOMLEFT", 0, 0}
+
+    if _G["ArtifactWatchBar"]:IsVisible() and dataSource == "dataAp" then
+        p["BLIZZEXPBAR"] = {"TOP", "ArtifactWatchBar", "TOPLEFT", 0, -8}
+    end
+
+    if _G["MainMenuExpBar"]:IsVisible() and dataSource == "dataXp" then
+        p["BLIZZEXPBAR"] = {"TOP", "MainMenuExpBar", "TOPLEFT", 0, -8}
+    end
+
+    if _G["ReputationWatchBar"]:IsVisible() and dataSource == "dataRep" then
+        p["BLIZZEXPBAR"] = {"TOP", "ReputationWatchBar", "TOPLEFT", 0, -8}
+    end
+
+    return p[pos] or p["SCREENTOP"]
+end
+
+local function GetDataSourceOptions()
+    local d = {}
+    d["dataXp"] = L["dataXp"]
+    d["dataRep"] = L["dataRep"]
+
+    if HasArtifactEquipped() and not UnitHasVehicleUI("player") then
+        d["dataAp"] = L["dataAp"]
+    end
+
+    return d
+end
+
+D.GetDataSourceOptions = GetDataSourceOptions
+D.GetMarkPosition = GetMarkPosition
+D.GetMarkMenuPosition = GetMarkMenuPosition
