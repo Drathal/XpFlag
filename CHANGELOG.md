@@ -3,6 +3,8 @@
 ### 1.2.0
 
   * feature: new data source: aritfact power
+  * feature: make mark positions dynamic (for blizzard bars)
+  * chore: refacor positions code
   
 ### 1.1.0
 

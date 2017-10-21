@@ -3,10 +3,11 @@ Its shows Player Data like Experience or Reputation as a little Flag. It can als
 
 ## Features
   * Add a Data Bar to the Top or Bottom of the Screen.
-  * Add a XpFlag that can be attached to screen top/bottom or the Blizzard Expirience Bar.
-  * Track XP of your relam or battlenet friends.
-  * Track Reputation of your relam or battlenet friends.
-  * A little animation whenever you or your friends gets XP or Reputation
+  * Add a XpFlag that can be attached to screen top/bottom or the Blizzard Experience Bar.
+  * Track Experience.
+  * Track Reputation.
+  * Track Artifact Powser.
+  * Share Data with your friends.
 
 ## How i can share my Char Data with XpFlag?
   * Your friend needs also XpFlag (best is same version)
@@ -20,6 +21,6 @@ Its shows Player Data like Experience or Reputation as a little Flag. It can als
   * Option to change XpFlag artwork
   * Option to select Bar and XpFlag Colors 
   * More attach Points for XpFlags
-  * More Data Sources like Artifact Power
+  * More Data Sources
   * ...
      
