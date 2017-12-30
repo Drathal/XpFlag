@@ -24,8 +24,6 @@ local module = D:NewModule(moduleName, "AceEvent-3.0")
 
 local nameRealm = UnitName("player") .. "-" .. GetRealmName()
 local data = nil
-local prevHash = ""
-local prevValue = 0
 
 function module:OnEnable()
     --@alpha@
@@ -111,6 +109,14 @@ end
 function module:GetData(mix)
     local d = mix or {}
 
+    if d.hash then
+        d.prevHash = d.hash
+    end
+
+    if d.value then
+        d.prevValue = d.value
+    end
+        
     d.dataSource = d.dataSource or moduleName
     d.name = d.name or UnitName("PLAYER")
     d.realm = d.realm or GetRealmName()
@@ -120,14 +126,14 @@ function module:GetData(mix)
     d.isMax = MAX_PLAYER_LEVEL_TABLE[GetExpansionLevel()] == UnitLevel("PLAYER")
     d.value = UnitXP("PLAYER")
     d.max = UnitXPMax("PLAYER")
-    d.gain = tonumber(d.value) - tonumber(prevValue or 0) or 0
+    d.gain = tonumber(d.value) - tonumber(d.prevValue or 0) or 0
     d.rested = (GetXPExhaustion() or 0)
 
     d.cR = d.rested > 0 and C.player.colorRested[1] or C.player.color[1]
     d.cG = d.rested > 0 and C.player.colorRested[2] or C.player.color[2]
     d.cB = d.rested > 0 and C.player.colorRested[3] or C.player.color[3]
 
-    prevValue = d.value
+    d.hash = d.level .. d.value .. d.rested    
 
     return d
 end
@@ -142,14 +148,14 @@ end
 function module:Update()
     data = self:GetData(data)
 
-    if prevHash ~= data.level .. data.value .. data.rested then
+    if data.prevHash ~= data.hash then
         --@alpha@
         D.Debug(moduleName, "Update - SendMessage", moduleName .. ":Update", nameRealm, data)
         --@end-alpha@
         D:SendMessage(moduleName .. ":Update", nameRealm, data)
     end
 
-    prevHash = data.level .. data.value .. data.rested
+    data.prevHash = data.hash
 
     if data.isMax then
         self:Disable()
