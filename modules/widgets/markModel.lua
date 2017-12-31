@@ -11,9 +11,11 @@ local module = D:NewModule(moduleName, "AceEvent-3.0")
 function module:Create(parent)
     local m = CreateFrame("PlayerModel", D.addonName .. "-SparkModel", parent)
     m:SetPoint("CENTER")
-    m:SetSize(parent:GetWidth() * C.sparkModel.size, parent:GetWidth() * C.sparkModel.size)
     m:SetModel(C.sparkModel.model)
     m:SetAlpha(1)
+
+    self:Config(m)
+
     return m
 end
 
@@ -44,5 +46,5 @@ end
 
 function module:OnEnable()
     self:RegisterMessage("mark:Update", "FadeInMarkModel")
-    self:RegisterMessage("AnimateXEnd", "FadeOutMarkModel")
+    self:RegisterMessage("mark:AnimateXEnd", "FadeOutMarkModel")
 end

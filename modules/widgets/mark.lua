@@ -19,7 +19,7 @@ local moduleName = "mark"
 local module = D:NewModule(moduleName, "AceEvent-3.0")
 
 function module:OnAnimation(mark)
-    D.AnimateX(mark)
+    D.AnimateX(mark, function() D:SendMessage("mark:AnimateXEnd", mark) end )    
 end
 
 function module:String2Position(posString, dataSource)
@@ -50,67 +50,53 @@ function module:CreateMark(id, data)
     --@end-alpha@
 
     local rcolor = RAID_CLASS_COLORS[data.class]
-
     local position = self:String2Position(C.db.profile.mark.position, data.dataSource)
 
     local m = CreateFrame("Frame", "XpFlagMark_" .. id:gsub("%W", ""), _G[select(2, unpack(position))])
-    m:SetHeight(C.db.profile.mark.size)
-    m:SetWidth(C.db.profile.mark.size)
     m:SetPoint(unpack(position))
     m:SetFrameStrata("DIALOG")
     m:SetFrameLevel(1)
     m:SetAlpha(1)
+    m:SetHeight(C.db.profile.mark.size)
+    m:SetWidth(C.db.profile.mark.size)
     m:EnableMouse()
-    D:GetModule("markTooltip"):SetTooltip(m)
 
     m.texture = m:CreateTexture(nil, "OVERLAY")
     m.texture:SetAllPoints(m)
-    m.texture:SetTexture(C.mark.texture.default)
-    m.texture:SetTexCoord(unpack(match(C.db.profile.mark.position, "TOP") ~= nil and {0, 1, 1, 0} or {0, 1, 0, 1}))
-    m.texture:SetVertexColor(rcolor.r, rcolor.g, rcolor.b, 1)
-    m:Show()
 
     m.data = data
     m.player = id == D.nameRealm
     m.anim = D.CreateUpdateAnimation(m, self.OnAnimation)
     m.model = D:GetModule("markModel"):Create(m)
     m.sparks = D:GetModule("markSpark"):Create(m)
+    m.tooltip = D:GetModule("markTooltip"):Create(m)
 
     marks[id] = m
+
+    self:UpdateMark(id)
 
     --@alpha@
     D.Debug(moduleName, "CreateMark - SendMessage", moduleName .. ":Create", id)
     --@end-alpha@
     D:SendMessage(moduleName .. ":Create", id)
 
-    if not m.player then
-        return m
-    end
-
-    m.texture:SetVertexColor(data.cR, data.cG, data.cB)
-    m:SetFrameLevel(5)
-
-    return m
 end
 
 function module:UpdateMark(id, data)
     --@alpha@
-    D.Debug(moduleName, "UpdateMark", id, data)
-    assert(id, "mark:UpdateMark - id is missing")
-    assert(data, "mark:UpdateMark - data is missing")
+    D.Debug(moduleName, "UpdateMark", id)
+    assert(id, "mark:UpdateMark - id is missing")    
     --@end-alpha@
 
-    if data.isMax then
-        return self:DeleteMark(id)
+    local m = self:GetMark(id)
+
+    if data then
+        m.data = data
     end
 
+    local rcolor = RAID_CLASS_COLORS[m.data.class]
     local flip = match(C.db.profile.mark.position, "TOP") == nil
-    local rcolor = RAID_CLASS_COLORS[data.class]
-    local m = marks[id] or self:CreateMark(id, data)
-
-    m.data = data
-
-    local newPos = self:String2Position(C.db.profile.mark.position, data.dataSource)
+    local newPos = self:String2Position(C.db.profile.mark.position, m.data.dataSource)
     newPos[1] = gsub(newPos[1], "TOP", flip and "BOTTOM" or "TOP")
 
     --@alpha@
@@ -121,10 +107,10 @@ function module:UpdateMark(id, data)
     m:ClearAllPoints()
     m:SetPoint(unpack(newPos))
 
-    m.to = _G[newPos[2]]:GetWidth() * data.value / data.max
+    m.to = _G[newPos[2]]:GetWidth() * m.data.value / m.data.max
     m:SetHeight(C.db.profile.mark.size)
     m:SetWidth(C.db.profile.mark.size)
-    m.texture:SetTexture(D.GetMarkTexture(data.level, UnitLevel("player")))
+    m.texture:SetTexture(D.GetMarkTexture(m.data.level, UnitLevel("player")))
     m.texture:SetVertexColor(rcolor.r, rcolor.g, rcolor.b)
     m.texture:SetTexCoord(unpack(flip and {0, 1, 0, 1} or {0, 1, 1, 0}))
     m:Show()
@@ -134,7 +120,8 @@ function module:UpdateMark(id, data)
     if not m.player then
         return m
     end
-    m.texture:SetVertexColor(data.cR, data.cG, data.cB)
+
+    m.texture:SetVertexColor(m.data.cR, m.data.cG, m.data.cB)
 
     return m
 end
@@ -187,25 +174,21 @@ function module:Config(key, value)
     D.Debug(moduleName, "Config", key, value)
     --@end-alpha@
 
-    if key == "showPlayer" and value then
-        self:UpdateMark(D.nameRealm, D:GetModule(C.db.profile.bar.dataSource):GetData())
+    if key == "showPlayer" and value and not self:GetMark(D.nameRealm) then
+        self:CreateMark(D.nameRealm, D:GetModule(C.db.profile.mark.dataSource):GetData())
+    end
+
+    if key == "showPlayer" and not value and self:GetMark(D.nameRealm) then
+        self:DeleteMark(D.nameRealm)
+    end
+
+    if key == "dataSource" then
+        self:GetMark(D.nameRealm).data = D:GetModule(C.db.profile.mark.dataSource):GetData()        
     end
 
     for mid, mark in pairs(marks) do
-        if mid == D.nameRealm and key == "dataSource" then
-            mark.data = D:GetModule(C.db.profile.mark.dataSource):GetData()
-        end
-
-        if key == "size" then
-            D:GetModule("markModel"):Config(mark.model)
-        end
-
-        if mid == D.nameRealm and not C.db.profile.mark.showPlayer then
-            -- mark.data.isMax = true
-            self:DeleteMark(mid)
-        else
-            self:UpdateMark(mid, mark.data)
-        end
+        D:GetModule("markModel"):Config(mark.model)
+        self:UpdateMark(mid)
     end
 end
 
@@ -224,11 +207,20 @@ function module:Update(msg, id, data, source)
         return
     end
 
+    if data.isMax then
+        return self:DeleteMark(id)
+    end
+
     --@alpha@
     D.Debug(moduleName, "Update", msg, id, data, data.dataSource)
     --@end-alpha@
 
+    if not self:GetMark(id) then
+       self:CreateMark(id, data)        
+    end
+    
     self:UpdateMark(id, data)
+    
 end
 
 function module:HasMark(id)

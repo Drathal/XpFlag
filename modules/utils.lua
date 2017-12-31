@@ -18,6 +18,7 @@ local MAX_PLAYER_LEVEL_TABLE = _G.MAX_PLAYER_LEVEL_TABLE
 local select = _G.select
 local tostring = _G.tostring
 local PARAMETER_COLORS = {"|cff88ff88"}
+
 local function Debug(module, ...)
     if D.debug and not D.debug[module] then
         return
@@ -103,14 +104,16 @@ local function AnimateWidth(f)
     return f.to
 end
 
-local function AnimateX(f)
+local function AnimateX(f, onAnimationEnd)
     local cur = f.cur or 0
     local new = cur + (f.to - cur) / C.mark.animationSpeed
 
     if abs(new - f.to) < 1 then
         new = f.to
         f.to = nil
-        D:SendMessage("AnimateXEnd", f)
+        if onAnimationEnd then
+            onAnimationEnd(f)
+        end
     end
 
     local p1, p, p2, _, yOfs = f:GetPoint()

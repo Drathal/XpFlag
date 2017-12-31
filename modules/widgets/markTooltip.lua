@@ -30,25 +30,25 @@ local function OnUpdate(parent, elapsed)
     parent.tooltip.delay = delay
 end
 
-function module:SetTooltip(parent)
+function module:Create(parent)
     --@alpha@
-    D.Debug(moduleName, "SetTooltip")
+    D.Debug(moduleName, "Create")
     --@end-alpha@
 
-    parent.tooltip = CreateFrame("Frame", nil, parent)
-    parent.tooltip:Hide()
+    local tooltip = CreateFrame("Frame", nil, parent)
+    tooltip:Hide()
 
     parent:SetScript(
         "OnEnter",
         function(self)
-            parent.tooltip:SetScript(
+            tooltip:SetScript(
                 "OnUpdate",
                 function(self, elapsed)
                     OnUpdate(parent, elapsed)
                 end
             )
-            parent.tooltip.delay = 0
-            parent.tooltip:Show()
+            tooltip.delay = 0
+            tooltip:Show()
             GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
             GameTooltip:ClearLines()
             GameTooltip:AddLine(format("%s XP", D.addonName))
@@ -58,9 +58,11 @@ function module:SetTooltip(parent)
     parent:SetScript(
         "OnLeave",
         function(self)
-            parent.tooltip:Hide()
+            tooltip:Hide()
             GameTooltip:Hide()
-            parent.tooltip:SetScript("OnUpdate", nil)
+            tooltip:SetScript("OnUpdate", nil)
         end
     )
+
+    return tooltip
 end
