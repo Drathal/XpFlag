@@ -13,7 +13,6 @@ local UnitXPMax = _G.UnitXPMax
 local UnitLevel = _G.UnitLevel
 local RAID_CLASS_COLORS = _G.RAID_CLASS_COLORS
 
--- local debug = true
 local marks = {}
 
 local moduleName = "mark"
@@ -21,6 +20,26 @@ local module = D:NewModule(moduleName, "AceEvent-3.0")
 
 function module:OnAnimation(mark)
     D.AnimateX(mark)
+end
+
+function module:String2Position(posString, dataSource)
+    local p = {}
+    p["SCREENTOP"] = {"TOP", "UIParent", "TOPLEFT", 0, 0}
+    p["SCREENBOTTOM"] = {"BOTTOM", "UIParent", "BOTTOMLEFT", 0, 0}
+
+    if _G["ArtifactWatchBar"]:IsVisible() and dataSource == "dataAp" then
+        p["BLIZZEXPBAR"] = {"TOP", "ArtifactWatchBar", "TOPLEFT", 0, -8}
+    end
+
+    if _G["MainMenuExpBar"]:IsVisible() and dataSource == "dataXp" then
+        p["BLIZZEXPBAR"] = {"TOP", "MainMenuExpBar", "TOPLEFT", 0, -8}
+    end
+
+    if _G["ReputationWatchBar"]:IsVisible() and dataSource == "dataRep" then
+        p["BLIZZEXPBAR"] = {"TOP", "ReputationWatchBar", "TOPLEFT", 0, -8}
+    end
+
+    return p[posString] or p["SCREENTOP"]
 end
 
 function module:CreateMark(id, data)
@@ -32,7 +51,7 @@ function module:CreateMark(id, data)
 
     local rcolor = RAID_CLASS_COLORS[data.class]
 
-    local position = D.GetMarkPosition(C.db.profile.mark.position, data.dataSource)
+    local position = self:String2Position(C.db.profile.mark.position, data.dataSource)
 
     local m = CreateFrame("Frame", "XpFlagMark_" .. id:gsub("%W", ""), _G[select(2, unpack(position))])
     m:SetHeight(C.db.profile.mark.size)
@@ -81,9 +100,9 @@ function module:UpdateMark(id, data)
     assert(data, "mark:UpdateMark - data is missing")
     --@end-alpha@
 
-    -- if data.isMax then
-    -- return self:DeleteMark(id)
-    -- end
+    if data.isMax then
+        return self:DeleteMark(id)
+    end
 
     local flip = match(C.db.profile.mark.position, "TOP") == nil
     local rcolor = RAID_CLASS_COLORS[data.class]
@@ -91,7 +110,7 @@ function module:UpdateMark(id, data)
 
     m.data = data
 
-    local newPos = D.GetMarkPosition(C.db.profile.mark.position, data.dataSource)
+    local newPos = self:String2Position(C.db.profile.mark.position, data.dataSource)
     newPos[1] = gsub(newPos[1], "TOP", flip and "BOTTOM" or "TOP")
 
     --@alpha@
@@ -120,6 +139,27 @@ function module:UpdateMark(id, data)
     return m
 end
 
+function module:DeleteMark(id)
+    --@alpha@
+    D.Debug(moduleName, "DeleteMark", id)
+    --@end-alpha@
+
+    if not id then
+        return
+    end
+    if not marks[id] then
+        return
+    end
+    marks[id]:Hide()
+    marks[id] = nil
+
+    --@alpha@
+    D.Debug(moduleName, "DeleteMark - SendMessage", moduleName .. ":Delete", id)
+    --@end-alpha@
+
+    D:SendMessage("mark:Delete", id)
+end
+
 function module:OnEnable()
     --@alpha@
     D.Debug(moduleName, "OnEnable")
@@ -140,27 +180,6 @@ function module:OnDisable()
     self:UnregisterMessage("com:Request")
     self:UnregisterMessage("com:Delete")
     self:UnregisterMessage("dataSource:Update")
-end
-
-function module:DeleteMark(id)
-    --@alpha@
-    D.Debug(moduleName, "DeleteMark", id)
-    --@end-alpha@
-
-    if not id then
-        return
-    end
-    if not marks[id] then
-        return
-    end
-    marks[id]:Hide()
-    marks[id] = nil
-
-    --@alpha@
-    D.Debug(moduleName, "DeleteMark - SendMessage", moduleName .. ":Delete", id)
-    --@end-alpha@
-
-    D:SendMessage("mark:Delete", id)
 end
 
 function module:Config(key, value)
@@ -200,6 +219,7 @@ function module:Update(msg, id, data, source)
     if C.db.profile.mark.dataSource .. ":Update" ~= source and id == D.nameRealm then
         return
     end
+
     if not C.db.profile.mark.showPlayer and id == D.nameRealm then
         return
     end
@@ -218,7 +238,7 @@ function module:HasMark(id)
     --@end-alpha@
 
     if not marks[id] then
-        return
+        return false
     end
     return true
 end

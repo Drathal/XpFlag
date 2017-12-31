@@ -25,7 +25,7 @@ C["sparkXP"] = {
     ["fontColor"] = {1, .82, 0, 1},
     ["xSpread"] = {-15, 15},
     ["ySpread"] = {-120, -80},
-    ["durationSpread"] = {1.5, 2}
+    ["durationSpread"] = {2, 3}
 }
 
 C["sparkModel"] = {
@@ -80,26 +80,6 @@ local function GetMarkMenuPosition()
     return p
 end
 
-local function GetMarkPosition(pos, dataSource)
-    local p = {}
-    p["SCREENTOP"] = {"TOP", "UIParent", "TOPLEFT", 0, 0}
-    p["SCREENBOTTOM"] = {"BOTTOM", "UIParent", "BOTTOMLEFT", 0, 0}
-
-    if _G["ArtifactWatchBar"]:IsVisible() and dataSource == "dataAp" then
-        p["BLIZZEXPBAR"] = {"TOP", "ArtifactWatchBar", "TOPLEFT", 0, -8}
-    end
-
-    if _G["MainMenuExpBar"]:IsVisible() and dataSource == "dataXp" then
-        p["BLIZZEXPBAR"] = {"TOP", "MainMenuExpBar", "TOPLEFT", 0, -8}
-    end
-
-    if _G["ReputationWatchBar"]:IsVisible() and dataSource == "dataRep" then
-        p["BLIZZEXPBAR"] = {"TOP", "ReputationWatchBar", "TOPLEFT", 0, -8}
-    end
-
-    return p[pos] or p["SCREENTOP"]
-end
-
 local function GetDataSourceOptions()
     local d = {}
     d["dataXp"] = L["dataXp"]
@@ -113,5 +93,4 @@ local function GetDataSourceOptions()
 end
 
 D.GetDataSourceOptions = GetDataSourceOptions
-D.GetMarkPosition = GetMarkPosition
 D.GetMarkMenuPosition = GetMarkMenuPosition
