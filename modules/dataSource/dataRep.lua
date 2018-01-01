@@ -23,6 +23,7 @@ local nameRealm = UnitName("player") .. "-" .. GetRealmName()
 local data = nil
 local prevHash = ""
 local prevValue = 0
+local setByAddon = false
 
 function module:OnEnable()
     --@alpha@
@@ -35,7 +36,13 @@ function module:OnEnable()
             --@alpha@
             D.Debug(moduleName, "SetWatchedFactionIndex", factionIndex)
             --@end-alpha@
-            self:Update()
+
+
+            if not setByAddon then
+                self:Update()
+            else
+                setByAddon = false
+            end
         end
     )
     self:RegisterEvent("PLAYER_ENTERING_WORLD")
@@ -74,6 +81,8 @@ function module:getSomeFactionID()
     for index = 1, GetNumFactions() do
         local name, _, standingID, min, max, cur, _, _, isHeader, _, _, _, _, factionID = GetFactionInfo(index)
         if not isHeader and cur > 3300 then
+            setByAddon = true
+            SetWatchedFactionIndex(index)
             return factionID
         end
     end
@@ -87,7 +96,7 @@ function module:GetData(mix)
 
     if not name then
         local _
-        name, _, standingID, min, max, cur, _, _, _, _, _, _, _, factionID = GetFactionInfoByID(self:getSomeFactionID())
+        name, _, standingID, min, max, cur, _, _, _, _, _, _, _, factionID = GetFactionInfoByID(self:getSomeFactionID())        
     end
 
     d.dataSource = moduleName

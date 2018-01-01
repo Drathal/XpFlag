@@ -51,7 +51,10 @@ function module:OnDisable()
 end
 
 function module:CHAT_MSG_SYSTEM(event, msg)
-    if msg ~= ERR_EXHAUSTION_RESTED and msg ~= ERR_EXHAUSTION_WELLRESTED and msg ~= ERR_EXHAUSTION_NORMAL and msg ~= ERR_EXHAUSTION_TIRED then
+    if msg ~= ERR_EXHAUSTION_RESTED and 
+       msg ~= ERR_EXHAUSTION_WELLRESTED and 
+       msg ~= ERR_EXHAUSTION_NORMAL and 
+       msg ~= ERR_EXHAUSTION_TIRED then
         return
     end
 

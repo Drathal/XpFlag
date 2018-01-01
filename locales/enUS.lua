@@ -50,3 +50,9 @@ L["dataXP"] = "Experience" -- fallback for old version
 L["dataAp"] = "Artifact Power"
 L["dataXp"] = "Experience"
 L["dataRep"] = "Reputation"
+
+--[[
+BONUS_OBJECTIVE_EXPERIENCE_FORMAT = "%s XP";
+XP_GAIN = "+%s XP";
+COMBAT_XP_GAIN = "Experience";
+]]--
