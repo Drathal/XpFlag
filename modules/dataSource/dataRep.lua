@@ -6,11 +6,12 @@ local UnitName = _G.UnitName
 local UnitClass = _G.UnitClass
 local GetRealmName = _G.GetRealmName
 local GetNumFactions = _G.GetNumFactions
-local GetWatchedFactionInfo = _G.GetWatchedFactionInfo
 local GetFactionInfo = _G.GetFactionInfo
+local IsFactionParagon = _G.IsFactionParagon
 local GetFactionInfoByID = _G.GetFactionInfoByID
 local FACTION_BAR_COLORS = _G.FACTION_BAR_COLORS
 local COLORS = _G.RAID_CLASS_COLORS
+local MAX_REPUTATION_REACTION = _G.MAX_REPUTATION_REACTION
 local hooksecurefunc = _G.hooksecurefunc
 local tonumber = _G.tonumber
 local select = _G.select
@@ -24,6 +25,9 @@ local data = nil
 local prevHash = ""
 local prevValue = 0
 local setByAddon = false
+
+_G["FACTION_STANDING_LABEL" .. (MAX_REPUTATION_REACTION + 1)] = "Paragon"
+--COLORS[MAX_REPUTATION_REACTION + 1] = {0, 0.5, 0.9} -- paragon color
 
 function module:OnEnable()
     --@alpha@
@@ -92,11 +96,18 @@ end
 function module:GetData(mix)
     local d = mix or {}
 
-    local name, standingID, min, max, cur, factionID = GetWatchedFactionInfo()
+    local faction, standingID, min, max, cur, factionID = GetWatchedFactionInfo()
 
-    if not name then
+    if not faction then
         local _
-        name, _, standingID, min, max, cur, _, _, _, _, _, _, _, factionID = GetFactionInfoByID(self:getSomeFactionID())        
+        faction, _, standingID, min, max, cur, _, _, _, _, _, _, _, factionID = GetFactionInfoByID(self:getSomeFactionID())        
+    end
+
+    if standingID == 8 and C_Reputation.IsFactionParagon(factionID) then
+        cur, _, _, _ = C_Reputation.GetFactionParagonInfo(factionID) 
+        min = 10000
+        max = 20000
+        standingID = 9
     end
 
     d.dataSource = moduleName
@@ -116,7 +127,7 @@ function module:GetData(mix)
     d.cB = FACTION_BAR_COLORS[5].b
 
     d.factionID = factionID
-    d.faction = name
+    d.faction = faction
     d.standingID = standingID
 
     prevValue = d.value
