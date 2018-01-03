@@ -16,17 +16,16 @@ local hooksecurefunc = _G.hooksecurefunc
 local tonumber = _G.tonumber
 local select = _G.select
 local format = _G.string.format
+local CopyTable = _G.CopyTable
 
 local moduleName = "dataRep"
 local module = D:NewModule(moduleName, "AceEvent-3.0")
 
 local nameRealm = UnitName("player") .. "-" .. GetRealmName()
 local data = nil
-local prevHash = ""
-local prevValue = 0
 local setByAddon = false
 
-_G["FACTION_STANDING_LABEL" .. (MAX_REPUTATION_REACTION + 1)] = "Paragon"
+_G["FACTION_STANDING_LABEL" .. (MAX_REPUTATION_REACTION + 1)] = L["Paragon"]
 --COLORS[MAX_REPUTATION_REACTION + 1] = {0, 0.5, 0.9} -- paragon color
 
 function module:OnEnable()
@@ -96,6 +95,16 @@ end
 function module:GetData(mix)
     local d = mix or {}
 
+    if d.hash then        
+        d.prevHash = d.hash
+    end
+
+    d.prevValue = d.prevValue or {}
+
+    if d.value and d.hashKey then    
+        d.prevValue[d.hashKey] = d.value
+    end
+
     local faction, standingID, min, max, cur, factionID = GetWatchedFactionInfo()
 
     if not faction then
@@ -120,7 +129,15 @@ function module:GetData(mix)
     d.min = min
     d.value = cur - min
     d.max = max - min
-    d.gain = tonumber(d.value) - tonumber(prevValue or 0) or 0
+
+    d.hashKey = faction .. standingID  
+    d.hash = faction .. d.value .. standingID  
+
+    d.gain = tonumber(d.value) - tonumber(d.prevValue[d.hashKey] or 0) or 0
+
+    if d.gain < 1 then
+        d.gain = 0
+    end
 
     d.cR = FACTION_BAR_COLORS[5].r
     d.cG = FACTION_BAR_COLORS[5].g
@@ -129,8 +146,6 @@ function module:GetData(mix)
     d.factionID = factionID
     d.faction = faction
     d.standingID = standingID
-
-    prevValue = d.value
 
     return d
 end
@@ -145,14 +160,14 @@ end
 function module:Update()
     data = self:GetData(data)
 
-    if prevHash ~= data.factionID .. data.value then
+    if data.prevHash ~= data.hash then
         --@alpha@
         D.Debug(moduleName, "Update - SendMessage", moduleName .. ":Update", nameRealm)
         --@end-alpha@
         D:SendMessage(moduleName .. ":Update", nameRealm, data)
     end
 
-    prevHash = data.factionID .. data.value
+    data.prevHash = data.hash
 
     if data.isMax then
         self:Disable()

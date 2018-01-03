@@ -113,7 +113,7 @@ function module:GetData(mix)
     local d = mix or {}
 
     if d.hash then
-        d.prevHash = d.hash
+        d.prev = d
     end
 
     if d.value then
@@ -153,7 +153,7 @@ function module:Update()
 
     if data.prevHash ~= data.hash then
         --@alpha@
-        D.Debug(moduleName, "Update - SendMessage", moduleName .. ":Update", nameRealm, data)
+        D.Debug(moduleName, "Update - SendMessage", moduleName .. ":Update", nameRealm)
         --@end-alpha@
         D:SendMessage(moduleName .. ":Update", nameRealm, data)
     end

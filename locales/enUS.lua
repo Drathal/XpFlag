@@ -51,6 +51,8 @@ L["dataAp"] = "Artifact Power"
 L["dataXp"] = "Experience"
 L["dataRep"] = "Reputation"
 
+L["Paragon"] = "Paragon"
+
 --[[
 BONUS_OBJECTIVE_EXPERIENCE_FORMAT = "%s XP";
 XP_GAIN = "+%s XP";
