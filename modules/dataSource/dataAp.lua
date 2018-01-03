@@ -5,10 +5,10 @@ local UnitLevel = _G.UnitLevel
 local UnitName = _G.UnitName
 local UnitClass = _G.UnitClass
 local GetRealmName = _G.GetRealmName
-local HasArtifactEquipped = _G.HasArtifactEquipped
+local HasArtifactEquipped = HasArtifactEquipped
 local UnitHasVehicleUI = _G.UnitHasVehicleUI
-local GetEquippedArtifactInfo = _G.C_ArtifactUI.GetEquippedArtifactInfo
-local GetNumArtifactTraitsPurchasableFromXP = _G.MainMenuBar_GetNumArtifactTraitsPurchasableFromXP
+local GetEquippedArtifactInfo = C_ArtifactUI.GetEquippedArtifactInfo
+local GetNumArtifactTraitsPurchasableFromXP = MainMenuBar_GetNumArtifactTraitsPurchasableFromXP
 local COLORS = _G.RAID_CLASS_COLORS
 local hooksecurefunc = _G.hooksecurefunc
 local tonumber = _G.tonumber
@@ -20,16 +20,13 @@ local module = D:NewModule(moduleName, "AceEvent-3.0")
 
 local nameRealm = UnitName("player") .. "-" .. GetRealmName()
 local data = nil
-local prevHash = ""
-local prevValue = 0
 
 function module:OnEnable()
     --@alpha@
     D.Debug(moduleName, "OnEnable")
     --@end-alpha@
 
-    self:RegisterEvent("PLAYER_ENTERING_WORLD")
-    self:RegisterEvent("ARTIFACT_XP_UPDATE")
+    self:RegisterEvent("ARTIFACT_UPDATE", "Update")    
 end
 
 function module:OnDisable()
@@ -37,39 +34,35 @@ function module:OnDisable()
     D.Debug(moduleName, "OnDisable")
     --@end-alpha@
 
-    self:UnregisterEvent("ARTIFACT_XP_UPDATE")
-end
-
-function module:PLAYER_ENTERING_WORLD()
-    --@alpha@
-    D.Debug(moduleName, "PLAYER_ENTERING_WORLD")
-    --@end-alpha@
-
-    self:Update()
-    self:UnregisterEvent("PLAYER_ENTERING_WORLD")
-end
-
-function module:ARTIFACT_XP_UPDATE(event, unit)
-    if unit ~= "player" then
-        return
-    end
-    --@alpha@
-    D.Debug(moduleName, "ARTIFACT_XP_UPDATE", event, unit)
-    --@end-alpha@
-
-    self:Update()
+    self:UnregisterEvent("ARTIFACT_UPDATE")
 end
 
 function module:GetData(mix)
     local d = mix or {}
+
+    if d.hash then        
+        d.prevHash = d.hash
+    end
+
+    d.prevValue = d.prevValue or {}
+
+    if d.value and d.hashKey then    
+        d.prevValue[d.hashKey] = d.value
+    end
+
     local canGetData = HasArtifactEquipped() and not UnitHasVehicleUI("player")
-    local actifactName, totalPower, traitsLearned, tier
-    local numTraitsLearnable, power, powerForNextTrait
+    local actifactName, totalPower, traitsLearned, tier, numTraitsLearnable, power, powerForNextTrait
 
     if canGetData then
         _, _, actifactName, _, totalPower, traitsLearned, _, _, _, _, _, _, tier = GetEquippedArtifactInfo()
         numTraitsLearnable, power, powerForNextTrait = GetNumArtifactTraitsPurchasableFromXP(traitsLearned, totalPower, tier)
     end
+
+    if powerForNextTrait <= 0 then
+        powerForNextTrait = power
+    end
+
+    actifactName = actifactName or "none"
 
     d.dataSource = moduleName
     d.name = d.name or UnitName("PLAYER")
@@ -80,7 +73,15 @@ function module:GetData(mix)
     d.level = UnitLevel("PLAYER")
     d.value = power or 0
     d.max = powerForNextTrait or 0
-    d.gain = tonumber(d.value) - tonumber(prevValue or 0) or 0
+
+    d.hashKey = actifactName  
+    d.hash = actifactName .. d.value  
+
+    d.gain = tonumber(d.value) - tonumber(d.prevValue[d.hashKey] or 0) or 0
+
+    if d.gain < 1 then
+        d.gain = 0
+    end
 
     d.cR = .901
     d.cG = .8
@@ -89,8 +90,6 @@ function module:GetData(mix)
     d.traitsLearned = traitsLearned or 0
     d.totalPower = totalPower or 0
     d.actifactName = actifactName or "none"
-
-    prevValue = d.value
 
     return d
 end
@@ -102,17 +101,17 @@ function module:AddTooltip(tooltip, d)
     tooltip:AddLine(format(L["AP_MARK_TT_4"], D.FormatNumber(d.value), D.FormatNumber(d.max), d.value / d.max * 100), 1, 1, 1, 1)
 end
 
-function module:Update()
+function module:Update(event, unit)
     data = self:GetData(data)
 
-    if prevHash ~= data.name .. data.value then
+    if data.prevHash ~= data.hash then
         --@alpha@
         D.Debug(moduleName, "Update - SendMessage", moduleName .. ":Update", nameRealm)
         --@end-alpha@
         D:SendMessage(moduleName .. ":Update", nameRealm, data)
     end
 
-    prevHash = data.name .. data.value
+    data.prevHash = data.hash
 
     if data.isMax then
         self:Disable()

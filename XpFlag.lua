@@ -42,10 +42,11 @@ AddOn.debug = {
     --dataSource = true,
     --dataXp = true,
     --dataRep = true,
+    --dataAp = true,
     --com = true,
     --bar = true,
     --friends = true
     --utils = true
-    debug = true
+    --debug = true
 }
 --@end-alpha@

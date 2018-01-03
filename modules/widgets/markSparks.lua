@@ -141,7 +141,7 @@ function module:PlayXpSpark(msg, name, f)
     if not f.data.gain or f.data.gain == 0 then
         return
     end
-    f.sparks.Play(f.data.gain)
+    f.sparks.Play(D.FormatNumber(f.data.gain, 2))
 end
 
 function module:Create(parent)

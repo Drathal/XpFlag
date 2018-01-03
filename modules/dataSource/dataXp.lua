@@ -30,12 +30,12 @@ function module:OnEnable()
     D.Debug(moduleName, "OnEnable")
     --@end-alpha@
 
-    self:RegisterEvent("PLAYER_ENTERING_WORLD")
-    self:RegisterEvent("PLAYER_UPDATE_RESTING")
-    self:RegisterEvent("ZONE_CHANGED_NEW_AREA")
-    self:RegisterEvent("PLAYER_XP_UPDATE")
-    self:RegisterEvent("PLAYER_LEVEL_UP")
-    self:RegisterEvent("CHAT_MSG_SYSTEM")
+    self:RegisterEvent("PLAYER_ENTERING_WORLD", "Update")
+    self:RegisterEvent("PLAYER_UPDATE_RESTING", "Update")
+    self:RegisterEvent("ZONE_CHANGED_NEW_AREA", "Update")
+    self:RegisterEvent("PLAYER_XP_UPDATE", "Update")
+    self:RegisterEvent("PLAYER_LEVEL_UP", "Update")
+    self:RegisterEvent("CHAT_MSG_SYSTEM", "Update")
 end
 
 function module:OnDisable()
@@ -50,70 +50,11 @@ function module:OnDisable()
     self:UnregisterEvent("CHAT_MSG_SYSTEM")
 end
 
-function module:CHAT_MSG_SYSTEM(event, msg)
-    if msg ~= ERR_EXHAUSTION_RESTED and 
-       msg ~= ERR_EXHAUSTION_WELLRESTED and 
-       msg ~= ERR_EXHAUSTION_NORMAL and 
-       msg ~= ERR_EXHAUSTION_TIRED then
-        return
-    end
-
-    --@alpha@
-    D.Debug(moduleName, "CHAT_MSG_SYSTEM", msg)
-    --@end-alpha@
-
-    self:Update()
-end
-
-function module:PLAYER_ENTERING_WORLD()
-    --@alpha@
-    D.Debug(moduleName, "PLAYER_ENTERING_WORLD")
-    --@end-alpha@
-
-    self:Update()
-    self:UnregisterEvent("PLAYER_ENTERING_WORLD")
-end
-
-function module:ZONE_CHANGED_NEW_AREA()
-    --@alpha@
-    D.Debug(moduleName, "ZONE_CHANGED_NEW_AREA")
-    --@end-alpha@
-
-    self:Update()
-end
-
-function module:PLAYER_UPDATE_RESTING()
-    --@alpha@
-    D.Debug(moduleName, "PLAYER_UPDATE_RESTING")
-    --@end-alpha@
-
-    self:Update()
-end
-
-function module:PLAYER_LEVEL_UP()
-    --@alpha@
-    D.Debug(moduleName, "PLAYER_LEVEL_UP")
-    --@end-alpha@
-
-    self:Update()
-end
-
-function module:PLAYER_XP_UPDATE(event, unit)
-    if unit ~= "player" then
-        return
-    end
-    --@alpha@
-    D.Debug(moduleName, "PLAYER_XP_UPDATE")
-    --@end-alpha@
-
-    self:Update()
-end
-
 function module:GetData(mix)
     local d = mix or {}
 
     if d.hash then
-        d.prev = d
+        d.prev = d.hash
     end
 
     if d.value then
@@ -136,6 +77,7 @@ function module:GetData(mix)
     d.cG = d.rested > 0 and C.player.colorRested[2] or C.player.color[2]
     d.cB = d.rested > 0 and C.player.colorRested[3] or C.player.color[3]
 
+    d.hashKey = d.dataSource
     d.hash = d.level .. d.value .. d.rested    
 
     return d
@@ -148,7 +90,12 @@ function module:AddTooltip(tooltip, d)
     tooltip:AddLine(format(L["XP_MARK_TT_4"], D.FormatNumber(d.rested), d.rested / d.max * 100), 1, 1, 1, 1)
 end
 
-function module:Update()
+function module:Update(event, unit)
+
+    if event == "PLAYER_ENTERING_WORLD" then
+        self:UnregisterEvent("PLAYER_ENTERING_WORLD")
+    end
+
     data = self:GetData(data)
 
     if data.prevHash ~= data.hash then

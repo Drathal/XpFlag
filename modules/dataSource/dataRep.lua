@@ -48,8 +48,8 @@ function module:OnEnable()
             end
         end
     )
-    self:RegisterEvent("PLAYER_ENTERING_WORLD")
-    self:RegisterEvent("UPDATE_FACTION")
+    self:RegisterEvent("PLAYER_ENTERING_WORLD", "Update")
+    self:RegisterEvent("UPDATE_FACTION", "Update")
 end
 
 function module:OnDisable()
@@ -58,26 +58,6 @@ function module:OnDisable()
     --@end-alpha@
 
     self:UnregisterEvent("UPDATE_FACTION")
-end
-
-function module:PLAYER_ENTERING_WORLD()
-    --@alpha@
-    D.Debug(moduleName, "PLAYER_ENTERING_WORLD")
-    --@end-alpha@
-
-    self:Update()
-    self:UnregisterEvent("PLAYER_ENTERING_WORLD")
-end
-
-function module:UPDATE_FACTION(event, unit)
-    if unit ~= "player" then
-        return
-    end
-    --@alpha@
-    D.Debug(moduleName, "UPDATE_FACTION", event, unit)
-    --@end-alpha@
-
-    self:Update()
 end
 
 function module:getSomeFactionID()
@@ -157,7 +137,12 @@ function module:AddTooltip(tooltip, d)
     tooltip:AddLine(format(L["REP_MARK_TT_4"], D.FormatNumber(d.value), D.FormatNumber(d.max), d.value / d.max * 100), 1, 1, 1, 1)
 end
 
-function module:Update()
+function module:Update(event, unit)
+
+    if event == "PLAYER_ENTERING_WORLD" then
+        self:UnregisterEvent("PLAYER_ENTERING_WORLD")
+    end
+
     data = self:GetData(data)
 
     if data.prevHash ~= data.hash then
