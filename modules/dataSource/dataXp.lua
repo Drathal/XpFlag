@@ -22,15 +22,22 @@ local format = _G.string.format
 local moduleName = "dataXp"
 local module = D:NewModule(moduleName, "AceEvent-3.0")
 
-local nameRealm = UnitName("player") .. "-" .. GetRealmName() 
+local nameRealm = UnitName("player") .. "-" .. GetRealmName()
 local data = nil
+
+function module:getConfig(key)
+    return C.db.profile.dataSource[moduleName][key]
+end
 
 function module:shouldActivate()
     return not (MAX_PLAYER_LEVEL_TABLE[GetExpansionLevel()] == UnitLevel("PLAYER"))
+           and (self:getConfig("enabled") and (self:getConfig("sendData") or self:getConfig("markShowOwn")))
 end
 
 function module:OnEnable()
     if not self:shouldActivate() then return self:Disable() end
+
+    D.Debug(moduleName, "enabled")
 
     self:RegisterEvent("PLAYER_ENTERING_WORLD", "Update")
     self:RegisterEvent("PLAYER_UPDATE_RESTING", "Update")
@@ -40,7 +47,12 @@ function module:OnEnable()
     self:RegisterEvent("CHAT_MSG_SYSTEM", "Update")
 end
 
-function module:OnDisable()
+function module:OnDisable(d)
+    D.Debug(moduleName, "disabled")
+
+    D:SendMessage(moduleName .. ":Update", nameRealm, d)
+
+    self:UnregisterEvent("PLAYER_ENTERING_WORLD")
     self:UnregisterEvent("PLAYER_UPDATE_RESTING")
     self:UnregisterEvent("ZONE_CHANGED_NEW_AREA")
     self:UnregisterEvent("PLAYER_XP_UPDATE")
@@ -58,14 +70,14 @@ function module:GetData(mix)
     if d.value then
         d.prevValue = d.value
     end
-        
+
     d.dataSource = d.dataSource or moduleName
     d.name = d.name or UnitName("PLAYER")
     d.realm = d.realm or GetRealmName()
     d.class = d.class or select(2, UnitClass("PLAYER"))
 
     d.level = UnitLevel("PLAYER")
-    d.isMax = MAX_PLAYER_LEVEL_TABLE[GetExpansionLevel()] == UnitLevel("PLAYER")
+    d.isMax = not self:shouldActivate()
     d.value = UnitXP("PLAYER")
     d.max = UnitXPMax("PLAYER")
     d.gain = tonumber(d.value) - tonumber(d.prevValue or 0) or 0
@@ -76,7 +88,7 @@ function module:GetData(mix)
     d.cB = d.rested > 0 and C.player.colorRested[3] or C.player.color[3]
 
     d.hashKey = d.dataSource
-    d.hash = d.level .. d.value .. d.rested    
+    d.hash = d.level .. d.value .. d.rested
 
     return d
 end
@@ -89,7 +101,6 @@ function module:AddTooltip(tooltip, d)
 end
 
 function module:Update(event, unit)
-
     if event == "PLAYER_ENTERING_WORLD" then
         self:UnregisterEvent("PLAYER_ENTERING_WORLD")
     end
@@ -103,6 +114,6 @@ function module:Update(event, unit)
     data.prevHash = data.hash
 
     if data.isMax then
-        self:Disable()
+        self:Disable(data)
     end
 end

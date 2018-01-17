@@ -2,6 +2,8 @@ local D, C, L = _G.unpack(_G.select(2, ...))
 
 local _G = _G
 local CopyTable = _G.CopyTable
+local pairs = _G.pairs
+local upper = _G.string.upper
 local LibStub = _G.LibStub
 local i18n = L.i18n
 local HasArtifactEquipped = _G.HasArtifactEquipped
@@ -42,7 +44,6 @@ end
 local function Get(section)
     return function(info)
         local key = info[#info]
-        -- print("GET",section, key)
         return C.db.profile["dataSource"][section][key]
     end
 end
@@ -51,15 +52,14 @@ local function Set(section)
     return function(info, value)
         local key = info[#info]
         C.db.profile["dataSource"][section][key] = value
-
-        print("SET",section, key, value)
         D:GetModule("mark"):Config(key, value)
+        D:GetModule(section):Config(key, value)
     end
 end
 
 local function generateTypeSection(type)
 
-    typeUpper = string.upper(type)
+    local typeUpper = upper(type)
 
     order = order + 1
 
@@ -87,21 +87,21 @@ local function generateTypeSection(type)
                 order = 30,
                 width = "full",
                 name = i18n("SECTION_"..typeUpper.."_SEND"),
-                desc = i18n("SECTION_"..typeUpper.."_SEND_DESCRIPTION") 
-            },              
+                desc = i18n("SECTION_"..typeUpper.."_SEND_DESCRIPTION")
+            },
             markShowOwn = {
                 type = "toggle",
                 order = 40,
                 width = "full",
                 name = i18n("SECTION_"..typeUpper.."_SHOWOWN"),
-                desc = i18n("SECTION_"..typeUpper.."_SHOWOWN_DESCRIPTION") 
+                desc = i18n("SECTION_"..typeUpper.."_SHOWOWN_DESCRIPTION")
             },
             markShowOther = {
                 type = "toggle",
                 order = 50,
                 width = "full",
                 name = i18n("SECTION_MARK_"..typeUpper.."_SHOWOTHER"),
-                desc = i18n("SECTION_MARK_"..typeUpper.."_SHOWOTHER_DESCRIPTION") 
+                desc = i18n("SECTION_MARK_"..typeUpper.."_SHOWOTHER_DESCRIPTION")
             },
             markPosition = {
                 type = "select",
@@ -126,8 +126,8 @@ local function generateTypeSection(type)
                 order = 80,
                 width = "full",
                 name = i18n("SECTION_BAR_"..typeUpper.."_SHOWOWN"),
-                desc = i18n("SECTION_BAR_"..typeUpper.."_SHOWOWN_DESCRIPTION") 
-            },        
+                desc = i18n("SECTION_BAR_"..typeUpper.."_SHOWOWN_DESCRIPTION")
+            },
             barPosition = {
                 type = "select",
                 order = 90,
@@ -145,7 +145,7 @@ local function generateTypeSection(type)
                 step = 1,
                 name = i18n("BAR_SIZE_LABEL"),
                 desc = i18n("BAR_SIZE_DESC")
-            }                           
+            }
         }
     }
 end

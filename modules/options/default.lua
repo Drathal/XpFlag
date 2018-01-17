@@ -60,34 +60,34 @@ C["mark"] = {
 C["dataSource"] = {
     ["dataXp"] = {
         ["enabled"] = true,
-        ["sendData"] = true,    
+        ["sendData"] = true,
         ["markShowOwn"] = true,
         ["markShowOther"] = true,
         ["markPosition"] = "SCREENTOP",
-        ["markSize"] = 15,    
-        ["barShowOwn"] = true,            
+        ["markSize"] = 15,
+        ["barShowOwn"] = true,
         ["barPosition"] = "SCREENTOP",
         ["barSize"] = 2,
     },
     ["dataRep"] = {
         ["enabled"] = true,
-        ["sendData"] = true,    
+        ["sendData"] = true,
         ["markShowOwn"] = true,
         ["markShowOther"] = true,
         ["markPosition"] = "SCREENTOP",
-        ["markSize"] = 15,    
-        ["barShowOwn"] = true,            
+        ["markSize"] = 15,
+        ["barShowOwn"] = true,
         ["barPosition"] = "SCREENTOP",
         ["barSize"] = 2,
     },
     ["dataAp"] = {
         ["enabled"] = true,
-        ["sendData"] = true,    
+        ["sendData"] = true,
         ["markShowOwn"] = true,
         ["markShowOther"] = true,
         ["markPosition"] = "SCREENTOP",
-        ["markSize"] = 15,    
-        ["barShowOwn"] = true,            
+        ["markSize"] = 15,
+        ["barShowOwn"] = true,
         ["barPosition"] = "SCREENTOP",
         ["barSize"] = 2,
     },
@@ -106,7 +106,7 @@ C["positions"] = {
     },
     ["BLIZZEXPBAR"] = {
         ["name"] = function() return L["POS_BLIZZ_EXPBAR"] end,
-        ["enabled"] = function() 
+        ["enabled"] = function()
             return _G["ArtifactWatchBar"]:IsVisible() or _G["MainMenuExpBar"]:IsVisible() or _G["ReputationWatchBar"]:IsVisible()
         end,
         ["pos"] = function(dataSource)
@@ -124,5 +124,5 @@ C["positions"] = {
 
             return {"TOP", "UIParent", "TOPLEFT", 0, 0}
         end
-    },    
+    },
  }

@@ -21,30 +21,43 @@ local module = D:NewModule(moduleName, "AceEvent-3.0")
 local nameRealm = UnitName("player") .. "-" .. GetRealmName()
 local data = nil
 
+function module:getConfig(key)
+    return C.db.profile.dataSource[moduleName][key]
+end
+
 function module:shouldActivate()
-    return UnitLevel("PLAYER") >= 100 and UnitLevel("PLAYER") <= 110
+    return (UnitLevel("PLAYER") >= 100 and UnitLevel("PLAYER") <= 110)
+           and (self:getConfig("enabled") and (self:getConfig("sendData") or self:getConfig("markShowOwn")))
 end
 
 function module:OnEnable()
-    -- if not self:shouldActivate() then return self:Disable() end
+    if not self:shouldActivate() then return self:Disable() end
 
-    self:RegisterEvent("ARTIFACT_UPDATE", "Update")    
+    D.Debug(moduleName, "enabled")
+
+    self:RegisterEvent("PLAYER_ENTERING_WORLD", "Update")
+    self:RegisterEvent("ARTIFACT_UPDATE", "Update")
 end
 
-function module:OnDisable()
+function module:OnDisable(d)
+    D.Debug(moduleName, "disabled")
+
+    D:SendMessage(moduleName .. ":Update", nameRealm, d)
+
+    self:UnregisterEvent("PLAYER_ENTERING_WORLD")
     self:UnregisterEvent("ARTIFACT_UPDATE")
 end
 
 function module:GetData(mix)
     local d = mix or {}
 
-    if d.hash then        
+    if d.hash then
         d.prevHash = d.hash
     end
 
     d.prevValue = d.prevValue or {}
 
-    if d.value and d.hashKey then    
+    if d.value and d.hashKey then
         d.prevValue[d.hashKey] = d.value
     end
 
@@ -66,14 +79,14 @@ function module:GetData(mix)
     d.name = d.name or UnitName("PLAYER")
     d.realm = d.realm or GetRealmName()
     d.class = d.class or select(2, UnitClass("PLAYER"))
-    d.isMax = d.isMax or false
 
+    d.isMax = not self:shouldActivate()
     d.level = UnitLevel("PLAYER")
     d.value = power or 0
     d.max = powerForNextTrait or 0
 
-    d.hashKey = actifactName  
-    d.hash = actifactName .. d.value  
+    d.hashKey = actifactName
+    d.hash = actifactName .. d.value
 
     d.gain = tonumber(d.value) - tonumber(d.prevValue[d.hashKey] or 0) or 0
 
@@ -100,8 +113,9 @@ function module:AddTooltip(tooltip, d)
 end
 
 function module:Update(event, unit)
-
-    --D.Debug(moduleName, "Update")
+    if event == "PLAYER_ENTERING_WORLD" then
+        self:UnregisterEvent("PLAYER_ENTERING_WORLD")
+    end
 
     data = self:GetData(data)
 
@@ -112,6 +126,6 @@ function module:Update(event, unit)
     data.prevHash = data.hash
 
     if data.isMax then
-        self:Disable()
+        self:Disable(data)
     end
 end

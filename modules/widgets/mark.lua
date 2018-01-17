@@ -18,10 +18,11 @@ local marks = {}
 local moduleName = "mark"
 local module = D:NewModule(moduleName, "AceEvent-3.0")
 
-function module:OnEnable()    
+function module:OnEnable()
     self:RegisterMessage("com:Data", "Update")
     self:RegisterMessage("com:Request", "Update")
     self:RegisterMessage("com:Delete", "DeleteMark")
+    self:RegisterMessage("dataSource:Disable", "DeleteMark")
     self:RegisterMessage("dataSource:Update", "Update")
 end
 
@@ -29,19 +30,20 @@ function module:OnDisable()
     self:UnregisterMessage("com:Data")
     self:UnregisterMessage("com:Request")
     self:UnregisterMessage("com:Delete")
+    self:UnregisterMessage("dataSource:Disable")
     self:UnregisterMessage("dataSource:Update")
 end
 
 function module:getConfig(data, key)
-    D.Debug(moduleName, "getConfig", data.dataSource, key)
-    return C.db.profile.dataSource[data.dataSource][key] 
+    --D.Debug(moduleName, "getConfig", data.dataSource, key)
+    return C.db.profile.dataSource[data.dataSource][key]
 end
 
 function module:OnAnimation(mark)
-    D.AnimateX(mark, function() D:SendMessage("mark:AnimateXEnd", mark) end )    
+    D.AnimateX(mark, function() D:SendMessage("mark:AnimateXEnd", mark) end )
 end
 
-function module:CreateMark(id, data)    
+function module:CreateMark(id, data)
     D.Debug(moduleName, "CreateMark", id, data)
 
     local position = D.String2Position(self:getConfig(data, "markPosition"), data.dataSource)
@@ -74,13 +76,14 @@ end
 
 function module:UpdateMark(id, data)
 
+    D.Debug(moduleName, "UpdateMark", id)
+
     local m = self:GetMark(id)
 
     if data then
         m.data = data
+        D.Debug(moduleName, "UpdateMark", id, m)
     end
-
-    D.Debug(moduleName, "UpdateMark", m)
 
     local flip = match(self:getConfig(m.data, "markPosition"), "TOP") == nil
     local newPos = D.String2Position(self:getConfig(m.data, "markPosition"), m.data.dataSource)
@@ -101,15 +104,16 @@ function module:UpdateMark(id, data)
 
     if data then
         D:SendMessage(moduleName .. ":Update", id, m)
-    end    
+    end
 
     return m
 end
 
 function module:DeleteMark(id)
-    if not id then
-        return
-    end
+
+    D.Debug(moduleName, "DeleteMark x", id)
+
+    if not id then return end
 
     if not marks[id] then
         return
@@ -131,7 +135,7 @@ function module:Config(key, value)
     end
 
     if key == "dataSource" then
-        self:GetMark(D.nameRealm).data = D:GetModule(C.db.profile.mark.dataSource):GetData()        
+        self:GetMark(D.nameRealm).data = D:GetModule(C.db.profile.mark.dataSource):GetData()
     end
 
     for mid, mark in pairs(marks) do
@@ -163,11 +167,11 @@ function module:Update(msg, id, data, sourceEvent)
 
 
     if not self:GetMark(markID) then
-       self:CreateMark(markID, data)        
+       self:CreateMark(markID, data)
     end
-    
+
     self:UpdateMark(markID, data)
-    
+
 end
 
 function module:HasMark(id)
