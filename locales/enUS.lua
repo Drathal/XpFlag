@@ -1,5 +1,9 @@
 local D, C, L = _G.unpack(_G.select(2, ...))
 
+L["i18n"] = function(string)
+    return L[string] or string
+end
+
 L["DESCRIPTION"] = "Its shows player experience at the top of the Screen. It can also Sync your Battle.net Friends Experience."
 
 L["SECTION_BAR"] = "Personal Bar"

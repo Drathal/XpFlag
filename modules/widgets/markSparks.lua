@@ -13,20 +13,12 @@ local moduleName = "markSpark"
 local module = D:NewModule(moduleName, "AceEvent-3.0")
 
 function module:PlaySpark(sparkList, parent)
-    --@alpha@
-    D.Debug(moduleName, "PlaySpark", sparkList, parent)
-    assert(sparkList, "markSpark:PlaySpark - sparkList is missing")
-    assert(parent, "markSpark:PlaySpark - parent is missing")
-    --@end-alpha@
-
     for k, spark in pairs(sparkList) do
         if not spark.ag:IsPlaying() then
             local f1, p, f2, xOfs, yOfs = parent:GetPoint()
 
             spark:ClearAllPoints()
             spark:SetPoint(f1, p, f2, xOfs, yOfs)
-
-            D.Debug(moduleName, "PlaySpark - POS", parent:GetPoint())
 
             local ySpread1, ySpread2 = unpack(C.sparkXP.ySpread)
             if match(C.db.profile.mark.position, "TOP") == nil then
@@ -47,16 +39,8 @@ function module:PlaySpark(sparkList, parent)
 end
 
 function module:OnSparkPlay(f)
-    --@alpha@
-    D.Debug(moduleName, "OnSparkPlay", f, f:GetParent().data.gain)
-    assert(f, "markSparks:OnSparkPlay - f is missing")
-    assert(f.text, "markSparks:OnSparkPlay - f.text is missing")
-    assert(f:GetParent().data, "markSparks:OnSparkPlay - f:GetParent().data is missing")
-    --@end-alpha@
-
     local gain = f:GetParent().data.gain
     if not gain or gain == "0" then
-        D.Debug(moduleName, "OnSparkPlay STOPPED", gain)
         f.ag:Stop()
         return
     end
@@ -65,18 +49,10 @@ function module:OnSparkPlay(f)
 end
 
 function module:OnSparkFinished(f)
-    --@alpha@
-    D.Debug(moduleName, "OnSparkFinished", f)
-    --@end-alpha@
-
     f.text:SetText("")
 end
 
 function module:AddSpark(parent, i)
-    --@alpha@
-    D.Debug(moduleName, "AddSpark", parent, i)
-    --@end-alpha@
-
     local f = CreateFrame("Frame", parent:GetName() .. "_spark_" .. i, parent)
     f:SetPoint("CENTER", _G[parent:GetName()], "CENTER", 0, 0)
     f:SetHeight(C.db.profile.mark.size)
@@ -128,28 +104,18 @@ function module:AddSpark(parent, i)
 end
 
 function module:PlayXpSpark(msg, name, f)
-    --@alpha@
-    D.Debug(moduleName, "PlayXpSpark", msg, name)
-    assert(name, "markSpark:PlayXpSpark - name is missing")
-    assert(f, "markSpark:PlayXpSpark - f is missing")
-    assert(f.data, "markSpark:PlayXpSpark - f.data is missing")
-    --@end-alpha@
-
     if not f.sparks then
         return
     end
-    if not f.data.gain or f.data.gain == 0 then
+
+    if not f.data.gain or f.data.gain < 1 then
         return
     end
-    f.sparks.Play(D.FormatNumber(f.data.gain, 2))
+
+    f.sparks.Play(D.FormatNumber(f.data.gain, 2))    
 end
 
 function module:Create(parent)
-    --@alpha@
-    D.Debug(moduleName, "Create", parent)
-    assert(parent, "markSparks:Create - parent is missing")
-    --@end-alpha@
-
     local f = {}
     f.sparkList = {}
 
@@ -171,8 +137,5 @@ function module:Create(parent)
 end
 
 function module:OnEnable()
-    --@alpha@
-    D.Debug(moduleName, "OnEnable")
-    --@end-alpha@
     self:RegisterMessage("mark:Update", "PlayXpSpark")
 end

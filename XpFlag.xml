@@ -12,6 +12,7 @@
 	<Include file="libs\AceConfig-3.0\AceConfig-3.0.xml"/>
     <Include file="libs\AceSerializer-3.0\AceSerializer-3.0.xml"/>
 	<Include file="libs\AceDBOptions-3.0\AceDBOptions-3.0.xml"/>
+	<Script file="libs\ALibArtifactData-1.0\LibArtifactData-1.0.lua"/>
 
 	<!-- app -->
 	<Script file="XpFlag.lua"/>
@@ -29,6 +30,6 @@
 	<Script file="modules\widgets\mark.lua"/>
 	<Script file="modules\widgets\markSparks.lua"/>
 	<Script file="modules\widgets\markModel.lua"/>
-	<Script file="modules\widgets\bar.lua"/>
+	<Script file="modules\widgets\markBar.lua"/>
 
 </Ui>

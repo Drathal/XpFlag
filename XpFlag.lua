@@ -34,19 +34,4 @@ AddOn.woWBuild = _G.tonumber(AddOn.woWBuild)
 --@alpha@
 AddOn.fakeCom = true
 AddOn.fakeName = "dummy-Madmortem"
-AddOn.debug = {
-    --mark = true,
-    --markSpark = true,
-    --markModel = true,
-    --markTooltip = true,
-    --dataSource = true,
-    --dataXp = true,
-    --dataRep = true,
-    --dataAp = true,
-    --com = true,
-    --bar = true,
-    --friends = true
-    --utils = true
-    --debug = true
-}
 --@end-alpha@

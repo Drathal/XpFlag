@@ -21,26 +21,23 @@ local CopyTable = _G.CopyTable
 local moduleName = "dataRep"
 local module = D:NewModule(moduleName, "AceEvent-3.0")
 
-local nameRealm = UnitName("player") .. "-" .. GetRealmName()
+local nameRealm = UnitName("player") .. "-" .. GetRealmName() 
 local data = nil
 local setByAddon = false
 
 _G["FACTION_STANDING_LABEL" .. (MAX_REPUTATION_REACTION + 1)] = L["Paragon"]
 --COLORS[MAX_REPUTATION_REACTION + 1] = {0, 0.5, 0.9} -- paragon color
 
+function module:shouldActivate()
+    return true
+end
+
 function module:OnEnable()
-    --@alpha@
-    D.Debug(moduleName, "OnEnable")
-    --@end-alpha@
+    if not self:shouldActivate() then return self:Disable() end
 
     hooksecurefunc(
         "SetWatchedFactionIndex",
         function(factionIndex)
-            --@alpha@
-            D.Debug(moduleName, "SetWatchedFactionIndex", factionIndex)
-            --@end-alpha@
-
-
             if not setByAddon then
                 self:Update()
             else
@@ -53,10 +50,6 @@ function module:OnEnable()
 end
 
 function module:OnDisable()
-    --@alpha@
-    D.Debug(moduleName, "OnDisable")
-    --@end-alpha@
-
     self:UnregisterEvent("UPDATE_FACTION")
 end
 
@@ -115,7 +108,7 @@ function module:GetData(mix)
 
     d.gain = tonumber(d.value) - tonumber(d.prevValue[d.hashKey] or 0) or 0
 
-    if d.gain < 1 then
+    if d.gain < 1 or tonumber(d.prevValue[d.hashKey] or 0) == 0 then
         d.gain = 0
     end
 
@@ -139,6 +132,8 @@ end
 
 function module:Update(event, unit)
 
+    --D.Debug(moduleName, "Update")
+
     if event == "PLAYER_ENTERING_WORLD" then
         self:UnregisterEvent("PLAYER_ENTERING_WORLD")
     end
@@ -146,9 +141,6 @@ function module:Update(event, unit)
     data = self:GetData(data)
 
     if data.prevHash ~= data.hash then
-        --@alpha@
-        D.Debug(moduleName, "Update - SendMessage", moduleName .. ":Update", nameRealm)
-        --@end-alpha@
         D:SendMessage(moduleName .. ":Update", nameRealm, data)
     end
 

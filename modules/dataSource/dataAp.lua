@@ -21,19 +21,17 @@ local module = D:NewModule(moduleName, "AceEvent-3.0")
 local nameRealm = UnitName("player") .. "-" .. GetRealmName()
 local data = nil
 
+function module:shouldActivate()
+    return UnitLevel("PLAYER") >= 100 and UnitLevel("PLAYER") <= 110
+end
+
 function module:OnEnable()
-    --@alpha@
-    D.Debug(moduleName, "OnEnable")
-    --@end-alpha@
+    -- if not self:shouldActivate() then return self:Disable() end
 
     self:RegisterEvent("ARTIFACT_UPDATE", "Update")    
 end
 
 function module:OnDisable()
-    --@alpha@
-    D.Debug(moduleName, "OnDisable")
-    --@end-alpha@
-
     self:UnregisterEvent("ARTIFACT_UPDATE")
 end
 
@@ -79,7 +77,7 @@ function module:GetData(mix)
 
     d.gain = tonumber(d.value) - tonumber(d.prevValue[d.hashKey] or 0) or 0
 
-    if d.gain < 1 then
+    if d.gain < 1 or tonumber(d.prevValue[d.hashKey] or 0) == 0 then
         d.gain = 0
     end
 
@@ -102,12 +100,12 @@ function module:AddTooltip(tooltip, d)
 end
 
 function module:Update(event, unit)
+
+    --D.Debug(moduleName, "Update")
+
     data = self:GetData(data)
 
     if data.prevHash ~= data.hash then
-        --@alpha@
-        D.Debug(moduleName, "Update - SendMessage", moduleName .. ":Update", nameRealm)
-        --@end-alpha@
         D:SendMessage(moduleName .. ":Update", nameRealm, data)
     end
 

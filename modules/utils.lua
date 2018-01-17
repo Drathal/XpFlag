@@ -20,10 +20,6 @@ local tostring = _G.tostring
 local PARAMETER_COLORS = {"|cff88ff88"}
 
 local function Debug(module, ...)
-    if D.debug and not D.debug[module] then
-        return
-    end
-
     local msg = "|cffffff78 " .. tostring(module) .. "|r : "
     for n = 1, select("#", ...) do
         msg = msg .. " " .. (PARAMETER_COLORS[n] or " |cffffffff") .. tostring(select(n, ...)) .. "|r"
@@ -130,14 +126,15 @@ end
 
 local function FormatNumber(num, places)
     local placeValue = ("%%.%df"):format(places or 2)
+    num = tonumber(num)
     if not num then
         return 0
     elseif num >= 1e12 then
-        return placeValue:format(num / 1e12) .. " T"
+        return placeValue:format(num / 1e12) .. "T"
     elseif num >= 1e9 then
-        return placeValue:format(num / 1e9) .. " B"
+        return placeValue:format(num / 1e9) .. "B"
     elseif num >= 1e6 then
-        return placeValue:format(num / 1e6) .. " M"
+        return placeValue:format(num / 1e6) .. "M"
     elseif num >= 1e3 then
         return placeValue:format(num / 1e3) .. "K"
     else

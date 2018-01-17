@@ -9,7 +9,7 @@ local pairs = _G.pairs
 
 local bars = {}
 
-local moduleName = "bar"
+local moduleName = "markBar"
 local module = D:NewModule(moduleName, "AceEvent-3.0")
 
 function module:OnAnimation(bar, elapsed)
@@ -20,28 +20,16 @@ function module:OnEnable()
     if not C.db.profile.bar.show then
         return
     end
-    --@alpha@
-    D.Debug(moduleName, "OnEnable")
-    --@end-alpha@
 
     self:RegisterMessage("dataSource:Update", "Update")
 end
 
 function module:OnDisable()
-    --@alpha@
-    D.Debug(moduleName, "OnDisable")
-    --@end-alpha@
-
     self.DeleteBar(D.nameRealm)
     self:UnregisterMessage("dataSource:Update")
 end
 
 function module:CreateBar(id)
-    --@alpha@
-    D.Debug(moduleName, "CreateBar", id)
-    assert(id, "bar:CreateBar - id is missing")
-    --@end-alpha@
-
     local bar = CreateFrame("Frame", nil, _G[select(2, unpack(C.barpositions[C.db.profile.bar.position]))])
     bar.name = id
     bar:SetHeight(C.db.profile.bar.height)
@@ -80,11 +68,6 @@ function module:CreateBar(id)
 end
 
 function module:DeleteBar(id)
-    --@alpha@
-    D.Debug(moduleName, "DeleteBar", id)
-    assert(id, "bar:DeleteBar - id is missing")
-    --@end-alpha@
-
     if not bars[id] then
         return
     end
@@ -118,10 +101,6 @@ function module:UpdateBar(id, data)
 end
 
 function module:Config(key, value)
-    --@alpha@
-    D.Debug(moduleName, "Config", key, value)
-    --@end-alpha@
-
     if key == "show" and value then
         self:UpdateBar(D.nameRealm, D:GetModule(C.db.profile.bar.dataSource):GetData())
     end
@@ -141,13 +120,6 @@ function module:Config(key, value)
 end
 
 function module:Update(msg, id, data, source)
-    --@alpha@
-    assert(msg, "bar:Update - msg is missing")
-    assert(id, "bar:Update - id is missing")
-    assert(data, "bar:Update - data is missing")
-    assert(source, "bar:Update - source is missing")
-    --@end-alpha@
-
     if C.db.profile.bar.dataSource .. ":Update" ~= source then
         return
     end
@@ -155,26 +127,13 @@ function module:Update(msg, id, data, source)
         return
     end
 
-    --@alpha@
-    D.Debug(moduleName, "Update", msg, id, data, source)
-    --@end-alpha@
-
     self:UpdateBar(id, data)
 end
 
 function module:GetBar(id)
-    --@alpha@
-    D.Debug(moduleName, "GetBar", id)
-    assert(id, "bar:GetBar - id is missing")
-    --@end-alpha@
-
     return bars[id]
 end
 
 function module:GetBars()
-    --@alpha@
-    D.Debug(moduleName, "GetBars")
-    --@end-alpha@
-
     return bars
 end

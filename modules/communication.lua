@@ -35,8 +35,6 @@ local fakeData = {
 function module:FakeSendAddonMessage(prefix, msg, type, target)
     local _, data = self:Deserialize(msg)
 
-    D.Debug(moduleName, "FakeSendAddonMessage", data.type, prefix, type, target)
-
     fakeData.level = random(UnitLevel("PLAYER") - 1, UnitLevel("PLAYER") + 1)
     fakeData.rested = random(100, 300)
     fakeData.gain = random(100, 300)
@@ -77,12 +75,6 @@ end
 --@end-alpha@
 
 function module:Send(type, target, data)
-    --@alpha@
-    assert(type, "com:Send - type is missing")
-    assert(target, "com:Send - target is missing")
-    assert(match(target, "%-") == "-", "com:Send - target has no relam ")
-    --@end-alpha@
-
     if not match(target, "%-") then
         return
     end
@@ -92,8 +84,7 @@ function module:Send(type, target, data)
 
     --@alpha@
     if target ~= D.fakeName then
-        D.Debug(moduleName, "Send", type, target)
-        --@end-alpha@
+    --@end-alpha@
         self:SendCommMessage(MessagePrefix, self:Serialize(data), "WHISPER", target)
     --@alpha@
     end
@@ -131,10 +122,6 @@ function module:SendUpdates(msg, id, data, source)
 
     for target, _ in pairs(D:GetModule("mark"):GetMarks()) do
         if target and target ~= D.nameRealm then
-            --@alpha@
-            D.Debug(moduleName, "SendUpdates", id, data)
-            --@end-alpha@
-
             self:SendUpdate(id, data)
         end
     end
@@ -165,11 +152,6 @@ function module:OnCommReceived(pre, rawmsg, chan, sender)
     end
 
     local success, data = self:Deserialize(rawmsg)
-
-    --@alpha@
-    assert(success, "OnCommReceived:Deserialize failed")
-    D.Debug(moduleName, "OnCommReceived", data.type, pre, chan, sender, data)
-    --@end-alpha@
 
     if not success then
         return

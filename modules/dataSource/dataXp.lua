@@ -22,13 +22,15 @@ local format = _G.string.format
 local moduleName = "dataXp"
 local module = D:NewModule(moduleName, "AceEvent-3.0")
 
-local nameRealm = UnitName("player") .. "-" .. GetRealmName()
+local nameRealm = UnitName("player") .. "-" .. GetRealmName() 
 local data = nil
 
+function module:shouldActivate()
+    return not (MAX_PLAYER_LEVEL_TABLE[GetExpansionLevel()] == UnitLevel("PLAYER"))
+end
+
 function module:OnEnable()
-    --@alpha@
-    D.Debug(moduleName, "OnEnable")
-    --@end-alpha@
+    if not self:shouldActivate() then return self:Disable() end
 
     self:RegisterEvent("PLAYER_ENTERING_WORLD", "Update")
     self:RegisterEvent("PLAYER_UPDATE_RESTING", "Update")
@@ -39,10 +41,6 @@ function module:OnEnable()
 end
 
 function module:OnDisable()
-    --@alpha@
-    D.Debug(moduleName, "OnDisable")
-    --@end-alpha@
-
     self:UnregisterEvent("PLAYER_UPDATE_RESTING")
     self:UnregisterEvent("ZONE_CHANGED_NEW_AREA")
     self:UnregisterEvent("PLAYER_XP_UPDATE")
@@ -99,9 +97,6 @@ function module:Update(event, unit)
     data = self:GetData(data)
 
     if data.prevHash ~= data.hash then
-        --@alpha@
-        D.Debug(moduleName, "Update - SendMessage", moduleName .. ":Update", nameRealm)
-        --@end-alpha@
         D:SendMessage(moduleName .. ":Update", nameRealm, data)
     end
 

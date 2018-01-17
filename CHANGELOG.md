@@ -1,5 +1,10 @@
 ## CHANGELOG
 
+### 2.0.0
+
+  * feature: new options menu
+  * chore: refactor reputation, xp and ap data Source 
+
 ### 1.2.0
 
   * feature: new data source: aritfact power

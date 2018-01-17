@@ -7,9 +7,6 @@ local GameTooltip = _G.GameTooltip
 local COLORS = _G.RAID_CLASS_COLORS
 local format = _G.string.format
 local pairs = _G.pairs
---@alpha@
-local assert = _G.assert
---@end-alpha@
 
 local moduleName = "markTooltip"
 local module = D:NewModule(moduleName)
@@ -31,10 +28,6 @@ local function OnUpdate(parent, elapsed)
 end
 
 function module:Create(parent)
-    --@alpha@
-    D.Debug(moduleName, "Create")
-    --@end-alpha@
-
     local tooltip = CreateFrame("Frame", nil, parent)
     tooltip:Hide()
 
