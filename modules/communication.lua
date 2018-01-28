@@ -7,6 +7,7 @@ local split = _G.strsplit
 local UnitLevel = _G.UnitLevel
 
 local MessagePrefix = "XPF1"
+local MSG_TYPE_UPDATE = "UPDATE"
 local MSG_TYPE_DATA = "DATA"
 local MSG_TYPE_REQUEST = "RESQUEST"
 local MSG_TYPE_DELETE = "DELETE"
@@ -16,64 +17,6 @@ local MSG_TYPE_PONG = "PONG"
 local moduleName = "com"
 local module = D:NewModule(moduleName, "AceEvent-3.0", "AceSerializer-3.0", "AceComm-3.0")
 
---@alpha@
--- mock communication
-local After = _G.C_Timer.After
-local assert = _G.assert
-local select = _G.select
-local random = _G.math.random
-local vv = 0
-local fakeData = {
-    dataSource = "dataXp",
-    name = select(1, split("-", D.fakeName)),
-    realm = select(2, split("-", D.fakeName)),
-    class = "MONK",
-    isMax = false,
-    max = 5000
-}
-
-function module:FakeSendAddonMessage(prefix, msg, type, target)
-    local _, data = self:Deserialize(msg)
-
-    fakeData.level = random(UnitLevel("PLAYER") - 1, UnitLevel("PLAYER") + 1)
-    fakeData.rested = random(100, 300)
-    fakeData.gain = random(100, 300)
-
-    vv = vv + fakeData.gain
-    fakeData.value = vv
-
-    if fakeData.value > 4999 then
-        fakeData.value = 0
-        vv = 0
-    end
-
-    if data.type == MSG_TYPE_PING then
-        fakeData.type = MSG_TYPE_PONG
-    end
-
-    if data.type == MSG_TYPE_REQUEST or data.type == MSG_TYPE_DATA then
-        fakeData.type = MSG_TYPE_DATA
-        After(
-            random(1, 5),
-            function()
-                if not fakeData.type then
-                    return
-                end
-                self:SendUpdate(D.fakeName, fakeData)
-            end
-        )
-    end
-
-    if data.type == MSG_TYPE_DELETE then
-        fakeData.type = nil
-    end
-
-    if fakeData.type then
-        self:OnCommReceived(MessagePrefix, self:Serialize(fakeData), "WHISPER", D.fakeName)
-    end
-end
---@end-alpha@
-
 function module:Send(type, target, data)
     if not match(target, "%-") then
         return
@@ -82,37 +25,7 @@ function module:Send(type, target, data)
     data = data or {}
     data.type = type
 
-    --@alpha@
-    if target ~= D.fakeName then
-    --@end-alpha@
-        self:SendCommMessage(MessagePrefix, self:Serialize(data), "WHISPER", target)
-    --@alpha@
-    end
-
-    if target == D.fakeName then
-        self:FakeSendAddonMessage(MessagePrefix, self:Serialize(data), "WHISPER", target)
-    end
-    --@end-alpha@
-end
-
-function module:SendRequest(target, data)
-    self:Send(MSG_TYPE_REQUEST, target, data)
-end
-
-function module:SendDelete(target, data)
-    self:Send(MSG_TYPE_DELETE, target, data)
-end
-
-function module:SendPing(target, data)
-    self:Send(MSG_TYPE_PING, target, data)
-end
-
-function module:SendPong(target, data)
-    self:Send(MSG_TYPE_PONG, target, data)
-end
-
-function module:SendUpdate(target, data)
-    self:Send(MSG_TYPE_DATA, target, data)
+    self:SendCommMessage(MessagePrefix, self:Serialize(data), "WHISPER", target)
 end
 
 function module:SendUpdates(msg, id, data, source)
@@ -157,25 +70,10 @@ function module:OnCommReceived(pre, rawmsg, chan, sender)
         return
     end
 
-    if data.type == MSG_TYPE_DATA then
-        D:SendMessage("com:Data", sender, data)
-    end
-
-    if data.type == MSG_TYPE_PING then
-        self:SendPong(sender)
-        D:SendMessage("com:Ping", sender, data)
-    end
-
-    if data.type == MSG_TYPE_PONG then
-        self:SendMessage("com:Pong", sender, data)
-    end
+    D:SendMessage("com:Update", sender, data)
 
     if data.type == MSG_TYPE_REQUEST then
-        self:SendUpdate(sender)
-        D:SendMessage("com:Request", sender, data)
+        self:Send(MSG_TYPE_DATA, sender, data)
     end
 
-    if data.type == MSG_TYPE_DELETE then
-        D:SendMessage("com:Delete", sender, data)
-    end
 end

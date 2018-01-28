@@ -19,18 +19,12 @@ local moduleName = "mark"
 local module = D:NewModule(moduleName, "AceEvent-3.0")
 
 function module:OnEnable()
-    self:RegisterMessage("com:Data", "Update")
-    self:RegisterMessage("com:Request", "Update")
-    self:RegisterMessage("com:Delete", "DeleteMark")
-    self:RegisterMessage("dataSource:Disable", "DeleteMark")
+    self:RegisterMessage("com:Update", "Update")
     self:RegisterMessage("dataSource:Update", "Update")
 end
 
 function module:OnDisable()
-    self:UnregisterMessage("com:Data")
-    self:UnregisterMessage("com:Request")
-    self:UnregisterMessage("com:Delete")
-    self:UnregisterMessage("dataSource:Disable")
+    self:UnregisterMessage("com:Update")
     self:UnregisterMessage("dataSource:Update")
 end
 
@@ -125,6 +119,10 @@ function module:DeleteMark(id)
     D:SendMessage("mark:Delete", id)
 end
 
+function module:getConfig(key)
+    return C.db.profile.dataSource[moduleName][key]
+end
+
 function module:Config(key, value)
     if key == "showPlayer" and value and not self:GetMark(D.nameRealm) then
         self:CreateMark(D.nameRealm, D:GetModule(C.db.profile.mark.dataSource):GetData())
@@ -148,8 +146,6 @@ function module:Update(msg, id, data, sourceEvent)
 
     D.Debug(moduleName, "Update", msg, id, data, sourceEvent)
 
-
-
 --[[
     if C.db.profile.mark.dataSource .. ":Update" ~= source and id == D.nameRealm then
         return
@@ -158,13 +154,13 @@ function module:Update(msg, id, data, sourceEvent)
     if not C.db.profile.mark.showPlayer and id == D.nameRealm then
         return
     end
+]]
 
     if data.isMax then
         return self:DeleteMark(id)
     end
-]]
-    local markID = id .. "-" .. data.dataSource
 
+    local markID = id .. "-" .. data.dataSource
 
     if not self:GetMark(markID) then
        self:CreateMark(markID, data)

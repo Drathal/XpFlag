@@ -47,10 +47,9 @@ function module:OnEnable()
     self:RegisterEvent("CHAT_MSG_SYSTEM", "Update")
 end
 
-function module:OnDisable(d)
+function module:OnDisable()
     D.Debug(moduleName, "disabled")
-
-    D:SendMessage(moduleName .. ":Update", nameRealm, d)
+    D:SendMessage(moduleName .. ":Update", nameRealm, data)
 
     self:UnregisterEvent("PLAYER_ENTERING_WORLD")
     self:UnregisterEvent("PLAYER_UPDATE_RESTING")
@@ -114,6 +113,6 @@ function module:Update(event, unit)
     data.prevHash = data.hash
 
     if data.isMax then
-        self:Disable(data)
+        self:Disable()
     end
 end

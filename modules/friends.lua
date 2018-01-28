@@ -76,14 +76,6 @@ function module:GetFriendNameByButton(button)
         data = self:GetFriendName(button.id)
     end
 
-    --@alpha@
-    if button == FriendsFrameBattlenetFrame then
-        data = D.fakeName
-        button:GetParent().friend = data
-        D.Debug(moduleName, "GetFriendNameByButton:fake", data)
-    end
-    --@end-alpha@
-
     return data
 end
 
@@ -94,11 +86,15 @@ function module:OnButtonClick(f)
 
     if D:GetModule("mark"):GetMark(f.friend) then
         D:GetModule("mark"):DeleteMark(f.friend)
-        D:GetModule("com"):SendDelete(f.friend)
+        -- D:GetModule("com"):SendDelete(f.friend)
     else
-        D:GetModule("com"):SendRequest(f.friend)
+        -- D:GetModule("com"):SendRequest(f.friend)
     end
-    tooltip:AddLine(format(L["XP_MARK_TT_1"], D.addonName))
+
+    GameTooltip:SetOwner(f, "ANCHOR_RIGHT")
+    GameTooltip:ClearLines()
+    GameTooltip:AddLine(format(L["XP_MARK_TT_1"], D.addonName))
+
     self:OnFriendsFrameUpdate()
 end
 
@@ -171,7 +167,8 @@ function module:Ping(friend)
         return
     end
 
-    D:GetModule("com"):SendPing(friend)
+    -- D:GetModule("com"):SendPing(friend)
+
     pinged[friend] = GetTime()
 end
 
@@ -204,14 +201,10 @@ function module:OnFriendsFrameUpdate()
     wipe(online)
     local buttons = FriendsFrameFriendsScrollFrame.buttons
 
-    --@alpha@
-    if D.fakeCom then
-        self:UpdateFriendButton(_G.FriendsFrameBattlenetFrame)
-    end
-    --@end-alpha@
-
     for i = 1, #buttons do
-        if (buttons[i].buttonType == FRIENDS_BUTTON_TYPE_WOW or buttons[i].buttonType == FRIENDS_BUTTON_TYPE_BNET) and buttons[i].gameIcon:IsVisible() then
+        if (buttons[i].buttonType == FRIENDS_BUTTON_TYPE_WOW
+            or buttons[i].buttonType == FRIENDS_BUTTON_TYPE_BNET)
+            and buttons[i].gameIcon:IsVisible() then
             self:UpdateFriendButton(buttons[i])
         end
     end
@@ -238,7 +231,7 @@ function module:getFriendProp(friend, propName)
     return hasAddonCache[friend][propName]
 end
 
-function module:OnData(event, friend, data)
+function module:OnUpdate(event, friend, data)
     if friend == D.nameRealm then
         return
     end
@@ -263,7 +256,5 @@ function module:OnEnable()
         end
     )
 
-    self:RegisterMessage("com:Pong", "OnData")
-    self:RegisterMessage("com:Data", "OnData")
-    self:RegisterMessage("com:Delete", "OnData")
+    self:RegisterMessage("com:Update", "OnUpdate")
 end

@@ -39,10 +39,9 @@ function module:OnEnable()
     self:RegisterEvent("ARTIFACT_UPDATE", "Update")
 end
 
-function module:OnDisable(d)
+function module:OnDisable()
     D.Debug(moduleName, "disabled")
-
-    D:SendMessage(moduleName .. ":Update", nameRealm, d)
+    D:SendMessage(moduleName .. ":Update", nameRealm, data)
 
     self:UnregisterEvent("PLAYER_ENTERING_WORLD")
     self:UnregisterEvent("ARTIFACT_UPDATE")
@@ -126,6 +125,6 @@ function module:Update(event, unit)
     data.prevHash = data.hash
 
     if data.isMax then
-        self:Disable(data)
+        self:Disable()
     end
 end

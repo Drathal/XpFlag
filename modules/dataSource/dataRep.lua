@@ -10,6 +10,7 @@ local GetNumFactions = _G.GetNumFactions
 local GetFactionInfo = _G.GetFactionInfo
 local IsFactionParagon = _G.IsFactionParagon
 local GetFactionInfoByID = _G.GetFactionInfoByID
+local GetWatchedFactionInfo = _G.GetWatchedFactionInfo
 local FACTION_BAR_COLORS = _G.FACTION_BAR_COLORS
 local COLORS = _G.RAID_CLASS_COLORS
 local MAX_REPUTATION_REACTION = _G.MAX_REPUTATION_REACTION
@@ -61,8 +62,7 @@ end
 
 function module:OnDisable()
     D.Debug(moduleName, "disabled")
-
-    D:SendMessage(moduleName .. ":Disable", nameRealm)
+    D:SendMessage(moduleName .. ":Update", nameRealm, data)
 
     self:UnregisterEvent("PLAYER_ENTERING_WORLD")
     self:UnregisterEvent("UPDATE_FACTION")
